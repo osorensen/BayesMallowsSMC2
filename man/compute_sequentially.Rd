@@ -4,7 +4,30 @@
 \alias{compute_sequentially}
 \title{Compute the Bayesian Mallows model sequentially}
 \usage{
-compute_sequentially()
+compute_sequentially(data = NULL)
+}
+\arguments{
+\item{data}{A dataframe containing partial rankings or pairwise preferences.
+If \code{data} contains complete or partial rankings, it must have the following
+columns:
+
+\itemize{
+\item \code{timepoint}: a numeric vector denoting the timepoint, starting at 1.
+\item \code{user}: a vector identifying the user.
+\item \code{item1}: ranking of item 1.
+\item \code{item2}: ranking of item 2.
+\item etc.
+}
+
+If data contains pairwise preferences, it must have the following structure:
+
+\itemize{
+\item \code{timepoint}: a numeric vector denoting the timepoint, starting at 1.
+\item \code{user}: a vector identifying the user.
+\item \code{top_item}: identifier for the preferred item.
+\item \code{bottom_item}: identifier for the dispreferred item.
+\item etc.
+}}
 }
 \value{
 An object
