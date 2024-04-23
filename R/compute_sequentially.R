@@ -28,7 +28,16 @@
 #' @export
 #'
 #' @examples
-#' compute_sequentially()
+#' compute_sequentially(partial_rankings)
 compute_sequentially <- function(data = NULL){
-
+  if(any(grepl("item[0-9]+", colnames(data)))) {
+    type <- "rankings"
+  } else if(any(grepl("bottom\\_item", colnames(data))) &&
+            any(grepl("top\\_item", colnames(data)))) {
+    type <- "pairwise"
+  } else {
+    stop("Something wrong with data")
+  }
+  timeseries <- split(data, f = data$timepoint)
+  run_smc(timeseries)
 }
