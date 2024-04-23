@@ -7,7 +7,8 @@
 <!-- badges: end -->
 
 The goal of BayesMallowsSMC2 is to provide sequential inference in the
-Bayesian Mallows model using the SMC$^{2}$ algorithm.
+Bayesian Mallows model using the SMC$^{2}$ algorithm. Currently the
+package does nothing.
 
 ## Installation
 
