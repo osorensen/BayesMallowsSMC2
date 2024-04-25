@@ -36,5 +36,5 @@ An object
 Compute the Bayesian Mallows model sequentially
 }
 \examples{
-compute_sequentially()
+compute_sequentially(partial_rankings)
 }

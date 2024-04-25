@@ -30,14 +30,30 @@
 #' @examples
 #' compute_sequentially(partial_rankings)
 compute_sequentially <- function(data = NULL){
-  if(any(grepl("item[0-9]+", colnames(data)))) {
-    type <- "rankings"
-  } else if(any(grepl("bottom\\_item", colnames(data))) &&
-            any(grepl("top\\_item", colnames(data)))) {
-    type <- "pairwise"
+  rank_columns <- grepl("item[0-9]+", colnames(data))
+  preference_columns <- grepl("top\\_item|bottom\\_item", colnames(data))
+  if(any(rank_columns)) {
+    input_timeseries <- split(data, f = ~ timepoint) |>
+      lapply(split, f = ~ user) |>
+      lapply(function(x) lapply(x, function(y) as.numeric(y[rank_columns])))
+
+    if(any(is.na(data[rank_columns]))) {
+      attr(input_timeseries, "type") <- "partial rankings"
+    } else {
+      attr(input_timeseries, "type") <- "complete rankings"
+    }
+  } else if(sum(preference_columns) == 2) {
+    input_timeseries <- split(data, f = ~ timepoint) |>
+      lapply(split, f = ~ user) |>
+      lapply(function(x) lapply(x, function(y) as.matrix(y[preference_columns])))
+    attr(input_timeseries, "type") <- "pairwise preferences"
   } else {
     stop("Something wrong with data")
   }
-  timeseries <- split(data, f = data$timepoint)
-  run_smc(timeseries)
+
+  input_prior <- list(
+    alpha_shape = 1, alpha_rate = 10,
+    cluster_concentration = 10, n_clusters = 1
+  )
+  run_smc(input_timeseries, input_prior)
 }

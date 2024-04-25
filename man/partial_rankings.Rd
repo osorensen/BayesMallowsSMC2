@@ -14,11 +14,26 @@ A data frame with 100 rows and 7 columns:
 \item{item1, item2, item3, item4, item5}{Ranking given to the item.}
 }
 }
+
+\subsection{\code{partial_rankings}}{
+
+A data frame with 400 rows and 4 columns:
+\describe{
+\item{timepoint}{Timepoint}
+\item{user}{User id}
+\item{top_item}{Item preferred in the comparison.}
+\item{bottom_item}{Item disfavored in the comparison.}
+}
+}
 }
 \usage{
+partial_rankings
+
 partial_rankings
 }
 \description{
 Simulated Data with Missing Values
+
+Simulated Data with Pairwise Preferences
 }
 \keyword{datasets}
