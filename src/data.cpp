@@ -15,6 +15,15 @@ Rankings::Rankings(const Rcpp::List& input_timeseries) {
   }
 }
 
+void Rankings::print() {
+  for(auto timepoint : timeseries) {
+    for(auto observation : timepoint) {
+      Rcpp::Rcout << "user " << observation.first << std::endl
+                  << "rankings " << observation.second.t() << std::endl;
+    }
+  }
+}
+
 PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) {
   timeseries.reserve(input_timeseries.size());
   for(Rcpp::List a : input_timeseries) {
@@ -30,6 +39,22 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) {
       new_data.push_back(pairwise_obs(nm[i], user_data));
     }
     timeseries.push_back(new_data);
+  }
+}
+
+void PairwisePreferences::print() {
+  for(auto timepoint : timeseries) {
+    for(auto observation : timepoint) {
+      Rcpp::Rcout << "user " << observation.first << std::endl
+                  << "preferences ";
+      auto comparisons{observation.second};
+      std::for_each(comparisons.begin(), comparisons.end(),
+                    [](const single_comparison& s ){
+                      Rcpp::Rcout << s.first << "<" << s.second << ", ";
+                    });
+      Rcpp::Rcout << std::endl;
+    }
+    Rcpp::Rcout << std::endl;
   }
 }
 

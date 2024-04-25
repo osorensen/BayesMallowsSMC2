@@ -10,4 +10,4 @@ using single_comparison = std::pair<unsigned int, unsigned int>;
 using comparisons = std::set<single_comparison>;
 using pairwise_obs = std::pair<std::string, comparisons>;
 using pairwise_tp = std::vector<pairwise_obs>;
-using pairwise_ts= std::vector<pairwise_tp>;
+using pairwise_ts = std::vector<pairwise_tp>;

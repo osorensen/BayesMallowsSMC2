@@ -13,6 +13,7 @@ Rcpp::List run_smc(
 
   Prior prior{input_prior};
   auto data = setup_data(input_timeseries);
+  //data->print();
 
   return Rcpp::List::create(
     Rcpp::Named("a") = "b"
