@@ -18,6 +18,7 @@ struct Particle{
   arma::vec alpha;
   arma::umat rho;
   arma::vec tau;
+  std::vector<ParticleFilter> particle_filters;
 };
 
 std::vector<Particle> create_particle_vector(
