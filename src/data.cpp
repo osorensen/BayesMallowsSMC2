@@ -15,13 +15,6 @@ Rankings::Rankings(const Rcpp::List& input_timeseries) {
   }
 }
 
-CompleteRankings::CompleteRankings(const Rcpp::List& input_timeseries) :
-  Rankings(input_timeseries) {}
-
-PartialRankings::PartialRankings(const Rcpp::List& input_timeseries) :
-  Rankings(input_timeseries) {}
-
-
 void Rankings::print() {
   for(auto timepoint : timeseries) {
     for(auto observation : timepoint) {
@@ -67,9 +60,9 @@ void PairwisePreferences::print() {
 
 std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
   if(strcmp(input_timeseries.attr("type"), "complete rankings") == 0) {
-    return std::make_unique<CompleteRankings>(input_timeseries);
+    return std::make_unique<Rankings>(input_timeseries);
   } else if(strcmp(input_timeseries.attr("type"), "partial rankings") == 0) {
-    return std::make_unique<PartialRankings>(input_timeseries);
+    return std::make_unique<Rankings>(input_timeseries);
   } else if(strcmp(input_timeseries.attr("type"), "pairwise preferences") == 0) {
     return std::make_unique<PairwisePreferences>(input_timeseries);
   } else {

@@ -18,14 +18,6 @@ struct Rankings : Data {
   unsigned int n_timepoints() override { return timeseries.size(); }
 };
 
-struct CompleteRankings : Rankings {
-  CompleteRankings(const Rcpp::List& input_timeseries);
-};
-
-struct PartialRankings : Rankings {
-  PartialRankings(const Rcpp::List& input_timeseries);
-};
-
 struct PairwisePreferences : Data{
   PairwisePreferences(const Rcpp::List& input_timeseries);
   pairwise_ts timeseries;

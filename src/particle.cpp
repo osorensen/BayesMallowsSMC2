@@ -23,7 +23,7 @@ void Particle::run_particle_filter(unsigned int t) {
     particle_filters = tmp;
   }
 
-  // sample latent ranks
+  // sample latent rankings
 
   // sample cluster assignments
 
