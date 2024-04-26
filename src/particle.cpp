@@ -38,26 +38,26 @@ void Particle::run_particle_filter(
     vec log_cluster_contribution(prior.n_clusters);
 
     for(size_t c{}; c < prior.n_clusters; c++) {
-
       unsigned int total_distance{};
       for(size_t i{}; i < pf.latent_rankings.n_cols; i++) {
         total_distance += distfun->d(pf.latent_rankings.col(i), rho.col(c));
       }
-      Rcpp::Rcout << "total distance " << total_distance << std::endl;
-
-      // insert log partition function for 0
-      // insert distance function for 1
-      log_cluster_contribution(c) = log(tau(c)) - pfun->logz(alpha(c)) +
+      log_cluster_contribution(c) = log(tau(c)) - pfun->logz(alpha(c)) -
         alpha(c) / prior.n_items * total_distance;
     }
-    Rcpp::Rcout << log_cluster_contribution << std::endl;
-    // use log-sum-exp trick to compute the exp-sum of cluster contributions,
-    // then divide by the log proposal probability
+    double maxval = log_cluster_contribution.max();
+    double log_prob = maxval + log(accu(exp(log_cluster_contribution - maxval)));
+    pf.log_weight = log_prob - proposal.log_probability;
   }
+  Rcpp::NumericVector tmp_pf_weights(log_normalized_particle_filter_weights.size());
+  std::transform(
+    particle_filters.cbegin(), particle_filters.cend(), tmp_pf_weights.begin(),
+    [](const ParticleFilter& pf){ return pf.log_weight; });
 
-  // sample cluster assignments
+  double maxval = Rcpp::max(tmp_pf_weights);
+  log_normalized_particle_filter_weights =
+    tmp_pf_weights - (maxval + log(sum(exp(tmp_pf_weights - maxval))));
 
-  // compute weights
 }
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior) {
