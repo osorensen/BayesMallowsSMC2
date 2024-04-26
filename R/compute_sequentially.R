@@ -56,7 +56,7 @@ compute_sequentially <- function(data = NULL){
     cluster_concentration = 10, n_clusters = 2, n_items = 5
   )
   input_options <- list(
-    n_particles = 3, n_particle_filters = 2, metric = "footrule"
+    n_particles = 3, n_particle_filters = 2, metric = "spearman"
   )
   run_smc(input_timeseries, input_prior, input_options)
 }

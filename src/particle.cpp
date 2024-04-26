@@ -15,7 +15,9 @@ Particle::Particle(const Options& options, const Prior& prior) :
   }
 
 void Particle::run_particle_filter(
-    unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data) {
+    unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
+    const std::unique_ptr<PartitionFunction>& pfun,
+    const std::unique_ptr<Distance>& distfun) {
   // resample
   if(t > 0) {
     Rcpp::NumericVector probs = exp(log_normalized_particle_filter_weights);
@@ -34,12 +36,21 @@ void Particle::run_particle_filter(
     auto proposal = data->sample_latent_rankings(t, prior);
     pf.latent_rankings = proposal.proposal;
     vec log_cluster_contribution(prior.n_clusters);
+
     for(size_t c{}; c < prior.n_clusters; c++) {
+
+      unsigned int total_distance{};
+      for(size_t i{}; i < pf.latent_rankings.n_cols; i++) {
+        total_distance += distfun->d(pf.latent_rankings.col(i), rho.col(c));
+      }
+      Rcpp::Rcout << "total distance " << total_distance << std::endl;
+
       // insert log partition function for 0
       // insert distance function for 1
-      log_cluster_contribution(c) = log(tau(c)) - 0 +
-        alpha(c) / prior.n_items * 1;
+      log_cluster_contribution(c) = log(tau(c)) - pfun->logz(alpha(c)) +
+        alpha(c) / prior.n_items * total_distance;
     }
+    Rcpp::Rcout << log_cluster_contribution << std::endl;
     // use log-sum-exp trick to compute the exp-sum of cluster contributions,
     // then divide by the log proposal probability
   }

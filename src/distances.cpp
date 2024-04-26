@@ -36,7 +36,11 @@ unsigned int CayleyDistance::d(const uvec& r1, const uvec& r2) {
 }
 
 unsigned int FootruleDistance::d(const uvec& r1, const uvec& r2) {
-  return norm(r1 - r2, 1);
+  unsigned int value{};
+  for(size_t i{}; i < r1.size(); i++) {
+    value += r1[i] > r2[i] ? r1[i] - r2[i] : r2[i] - r1[i];
+  }
+  return value;
 }
 
 unsigned int HammingDistance::d(const uvec& r1, const uvec& r2) {
@@ -57,7 +61,11 @@ unsigned int KendallDistance::d(const uvec& r1, const uvec& r2) {
 }
 
 unsigned int SpearmanDistance::d(const uvec& r1, const uvec& r2) {
-  return std::pow(norm(r1 - r2, 2), 2);
+  unsigned int value{};
+  for(size_t i{}; i < r1.size(); i++) {
+    value += r1[i] > r2[i] ? pow(r1[i] - r2[i], 2) : pow(r2[i] - r1[i], 2);
+  }
+  return value;
 }
 
 // Rewritten from https://www.geeksforgeeks.org/c-program-for-longest-increasing-subsequence/

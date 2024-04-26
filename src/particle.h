@@ -4,6 +4,8 @@
 #include "prior.h"
 #include "data.h"
 #include "options.h"
+#include "partition_functions.h"
+#include "distances.h"
 
 struct ParticleFilter{
   ParticleFilter() {}
@@ -22,7 +24,10 @@ struct Particle{
   std::vector<ParticleFilter> particle_filters;
   double log_importance_weight{};
   Rcpp::NumericVector log_normalized_particle_filter_weights;
-  void run_particle_filter(unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data);
+  void run_particle_filter(
+      unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
+      const std::unique_ptr<PartitionFunction>& pfun,
+      const std::unique_ptr<Distance>& distfun);
 };
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);
