@@ -6,14 +6,14 @@
 #include "options.h"
 
 struct ParticleFilter{
-  ParticleFilter(const Data& dat);
+  ParticleFilter() {}
   ~ParticleFilter() = default;
   arma::umat latent_rankings;
   arma::uvec cluster_assignments;
 };
 
 struct Particle{
-  Particle(const Prior& prior);
+  Particle(const Options& options, const Prior& prior);
   ~Particle() = default;
   arma::vec alpha;
   arma::umat rho;
@@ -21,6 +21,6 @@ struct Particle{
   std::vector<ParticleFilter> particle_filters;
 };
 
-std::vector<Particle> create_particle_vector(
-  const Options& options, const Prior& prior, const std::unique_ptr<Data>& dat
-);
+std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);
+
+std::vector<ParticleFilter> create_particle_filters(const Options& options);

@@ -17,7 +17,7 @@ Rcpp::List run_smc(
   Prior prior{input_prior};
   Options options{input_options};
   auto data = setup_data(input_timeseries);
-  auto particle_vector = create_particle_vector(options, prior, data);
+  auto particle_vector = create_particle_vector(options, prior);
 
   return Rcpp::List::create(
     Rcpp::Named("a") = "b"
