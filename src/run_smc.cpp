@@ -6,6 +6,7 @@
 #include "particle.h"
 #include "options.h"
 #include "partition_functions.h"
+#include "distances.h"
 using namespace arma;
 
 // [[Rcpp::export]]
@@ -21,6 +22,7 @@ Rcpp::List run_smc(
   auto data = setup_data(input_timeseries);
   auto particle_vector = create_particle_vector(options, prior);
   auto pfun = choose_partition_function(prior.n_items, options.metric);
+  auto distfun = choose_distance_function(options.metric);
 
   for(size_t t{}; t < 2; t++) {
     for(auto& p : particle_vector) {
