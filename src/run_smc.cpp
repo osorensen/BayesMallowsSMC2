@@ -3,6 +3,7 @@
 #include <string>
 #include "prior.h"
 #include "data.h"
+#include "particle.h"
 using namespace arma;
 
 // [[Rcpp::export]]
@@ -14,6 +15,10 @@ Rcpp::List run_smc(
   Prior prior{input_prior};
   auto data = setup_data(input_timeseries);
   //data->print();
+  auto p = Particle(prior);
+  Rcpp::Rcout << "alpha " << p.alpha << std::endl
+              << "rho " << p.rho << std::endl
+              << "tau " << p.tau << std::endl;
 
   return Rcpp::List::create(
     Rcpp::Named("a") = "b"

@@ -8,4 +8,5 @@ struct Prior{
   double alpha_rate;
   int cluster_concentration;
   int n_clusters;
+  int n_items;
 };

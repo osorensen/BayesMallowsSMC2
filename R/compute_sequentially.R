@@ -52,8 +52,8 @@ compute_sequentially <- function(data = NULL){
   }
 
   input_prior <- list(
-    alpha_shape = 1, alpha_rate = 10,
-    cluster_concentration = 10, n_clusters = 1
+    alpha_shape = 1, alpha_rate = .1,
+    cluster_concentration = 10, n_clusters = 2, n_items = 5
   )
   run_smc(input_timeseries, input_prior)
 }
