@@ -5,6 +5,7 @@
 #include "data.h"
 #include "particle.h"
 #include "options.h"
+#include "partition_functions.h"
 using namespace arma;
 
 // [[Rcpp::export]]
@@ -16,8 +17,10 @@ Rcpp::List run_smc(
 
   Prior prior{input_prior};
   Options options{input_options};
+
   auto data = setup_data(input_timeseries);
   auto particle_vector = create_particle_vector(options, prior);
+  auto pfun = choose_partition_function(prior.n_items, options.metric);
 
   for(size_t t{}; t < 2; t++) {
     for(auto& p : particle_vector) {

@@ -1,4 +1,7 @@
 #include "partition_functions.h"
+#include <string>
+#include <RcppArmadillo.h>
+using namespace arma;
 
 std::unique_ptr<PartitionFunction> choose_partition_function(
     int n_items, std::string metric) {
@@ -8,12 +11,8 @@ std::unique_ptr<PartitionFunction> choose_partition_function(
     return std::make_unique<Hamming>(n_items);
   } else if(metric == "kendall") {
     return std::make_unique<Kendall>(n_items);
-  } else if(metric == "footrule") {
-    return std::make_unique<Footrule>(n_items);
-  } else if(metric == "spearman") {
-    return std::make_unique<Spearman>(n_items);
-  } else if(metric == "ulam") {
-    return std::make_unique<Ulam>(n_items);
+  } else if(metric == "footrule" || metric == "spearman" || metric == "ulam") {
+    return std::make_unique<Cardinalities>(n_items, metric);
   } else {
     Rcpp::stop("Unknown metric.");
   }
@@ -51,10 +50,23 @@ double Kendall::logz(double alpha) {
   return res;
 }
 
-Footrule::Footrule(unsigned int n_items) : n_items { n_items } {
+Cardinalities::Cardinalities(unsigned int n_items, const std::string& metric) :
+  n_items { n_items } {
+  mat tmp;
+  std::string filename = std::string("inst/partition_function_data/") +
+    metric + std::string("_") + std::to_string(n_items) + std::string("items.csv");
 
+  bool ok = tmp.load(filename);
+  if(ok == false) {
+    Rcpp::stop("Could not find partition function.");
+  }
+
+  distances = tmp.col(0);
+  cardinalities = tmp.col(1);
 }
 
-double Footrule::logz(double alpha) {
-  return std::log(arma::sum(cardinalities % exp(-alpha / n_items * distances)));
+double Cardinalities::logz(double alpha) {
+  return std::log(accu(cardinalities % exp(-distances * alpha / n_items)));
 }
+
+

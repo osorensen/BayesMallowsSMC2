@@ -29,26 +29,10 @@ struct Kendall : PartitionFunction {
   const unsigned int n_items;
 };
 
-struct Footrule : PartitionFunction {
-  Footrule(unsigned int n_items);
+struct Cardinalities : PartitionFunction {
+  Cardinalities(unsigned int n_items, const std::string& metric);
   double logz(double alpha) override;
   const unsigned int n_items;
-  arma::uvec cardinalities;
-  arma::uvec distances;
-};
-
-struct Spearman : PartitionFunction {
-  Spearman(unsigned int n_items);
-  double logz(double alpha) override;
-  const unsigned int n_items;
-  arma::uvec cardinalities;
-  arma::uvec distances;
-};
-
-struct Ulam : PartitionFunction {
-  Ulam(unsigned int n_items);
-  double logz(double alpha) override;
-  const unsigned int n_items;
-  arma::uvec cardinalities;
-  arma::uvec distances;
+  arma::vec distances;
+  arma::vec cardinalities;
 };
