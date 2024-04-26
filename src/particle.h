@@ -10,6 +10,8 @@ struct ParticleFilter{
   ~ParticleFilter() = default;
   arma::umat latent_rankings;
   arma::uvec cluster_assignments;
+  double normalized_log_weight{};
+  double log_weight{};
 };
 
 struct Particle{
@@ -19,7 +21,7 @@ struct Particle{
   arma::umat rho;
   arma::vec tau;
   std::vector<ParticleFilter> particle_filters;
-  double log_importance_weight{0};
+  double log_importance_weight{};
   void run_particle_filter(unsigned int t);
 };
 
