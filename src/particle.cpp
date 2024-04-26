@@ -7,7 +7,9 @@ Particle::Particle(const Options& options, const Prior& prior) :
   rho (umat(prior.n_items, prior.n_clusters)),
   tau (normalise(randg(prior.n_clusters, distr_param(prior.cluster_concentration, 1)), 1)),
   particle_filters(create_particle_filters(options)),
-  log_normalized_particle_filter_weights (Rcpp::NumericVector(options.n_particle_filters))
+  log_normalized_particle_filter_weights (
+      Rcpp::NumericVector(options.n_particle_filters, -log(options.n_particle_filters))
+  )
   {
     rho.each_col([&prior](uvec& a){ a = shuffle(regspace<uvec>(1, prior.n_items)); });
   }
@@ -24,7 +26,7 @@ void Particle::run_particle_filter(
     }
     particle_filters = tmp;
     std::fill(log_normalized_particle_filter_weights.begin(),
-              log_normalized_particle_filter_weights.end(), 0);
+              log_normalized_particle_filter_weights.end(), -log(particle_filters.size()));
   }
 
   // sample latent rankings
