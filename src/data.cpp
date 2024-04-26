@@ -1,4 +1,6 @@
+#include <math.h>
 #include "data.h"
+#include "misc.h"
 using namespace arma;
 
 Rankings::Rankings(const Rcpp::List& input_timeseries) {
@@ -56,6 +58,35 @@ void PairwisePreferences::print() {
     }
     Rcpp::Rcout << std::endl;
   }
+}
+
+LatentRankingProposal Rankings::sample_latent_rankings(
+    unsigned int t, const Prior& prior) {
+  LatentRankingProposal proposal;
+  ranking_tp new_data = timeseries[t];
+  uvec all_items = regspace<uvec>(0, prior.n_items - 1);
+  uvec all_rankings = regspace<uvec>(1, prior.n_items);
+  proposal.proposal = umat(prior.n_items, new_data.size());
+
+  for(size_t i{}; i < new_data.size(); i++) {
+    uvec observed_ranking = new_data[i].second;
+    uvec observed_items = find(observed_ranking);
+    uvec available_items = setdiff(all_items, observed_items);
+    uvec available_rankings = setdiff(all_rankings, observed_ranking);
+    uvec tmp = observed_ranking;
+    tmp(available_items) = shuffle(available_rankings);
+    proposal.proposal.col(i) = tmp;
+
+    proposal.log_probability -= lgamma(available_rankings.size() + 1.0);
+  }
+
+  return proposal;
+}
+
+LatentRankingProposal PairwisePreferences::sample_latent_rankings(
+    unsigned int t, const Prior& prior) {
+
+  return LatentRankingProposal();
 }
 
 std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {

@@ -21,7 +21,7 @@ Rcpp::List run_smc(
 
   for(size_t t{}; t < 2; t++) {
     for(auto& p : particle_vector) {
-      p.run_particle_filter(t);
+      p.run_particle_filter(t, prior, data);
     }
   }
 

@@ -22,7 +22,7 @@ struct Particle{
   std::vector<ParticleFilter> particle_filters;
   double log_importance_weight{};
   Rcpp::NumericVector log_normalized_particle_filter_weights;
-  void run_particle_filter(unsigned int t);
+  void run_particle_filter(unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data);
 };
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);
