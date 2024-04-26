@@ -19,6 +19,7 @@ struct Particle{
   arma::umat rho;
   arma::vec tau;
   std::vector<ParticleFilter> particle_filters;
+  double log_importance_weight{0};
 };
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);
