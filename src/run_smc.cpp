@@ -19,7 +19,7 @@ Rcpp::List run_smc(
   auto data = setup_data(input_timeseries);
   auto particle_vector = create_particle_vector(options, prior);
 
-  for(size_t t{}; t < 1; t++) {
+  for(size_t t{}; t < 2; t++) {
     for(auto& p : particle_vector) {
       p.run_particle_filter(t);
     }
