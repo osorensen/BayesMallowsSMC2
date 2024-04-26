@@ -12,20 +12,21 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // run_smc
-Rcpp::List run_smc(Rcpp::List input_timeseries, Rcpp::List input_prior);
-RcppExport SEXP _BayesMallowsSMC2_run_smc(SEXP input_timeseriesSEXP, SEXP input_priorSEXP) {
+Rcpp::List run_smc(Rcpp::List input_timeseries, Rcpp::List input_prior, Rcpp::List input_options);
+RcppExport SEXP _BayesMallowsSMC2_run_smc(SEXP input_timeseriesSEXP, SEXP input_priorSEXP, SEXP input_optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type input_timeseries(input_timeseriesSEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type input_prior(input_priorSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_smc(input_timeseries, input_prior));
+    Rcpp::traits::input_parameter< Rcpp::List >::type input_options(input_optionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_smc(input_timeseries, input_prior, input_options));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_BayesMallowsSMC2_run_smc", (DL_FUNC) &_BayesMallowsSMC2_run_smc, 2},
+    {"_BayesMallowsSMC2_run_smc", (DL_FUNC) &_BayesMallowsSMC2_run_smc, 3},
     {NULL, NULL, 0}
 };
 

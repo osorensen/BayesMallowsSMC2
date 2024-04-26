@@ -55,5 +55,8 @@ compute_sequentially <- function(data = NULL){
     alpha_shape = 1, alpha_rate = .1,
     cluster_concentration = 10, n_clusters = 2, n_items = 5
   )
-  run_smc(input_timeseries, input_prior)
+  input_options <- list(
+    n_particles = 3, n_particle_filters = 2
+  )
+  run_smc(input_timeseries, input_prior, input_options)
 }
