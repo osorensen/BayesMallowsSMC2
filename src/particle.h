@@ -33,6 +33,12 @@ struct Particle{
       unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
       const std::unique_ptr<PartitionFunction>& pfun,
       const std::unique_ptr<Distance>& distfun);
+  void rejuvenate(
+    unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
+    const std::unique_ptr<PartitionFunction>& pfun,
+    const std::unique_ptr<Distance>& distfun,
+    const arma::vec& alpha_sd
+  );
 
 };
 

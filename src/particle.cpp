@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <Rmath.h>
 #include "particle.h"
 #include "sample_latent_rankings.h"
 #include "sample_cluster_assignments.h"
@@ -92,4 +93,31 @@ std::vector<ParticleFilter> create_particle_filters(const Options& options) {
   }
 
   return result;
+}
+
+void Particle::rejuvenate(
+    unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
+    const std::unique_ptr<PartitionFunction>& pfun,
+    const std::unique_ptr<Distance>& distfun,
+    const vec& alpha_sd
+) {
+  // sample a complete cluster assignment and compute frequencies
+  int pf_index = randi(distr_param(0, particle_filters.size() - 1));
+  uvec cluster_assignments = particle_filters[pf_index].cluster_assignments;
+  uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
+
+  // sample proposals
+  vec alpha_proposal(prior.n_clusters);
+  vec tau_proposal(prior.n_clusters);
+  for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
+    alpha_proposal(cluster) = R::rlnorm(log(parameters.alpha(cluster)), alpha_sd(cluster));
+    tau_proposal(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
+  }
+  tau_proposal = normalise(tau_proposal, 1);
+
+  Rcpp::Rcout << "alpha current: " << std::endl << parameters.alpha << std::endl
+              << "alpha proposal: " << std::endl << alpha_proposal << std::endl
+              << "tau current: " << std::endl << parameters.tau << std::endl
+              << "tau proposal: " << std::endl << tau_proposal << std::endl << std::endl;
+
 }

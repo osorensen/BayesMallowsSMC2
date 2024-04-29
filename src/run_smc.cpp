@@ -58,8 +58,11 @@ Rcpp::List run_smc(
       for(size_t i{}; i < particle_vector.size(); i++) {
         alpha_values.row(i) = particle_vector[i].parameters.alpha.t();
       }
-      mat alpha_cov = cov(alpha_values);
-      Rcpp::Rcout << alpha_cov << std::endl;
+      auto alpha_sd = stddev(alpha_values, 0, 0);
+
+      for(auto& p: particle_vector) {
+        p.rejuvenate(t, prior, data, pfun, distfun, alpha_sd.t());
+      }
 
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p) { p.log_importance_weight = 1; });
