@@ -5,12 +5,6 @@
 #include "typedefs.h"
 #include "prior.h"
 
-struct StaticParameters{
-  arma::vec alpha;
-  arma::umat rho;
-  arma::vec tau;
-};
-
 struct Data{
   Data(){};
   virtual ~Data() = default;

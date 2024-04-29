@@ -7,6 +7,12 @@
 #include "partition_functions.h"
 #include "distances.h"
 
+struct StaticParameters{
+  arma::vec alpha;
+  arma::umat rho;
+  arma::vec tau;
+};
+
 struct ParticleFilter{
   ParticleFilter() {}
   ~ParticleFilter() = default;
