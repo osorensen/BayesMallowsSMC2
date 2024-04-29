@@ -53,11 +53,14 @@ void Particle::run_particle_filter(
   std::transform(
     particle_filters.cbegin(), particle_filters.cend(), tmp_pf_weights.begin(),
     [](const ParticleFilter& pf){ return pf.log_weight; });
-
   double maxval = Rcpp::max(tmp_pf_weights);
+
+  log_incremental_likelihood.resize(log_incremental_likelihood.size() + 1);
+  log_incremental_likelihood(log_incremental_likelihood.size() - 1) =
+    maxval + log(mean(exp(tmp_pf_weights - maxval)));
+
   log_normalized_particle_filter_weights =
     tmp_pf_weights - (maxval + log(sum(exp(tmp_pf_weights - maxval))));
-
 }
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior) {

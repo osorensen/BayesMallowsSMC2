@@ -23,6 +23,7 @@ struct Particle{
   arma::vec tau;
   std::vector<ParticleFilter> particle_filters;
   double log_importance_weight{};
+  arma::vec log_incremental_likelihood{};
   Rcpp::NumericVector log_normalized_particle_filter_weights;
   void run_particle_filter(
       unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,

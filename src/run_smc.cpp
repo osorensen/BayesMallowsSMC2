@@ -27,6 +27,7 @@ Rcpp::List run_smc(
   for(size_t t{}; t < 2; t++) {
     for(auto& p : particle_vector) {
       p.run_particle_filter(t, prior, data, pfun, distfun);
+      p.log_importance_weight += p.log_incremental_likelihood(t);
     }
   }
 
