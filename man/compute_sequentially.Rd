@@ -4,7 +4,11 @@
 \alias{compute_sequentially}
 \title{Compute the Bayesian Mallows model sequentially}
 \usage{
-compute_sequentially(data = NULL)
+compute_sequentially(
+  data,
+  hyperparameters = set_hyperparameters(),
+  smc_options = set_smc_options()
+)
 }
 \arguments{
 \item{data}{A dataframe containing partial rankings or pairwise preferences.
@@ -28,6 +32,8 @@ If data contains pairwise preferences, it must have the following structure:
 \item \code{bottom_item}: identifier for the dispreferred item.
 \item etc.
 }}
+
+\item{hyperparameters}{A list returned from \code{\link[=set_hyperparameters]{set_hyperparameters()}}.}
 }
 \value{
 An object

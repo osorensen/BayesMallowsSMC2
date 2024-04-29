@@ -53,7 +53,10 @@ double Kendall::logz(double alpha) {
 Cardinalities::Cardinalities(unsigned int n_items, const std::string& metric) :
   n_items { n_items } {
   mat tmp;
-  std::string filename = std::string("inst/partition_function_data/") +
+    Rcpp::Function f("system.file");
+    Rcpp::List pkg_path = f(Rcpp::Named("package") = "BayesMallowsSMC2");
+
+  std::string filename = std::string(pkg_path[0]) + std::string("/partition_function_data/") +
     metric + std::string("_") + std::to_string(n_items) + std::string("items.csv");
 
   bool ok = tmp.load(filename);

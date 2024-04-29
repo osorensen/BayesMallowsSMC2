@@ -23,13 +23,17 @@
 #' \item etc.
 #' }
 #'
+#' @param hyperparameters A list returned from [set_hyperparameters()].
 #'
 #' @return An object
 #' @export
 #'
 #' @examples
 #' compute_sequentially(partial_rankings)
-compute_sequentially <- function(data = NULL){
+compute_sequentially <- function(
+    data,
+    hyperparameters = set_hyperparameters(),
+    smc_options = set_smc_options()){
   rank_columns <- grepl("item[0-9]+", colnames(data))
   preference_columns <- grepl("top\\_item|bottom\\_item", colnames(data))
   if(any(rank_columns)) {
@@ -51,13 +55,5 @@ compute_sequentially <- function(data = NULL){
     stop("Something wrong with data")
   }
 
-  input_prior <- list(
-    alpha_shape = 1, alpha_rate = .1,
-    cluster_concentration = 10, n_clusters = 1, n_items = 5
-  )
-  input_options <- list(
-    n_particles = 1000, n_particle_filters = 50, metric = "footrule",
-    resampling_threshold = 500
-  )
-  ret <- run_smc(input_timeseries, input_prior, input_options)
+  ret <- run_smc(input_timeseries, hyperparameters, smc_options)
 }
