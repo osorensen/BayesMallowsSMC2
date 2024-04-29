@@ -96,6 +96,42 @@ std::vector<ParticleFilter> create_particle_filters(const Options& options) {
   return result;
 }
 
+uvec leap_and_shift(const uvec& current_rho, unsigned int cluster, const Prior& prior) {
+  unsigned int u = randi(distr_param(0, prior.n_items - 1));
+  uvec intermediate_rho = current_rho;
+  uvec rho_proposal = intermediate_rho;
+  int rho_u = intermediate_rho(u);
+  uvec support = setdiff(
+    regspace<uvec>(std::max(1, rho_u - 1), std::min(prior.n_items, rho_u + 1)),
+    uvec(rho_u)
+  );
+
+  unsigned int index = randi(distr_param(0, support.size() - 1));
+  intermediate_rho(u) = support(index);
+  for(size_t i{}; i < intermediate_rho.size(); i++) {
+    if(current_rho(i) == current_rho(u)) {
+      rho_proposal(u) = intermediate_rho(i);
+    } else if(current_rho(u) < current_rho(i) &&
+      current_rho(i) <= intermediate_rho(u) &&
+      intermediate_rho(u) > current_rho(u)) {
+      rho_proposal(i) = current_rho(i) - 1;
+    } else if(current_rho(u) > current_rho(i) &&
+      current_rho(i) >= intermediate_rho(u) &&
+      intermediate_rho(u) < current_rho(u)) {
+      rho_proposal(i) = current_rho(i) + 1;
+    } else {
+      rho_proposal(i) = current_rho(i);
+    }
+  }
+  uvec v1 = unique(rho_proposal);
+  uvec v2 = regspace<uvec>(1, prior.n_items);
+  if(!approx_equal(v1, v2, "absdiff", 0)) {
+    Rcpp::stop("Something wrong with rho proposal.");
+  }
+
+  return rho_proposal;
+}
+
 void Particle::rejuvenate(
     unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
     const std::unique_ptr<PartitionFunction>& pfun,
@@ -114,39 +150,7 @@ void Particle::rejuvenate(
   for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
     alpha_proposal(cluster) = R::rlnorm(log(parameters.alpha(cluster)), std::max(.001, alpha_sd(cluster)));
     tau_proposal(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
-
-    unsigned int u = randi(distr_param(0, prior.n_items - 1));
-    Rcpp::Rcout << "u = " << u << std::endl;
-    uvec intermediate_rho = parameters.rho.col(cluster);
-    int rho_u = intermediate_rho(u);
-    Rcpp::Rcout << "rho_u = " << rho_u << std::endl;
-    uvec support = setdiff(
-      regspace<uvec>(std::max(1, rho_u - 1), std::min(prior.n_items, rho_u + 1)),
-      uvec(rho_u)
-    );
-    Rcpp::Rcout << "support = " << support << std::endl;
-    unsigned int index = randi(distr_param(0, support.size() - 1));
-    intermediate_rho(u) = support(index);
-    for(size_t i{}; i < intermediate_rho.size(); i++) {
-      if(parameters.rho(i, cluster) == parameters.rho(u, cluster)) {
-        rho_proposal(u, cluster) = intermediate_rho(i);
-      } else if(parameters.rho(u, cluster) < parameters.rho(i, cluster) &&
-        parameters.rho(i, cluster) <= intermediate_rho(u) &&
-        intermediate_rho(u) > parameters.rho(u, cluster)) {
-        rho_proposal(i, cluster) = parameters.rho(i, cluster) - 1;
-      } else if(parameters.rho(u, cluster) > parameters.rho(i, cluster) &&
-        parameters.rho(i, cluster) >= intermediate_rho(u) &&
-        intermediate_rho(u) < parameters.rho(u, cluster)) {
-        rho_proposal(i, cluster) = parameters.rho(i, cluster) + 1;
-      } else {
-        rho_proposal(i, cluster) = parameters.rho(i, cluster);
-      }
-    }
-    uvec v1 = unique(rho_proposal.col(cluster));
-    uvec v2 = regspace<uvec>(1, prior.n_items);
-    if(!approx_equal(v1, v2, "absdiff", 0)) {
-      Rcpp::stop("Something wrong with rho proposal.");
-    }
+    rho_proposal.col(cluster) = leap_and_shift(parameters.rho.col(cluster), cluster, prior);
   }
   tau_proposal = normalise(tau_proposal, 1);
 
