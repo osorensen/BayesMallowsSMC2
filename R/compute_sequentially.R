@@ -56,8 +56,8 @@ compute_sequentially <- function(data = NULL){
     cluster_concentration = 10, n_clusters = 1, n_items = 5
   )
   input_options <- list(
-    n_particles = 1000, n_particle_filters = 1, metric = "footrule",
-    resampling_threshold = 1000
+    n_particles = 1000, n_particle_filters = 50, metric = "footrule",
+    resampling_threshold = 500
   )
   ret <- run_smc(input_timeseries, input_prior, input_options)
 }
