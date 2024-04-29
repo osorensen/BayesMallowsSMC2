@@ -53,11 +53,11 @@ compute_sequentially <- function(data = NULL){
 
   input_prior <- list(
     alpha_shape = 1, alpha_rate = .1,
-    cluster_concentration = 10, n_clusters = 2, n_items = 5
+    cluster_concentration = 10, n_clusters = 1, n_items = 5
   )
   input_options <- list(
-    n_particles = 3, n_particle_filters = 2, metric = "spearman",
-    resampling_threshold = 3
+    n_particles = 1000, n_particle_filters = 1, metric = "footrule",
+    resampling_threshold = 1000
   )
-  run_smc(input_timeseries, input_prior, input_options)
+  ret <- run_smc(input_timeseries, input_prior, input_options)
 }

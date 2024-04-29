@@ -3,7 +3,7 @@ library(mvtnorm)
 n_items <- 5
 set.seed(1)
 complete_rankings <- tibble(
-  timepoint = sort(sample(100, 100, replace = TRUE)),
+  timepoint = 1:100,
   user = 1:100
 ) %>%
   pmap_dfr(function(timepoint, user) {

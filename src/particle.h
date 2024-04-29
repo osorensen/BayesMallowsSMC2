@@ -18,7 +18,7 @@ struct ParticleFilter{
   ~ParticleFilter() = default;
   arma::umat latent_rankings{};
   arma::uvec cluster_assignments{};
-  double log_weight{};
+  arma::vec log_weight{};
 };
 
 struct Particle{
@@ -33,13 +33,13 @@ struct Particle{
       unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
       const std::unique_ptr<PartitionFunction>& pfun,
       const std::unique_ptr<Distance>& distfun);
-  void rejuvenate(
-    unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
+  bool rejuvenate(
+    unsigned int T, const Options& options, const Prior& prior,
+    const std::unique_ptr<Data>& data,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
     const arma::vec& alpha_sd
   );
-
 };
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);

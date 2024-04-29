@@ -57,14 +57,15 @@ void Particle::run_particle_filter(
     }
     double maxval = log_cluster_contribution.max();
     double log_prob = maxval + log(accu(exp(log_cluster_contribution - maxval)));
-    pf.log_weight = log_prob - proposal.log_probability;
+    pf.log_weight.resize(t + 1);
+    pf.log_weight(t) = log_prob - proposal.log_probability;
   }
 
   // normalize weights
   Rcpp::NumericVector tmp_pf_weights(log_normalized_particle_filter_weights.size());
   std::transform(
     particle_filters.cbegin(), particle_filters.cend(), tmp_pf_weights.begin(),
-    [](const ParticleFilter& pf){ return pf.log_weight; });
+    [t](const ParticleFilter& pf){ return pf.log_weight(t); });
   double maxval = Rcpp::max(tmp_pf_weights);
 
   log_incremental_likelihood.resize(log_incremental_likelihood.size() + 1);
@@ -132,8 +133,9 @@ uvec leap_and_shift(const uvec& current_rho, unsigned int cluster, const Prior& 
   return rho_proposal;
 }
 
-void Particle::rejuvenate(
-    unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
+bool Particle::rejuvenate(
+    unsigned int T, const Options& options, const Prior& prior,
+    const std::unique_ptr<Data>& data,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
     const vec& alpha_sd
@@ -154,4 +156,26 @@ void Particle::rejuvenate(
   }
   tau_proposal = normalise(tau_proposal, 1);
 
+  // run particle filters
+  Particle proposal_particle(options, prior);
+  proposal_particle.parameters = StaticParameters{alpha_proposal, rho_proposal, tau_proposal};
+  vec current_log_likelihood(T + 1);
+
+  for(size_t t{}; t < T + 1; t++) {
+    proposal_particle.run_particle_filter(t, prior, data, pfun, distfun);
+    proposal_particle.log_importance_weight += proposal_particle.log_incremental_likelihood(t);
+  }
+
+  vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
+  prior.alpha_rate * (alpha_proposal - parameters.alpha) +
+  (prior.cluster_concentration + cluster_frequencies - 1) % (log(tau_proposal) - log(parameters.tau));
+  double log_ratio = proposal_particle.log_importance_weight -
+    sum(log_incremental_likelihood) + accu(additional_terms);
+
+  if(log_ratio > log(randu())) {
+    parameters = StaticParameters{alpha_proposal, rho_proposal, tau_proposal};
+    return true;
+  } else {
+    return false;
+  }
 }
