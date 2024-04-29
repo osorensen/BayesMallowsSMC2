@@ -10,17 +10,15 @@
 struct ParticleFilter{
   ParticleFilter() {}
   ~ParticleFilter() = default;
-  arma::umat latent_rankings;
-  arma::uvec cluster_assignments;
+  arma::umat latent_rankings{};
+  arma::uvec cluster_assignments{};
   double log_weight{};
 };
 
 struct Particle{
   Particle(const Options& options, const Prior& prior);
   ~Particle() = default;
-  arma::vec alpha;
-  arma::umat rho;
-  arma::vec tau;
+  StaticParameters parameters;
   std::vector<ParticleFilter> particle_filters;
   double log_importance_weight{};
   arma::vec log_incremental_likelihood{};
@@ -29,6 +27,7 @@ struct Particle{
       unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
       const std::unique_ptr<PartitionFunction>& pfun,
       const std::unique_ptr<Distance>& distfun);
+
 };
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);

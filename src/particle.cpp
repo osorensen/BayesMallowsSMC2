@@ -3,15 +3,15 @@
 using namespace arma;
 
 Particle::Particle(const Options& options, const Prior& prior) :
-  alpha (randg(prior.n_clusters, distr_param(prior.alpha_shape, 1 / prior.alpha_rate))),
-  rho (umat(prior.n_items, prior.n_clusters)),
-  tau (normalise(randg(prior.n_clusters, distr_param(prior.cluster_concentration, 1)), 1)),
+  parameters { randg(prior.n_clusters, distr_param(prior.alpha_shape, 1 / prior.alpha_rate)),
+               umat(prior.n_items, prior.n_clusters),
+               normalise(randg(prior.n_clusters, distr_param(prior.cluster_concentration, 1)), 1) },
   particle_filters(create_particle_filters(options)),
   log_normalized_particle_filter_weights (
       Rcpp::NumericVector(options.n_particle_filters, -log(options.n_particle_filters))
   )
   {
-    rho.each_col([&prior](uvec& a){ a = shuffle(regspace<uvec>(1, prior.n_items)); });
+    parameters.rho.each_col([&prior](uvec& a){ a = shuffle(regspace<uvec>(1, prior.n_items)); });
   }
 
 void Particle::run_particle_filter(
@@ -31,24 +31,30 @@ void Particle::run_particle_filter(
               log_normalized_particle_filter_weights.end(), -log(particle_filters.size()));
   }
 
-  // sample latent rankings
   for(auto& pf : particle_filters) {
+    // sample latent rankings
     auto proposal = data->sample_latent_rankings(t, prior);
     pf.latent_rankings = proposal.proposal;
+
+    // sample cluster indicators
+
+    // compute weights
     vec log_cluster_contribution(prior.n_clusters);
 
     for(size_t c{}; c < prior.n_clusters; c++) {
       unsigned int total_distance{};
       for(size_t i{}; i < pf.latent_rankings.n_cols; i++) {
-        total_distance += distfun->d(pf.latent_rankings.col(i), rho.col(c));
+        total_distance += distfun->d(pf.latent_rankings.col(i), parameters.rho.col(c));
       }
-      log_cluster_contribution(c) = log(tau(c)) - pfun->logz(alpha(c)) -
-        alpha(c) / prior.n_items * total_distance;
+      log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
+        parameters.alpha(c) / prior.n_items * total_distance;
     }
     double maxval = log_cluster_contribution.max();
     double log_prob = maxval + log(accu(exp(log_cluster_contribution - maxval)));
     pf.log_weight = log_prob - proposal.log_probability;
   }
+
+  // normalize weights
   Rcpp::NumericVector tmp_pf_weights(log_normalized_particle_filter_weights.size());
   std::transform(
     particle_filters.cbegin(), particle_filters.cend(), tmp_pf_weights.begin(),

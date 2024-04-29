@@ -55,6 +55,8 @@ Rcpp::List run_smc(
         particle_vector[i] = tmp[new_inds[i]];
       }
 
+
+
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p) { p.log_importance_weight = 1; });
     }

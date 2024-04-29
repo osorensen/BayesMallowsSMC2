@@ -10,6 +10,12 @@ struct LatentRankingProposal{
   double log_probability{};
 };
 
+struct StaticParameters{
+  arma::vec alpha;
+  arma::umat rho;
+  arma::vec tau;
+};
+
 struct Data{
   Data(){};
   virtual ~Data() = default;
