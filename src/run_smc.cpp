@@ -54,11 +54,12 @@ Rcpp::List run_smc(
         particle_vector[i] = tmp[new_inds[i]];
       }
 
-      mat alpha_values(prior.n_clusters, particle_vector.size());
+      mat alpha_values(particle_vector.size(), prior.n_clusters);
       for(size_t i{}; i < particle_vector.size(); i++) {
-        alpha_values.col(i) = particle_vector[i].parameters.alpha;
+        alpha_values.row(i) = particle_vector[i].parameters.alpha.t();
       }
-      vec alpha_var = var(alpha_values, 0, 1);
+      mat alpha_cov = cov(alpha_values);
+      Rcpp::Rcout << alpha_cov << std::endl;
 
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p) { p.log_importance_weight = 1; });
