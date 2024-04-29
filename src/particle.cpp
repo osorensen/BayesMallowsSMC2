@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <Rmath.h>
+#include "misc.h"
 #include "particle.h"
 #include "sample_latent_rankings.h"
 #include "sample_cluster_assignments.h"
@@ -109,15 +110,44 @@ void Particle::rejuvenate(
   // sample proposals
   vec alpha_proposal(prior.n_clusters);
   vec tau_proposal(prior.n_clusters);
+  umat rho_proposal(prior.n_items, prior.n_clusters);
   for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
     alpha_proposal(cluster) = R::rlnorm(log(parameters.alpha(cluster)), std::max(.001, alpha_sd(cluster)));
     tau_proposal(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
+
+    unsigned int u = randi(distr_param(0, prior.n_items - 1));
+    Rcpp::Rcout << "u = " << u << std::endl;
+    uvec intermediate_rho = parameters.rho.col(cluster);
+    int rho_u = intermediate_rho(u);
+    Rcpp::Rcout << "rho_u = " << rho_u << std::endl;
+    uvec support = setdiff(
+      regspace<uvec>(std::max(1, rho_u - 1), std::min(prior.n_items, rho_u + 1)),
+      uvec(rho_u)
+    );
+    Rcpp::Rcout << "support = " << support << std::endl;
+    unsigned int index = randi(distr_param(0, support.size() - 1));
+    intermediate_rho(u) = support(index);
+    for(size_t i{}; i < intermediate_rho.size(); i++) {
+      if(parameters.rho(i, cluster) == parameters.rho(u, cluster)) {
+        rho_proposal(u, cluster) = intermediate_rho(i);
+      } else if(parameters.rho(u, cluster) < parameters.rho(i, cluster) &&
+        parameters.rho(i, cluster) <= intermediate_rho(u) &&
+        intermediate_rho(u) > parameters.rho(u, cluster)) {
+        rho_proposal(i, cluster) = parameters.rho(i, cluster) - 1;
+      } else if(parameters.rho(u, cluster) > parameters.rho(i, cluster) &&
+        parameters.rho(i, cluster) >= intermediate_rho(u) &&
+        intermediate_rho(u) < parameters.rho(u, cluster)) {
+        rho_proposal(i, cluster) = parameters.rho(i, cluster) + 1;
+      } else {
+        rho_proposal(i, cluster) = parameters.rho(i, cluster);
+      }
+    }
+    uvec v1 = unique(rho_proposal.col(cluster));
+    uvec v2 = regspace<uvec>(1, prior.n_items);
+    if(!approx_equal(v1, v2, "absdiff", 0)) {
+      Rcpp::stop("Something wrong with rho proposal.");
+    }
   }
   tau_proposal = normalise(tau_proposal, 1);
-
-  Rcpp::Rcout << "alpha current: " << std::endl << parameters.alpha << std::endl
-              << "alpha proposal: " << std::endl << alpha_proposal << std::endl
-              << "tau current: " << std::endl << parameters.tau << std::endl
-              << "tau proposal: " << std::endl << tau_proposal << std::endl << std::endl;
 
 }
