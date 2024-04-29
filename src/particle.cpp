@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "particle.h"
+#include "sample_latent_rankings.h"
 using namespace arma;
 
 Particle::Particle(const Options& options, const Prior& prior) :
@@ -33,8 +34,9 @@ void Particle::run_particle_filter(
 
   for(auto& pf : particle_filters) {
     // sample latent rankings
-    auto proposal = data->sample_latent_rankings(t, prior);
+    auto proposal = sample_latent_rankings(data, t, prior);
     pf.latent_rankings = proposal.proposal;
+    Rcpp::Rcout << "latent rankings " << std::endl << pf.latent_rankings << std::endl << std::endl;
 
     // sample cluster indicators
 
