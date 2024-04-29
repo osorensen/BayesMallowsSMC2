@@ -26,6 +26,7 @@ Rcpp::List run_smc(
 
   int T = data->n_timepoints();
   for(size_t t{}; t < T; t++) {
+    Rcpp::Rcout << "t = " << t << std::endl;
     for(auto& p : particle_vector) {
       p.run_particle_filter(t, prior, data, pfun, distfun);
       p.log_importance_weight += p.log_incremental_likelihood(t);
@@ -43,7 +44,20 @@ Rcpp::List run_smc(
 
     double ess = pow(norm(exp(log_normalized_importance_weights), 2), -2);
 
-    Rcpp::Rcout << "B = " << options.resampling_threshold << ", ESS = " << ess << std::endl;
+    Rcpp::Rcout << "ess = " << ess << std::endl;
+    if(ess < options.resampling_threshold) {
+      ivec new_inds = Rcpp::sample(
+        log_normalized_importance_weights.size(),
+        log_normalized_importance_weights.size(), true,
+        Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(log_normalized_importance_weights))), false);
+      std::vector<Particle> tmp = particle_vector;
+      for(size_t i{}; i < new_inds.size(); i++) {
+        particle_vector[i] = tmp[new_inds[i]];
+      }
+
+      std::for_each(particle_vector.begin(), particle_vector.end(),
+                    [](Particle& p) { p.log_importance_weight = 1; });
+    }
 
   }
 
