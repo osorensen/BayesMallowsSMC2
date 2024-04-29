@@ -110,7 +110,7 @@ void Particle::rejuvenate(
   vec alpha_proposal(prior.n_clusters);
   vec tau_proposal(prior.n_clusters);
   for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
-    alpha_proposal(cluster) = R::rlnorm(log(parameters.alpha(cluster)), alpha_sd(cluster));
+    alpha_proposal(cluster) = R::rlnorm(log(parameters.alpha(cluster)), std::max(.001, alpha_sd(cluster)));
     tau_proposal(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
   }
   tau_proposal = normalise(tau_proposal, 1);
