@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "particle.h"
 #include "sample_latent_rankings.h"
+#include "sample_cluster_assignments.h"
 using namespace arma;
 
 Particle::Particle(const Options& options, const Prior& prior) :
@@ -36,9 +37,10 @@ void Particle::run_particle_filter(
     // sample latent rankings
     auto proposal = sample_latent_rankings(data, t, prior);
     pf.latent_rankings = proposal.proposal;
-    Rcpp::Rcout << "latent rankings " << std::endl << pf.latent_rankings << std::endl << std::endl;
 
     // sample cluster indicators
+    uvec new_cluster_assignments = sample_cluster_assignments(pf.latent_rankings, parameters, pfun, distfun);
+    pf.cluster_assignments = join_cols(pf.cluster_assignments, new_cluster_assignments);
 
     // compute weights
     vec log_cluster_contribution(prior.n_clusters);

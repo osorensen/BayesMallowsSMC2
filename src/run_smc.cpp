@@ -44,7 +44,6 @@ Rcpp::List run_smc(
 
     double ess = pow(norm(exp(log_normalized_importance_weights), 2), -2);
 
-    Rcpp::Rcout << "ess = " << ess << std::endl;
     if(ess < options.resampling_threshold) {
       ivec new_inds = Rcpp::sample(
         log_normalized_importance_weights.size(),
@@ -54,8 +53,6 @@ Rcpp::List run_smc(
       for(size_t i{}; i < new_inds.size(); i++) {
         particle_vector[i] = tmp[new_inds[i]];
       }
-
-
 
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p) { p.log_importance_weight = 1; });
