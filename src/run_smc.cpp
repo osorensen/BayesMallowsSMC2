@@ -24,7 +24,8 @@ Rcpp::List run_smc(
   auto pfun = choose_partition_function(prior.n_items, options.metric);
   auto distfun = choose_distance_function(options.metric);
 
-  for(size_t t{}; t < 2; t++) {
+  int T = data->n_timepoints();
+  for(size_t t{}; t < T; t++) {
     for(auto& p : particle_vector) {
       p.run_particle_filter(t, prior, data, pfun, distfun);
       p.log_importance_weight += p.log_incremental_likelihood(t);
@@ -41,6 +42,8 @@ Rcpp::List run_smc(
       log(sum(exp(log_importance_weights - max(log_importance_weights))))));
 
     double ess = pow(norm(exp(log_normalized_importance_weights), 2), -2);
+
+    Rcpp::Rcout << "B = " << options.resampling_threshold << ", ESS = " << ess << std::endl;
 
   }
 

@@ -9,4 +9,5 @@ struct Options{
   const std::string metric;
   unsigned int n_particles;
   unsigned int n_particle_filters;
+  unsigned int resampling_threshold;
 };
