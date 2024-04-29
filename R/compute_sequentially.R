@@ -57,7 +57,7 @@ compute_sequentially <- function(data = NULL){
   )
   input_options <- list(
     n_particles = 3, n_particle_filters = 2, metric = "spearman",
-    resampling_threshold = 2
+    resampling_threshold = 3
   )
   run_smc(input_timeseries, input_prior, input_options)
 }
