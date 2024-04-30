@@ -48,6 +48,8 @@ Rcpp::List run_smc(
 
     if(ess < options.resampling_threshold) {
       ivec new_inds = resampler->resample(exp(log_normalized_importance_weights));
+      uvec unique_particles = find_unique(new_inds);
+
       std::vector<Particle> tmp = particle_vector;
       for(size_t i{}; i < new_inds.size(); i++) {
         particle_vector[i] = tmp[new_inds[i]];
@@ -59,15 +61,19 @@ Rcpp::List run_smc(
       }
       auto alpha_sd = stddev(alpha_values, 0, 0);
 
-      vec modified_particle(particle_vector.size());
       size_t iter{};
-      while(mean(modified_particle) < .2 && iter < 20) {
+      vec alpha0_tmp = vec(particle_vector.size());
+      do {
         iter++;
         for(size_t i{}; i < particle_vector.size(); i++) {
-          modified_particle(i) = modified_particle[i] ||
-            particle_vector[i].rejuvenate(t, options, prior, data, pfun, distfun, resampler, alpha_sd.t());
+          particle_vector[i].rejuvenate(t, options, prior, data, pfun, distfun, resampler, alpha_sd.t());
         }
-      }
+        std::transform(
+          particle_vector.cbegin(), particle_vector.cend(), alpha0_tmp.begin(),
+          [](const Particle& p) { return p.parameters.alpha(0); });
+
+        unique_particles = find_unique(alpha0_tmp);
+      } while(unique_particles.size() < particle_vector.size() / 2 && iter < 100);
 
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p) { p.log_importance_weight = 1; });
