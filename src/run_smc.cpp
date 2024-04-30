@@ -7,6 +7,7 @@
 #include "options.h"
 #include "partition_functions.h"
 #include "distances.h"
+#include "resampler.h"
 using namespace arma;
 
 // [[Rcpp::export]]
@@ -23,6 +24,7 @@ Rcpp::List run_smc(
   auto particle_vector = create_particle_vector(options, prior);
   auto pfun = choose_partition_function(prior.n_items, options.metric);
   auto distfun = choose_distance_function(options.metric);
+  auto resampler = choose_resampler(options.resampler);
 
   int T = data->n_timepoints();
   mat alpha_trace(prior.n_clusters, T);
@@ -45,10 +47,7 @@ Rcpp::List run_smc(
     double ess = pow(norm(exp(log_normalized_importance_weights), 2), -2);
 
     if(ess < options.resampling_threshold) {
-      ivec new_inds = Rcpp::sample(
-        log_normalized_importance_weights.size(),
-        log_normalized_importance_weights.size(), true,
-        Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(log_normalized_importance_weights))), false);
+      ivec new_inds = resampler->resample(exp(log_normalized_importance_weights));
       std::vector<Particle> tmp = particle_vector;
       for(size_t i{}; i < new_inds.size(); i++) {
         particle_vector[i] = tmp[new_inds[i]];

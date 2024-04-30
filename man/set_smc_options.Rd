@@ -8,7 +8,8 @@ set_smc_options(
   n_particles = 1000,
   n_particle_filters = 50,
   resampling_threshold = n_particles/2,
-  metric = "footrule"
+  metric = "footrule",
+  resampler = "multinomial"
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ set_smc_options(
 \item{resampling_threshold}{Effective sample size threshold for resampling}
 
 \item{metric}{Metric}
+
+\item{resampler}{resampler}
 }
 \value{
 A list

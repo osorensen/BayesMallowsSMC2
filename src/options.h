@@ -7,6 +7,7 @@ struct Options{
   ~Options() = default;
 
   const std::string metric;
+  const std::string resampler;
   unsigned int n_particles;
   unsigned int n_particle_filters;
   unsigned int resampling_threshold;
