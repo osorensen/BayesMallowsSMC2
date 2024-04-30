@@ -4,6 +4,7 @@
 #include "particle.h"
 #include "sample_latent_rankings.h"
 #include "sample_cluster_assignments.h"
+
 using namespace arma;
 
 Particle::Particle(const Options& options, const Prior& prior) :
@@ -21,11 +22,11 @@ Particle::Particle(const Options& options, const Prior& prior) :
 void Particle::run_particle_filter(
     unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
     const std::unique_ptr<PartitionFunction>& pfun,
-    const std::unique_ptr<Distance>& distfun) {
+    const std::unique_ptr<Distance>& distfun,
+    const std::unique_ptr<Resampler>& resampler) {
   // resample
   if(t > 0) {
-    Rcpp::NumericVector probs = exp(log_normalized_particle_filter_weights);
-    ivec new_inds = Rcpp::sample(probs.size(), probs.size(), true, probs, false);
+    ivec new_inds = resampler->resample(exp(log_normalized_particle_filter_weights));
     std::vector<ParticleFilter> tmp(particle_filters.size());
     for(size_t i{}; i < new_inds.size(); i++) {
       tmp[i] = particle_filters[new_inds[i]];
@@ -138,6 +139,7 @@ bool Particle::rejuvenate(
     const std::unique_ptr<Data>& data,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
+    const std::unique_ptr<Resampler>& resampler,
     const vec& alpha_sd
 ) {
   // sample a complete cluster assignment and compute frequencies
@@ -162,7 +164,7 @@ bool Particle::rejuvenate(
   vec current_log_likelihood(T + 1);
 
   for(size_t t{}; t < T + 1; t++) {
-    proposal_particle.run_particle_filter(t, prior, data, pfun, distfun);
+    proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler);
     proposal_particle.log_importance_weight += proposal_particle.log_incremental_likelihood(t);
   }
 

@@ -6,6 +6,7 @@
 #include "options.h"
 #include "partition_functions.h"
 #include "distances.h"
+#include "resampler.h"
 
 struct StaticParameters{
   arma::vec alpha;
@@ -32,12 +33,14 @@ struct Particle{
   void run_particle_filter(
       unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
       const std::unique_ptr<PartitionFunction>& pfun,
-      const std::unique_ptr<Distance>& distfun);
+      const std::unique_ptr<Distance>& distfun,
+      const std::unique_ptr<Resampler>& resampler);
   bool rejuvenate(
     unsigned int T, const Options& options, const Prior& prior,
     const std::unique_ptr<Data>& data,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
+    const std::unique_ptr<Resampler>& resampler,
     const arma::vec& alpha_sd
   );
 };

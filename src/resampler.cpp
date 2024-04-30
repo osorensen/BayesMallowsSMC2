@@ -51,10 +51,12 @@ ivec Residual::resample(vec probs) {
   ivec result = count_to_index(counts);
 
   vec residual_weights = probs - counts / N;
-  residual_weights = residual_weights / sum(residual_weights);
-  ivec part2 = Rcpp::sample(
-    N, R, true,
-    Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(residual_weights)), false);
+  ivec part2{};
+  if(sum(residual_weights) > 0) {
+    part2 = Rcpp::sample(
+      N, R, true,
+      Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(normalise(residual_weights, 1))), false);
+  }
 
   return join_cols(result, part2);
 }

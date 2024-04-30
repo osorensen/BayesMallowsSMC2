@@ -30,7 +30,7 @@ Rcpp::List run_smc(
   mat alpha_trace(prior.n_clusters, T);
   for(size_t t{}; t < T; t++) {
     for(auto& p : particle_vector) {
-      p.run_particle_filter(t, prior, data, pfun, distfun);
+      p.run_particle_filter(t, prior, data, pfun, distfun, resampler);
       p.log_importance_weight += p.log_incremental_likelihood(t);
     }
 
@@ -64,7 +64,8 @@ Rcpp::List run_smc(
       while(mean(modified_particle) < .2 && iter < 20) {
         iter++;
         for(size_t i{}; i < particle_vector.size(); i++) {
-          modified_particle(i) = modified_particle[i] || particle_vector[i].rejuvenate(t, options, prior, data, pfun, distfun, alpha_sd.t());
+          modified_particle(i) = modified_particle[i] ||
+            particle_vector[i].rejuvenate(t, options, prior, data, pfun, distfun, resampler, alpha_sd.t());
         }
       }
 
