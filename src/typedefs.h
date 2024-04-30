@@ -11,3 +11,6 @@ using comparisons = std::set<single_comparison>;
 using pairwise_obs = std::pair<std::string, comparisons>;
 using pairwise_tp = std::vector<pairwise_obs>;
 using pairwise_ts = std::vector<pairwise_tp>;
+
+using topological_sorts_user = std::vector<arma::ivec>;
+using topological_sorts_tp = std::vector<topological_sorts_user>;

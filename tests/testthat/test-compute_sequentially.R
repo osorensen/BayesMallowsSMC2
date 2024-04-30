@@ -76,3 +76,7 @@ test_that("compute_sequentially works with partial data", {
   expect_gt(mean(mod$alpha), .7)
   expect_lt(mean(mod$alpha), 1.3)
 })
+
+test_that("compute_sequentially works with pairwise preference data", {
+
+})

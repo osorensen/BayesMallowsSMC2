@@ -41,6 +41,15 @@ LatentRankingProposal sample_latent_rankings(
 
 LatentRankingProposal sample_latent_rankings(
     const PairwisePreferences* data, unsigned int t, const Prior& prior) {
+  LatentRankingProposal proposal;
+  topological_sorts_tp new_data = data->current_topological_sorts;
+  proposal.proposal = umat(prior.n_items, new_data.size());
 
-  return LatentRankingProposal{};
+  for(size_t i{}; i < new_data.size(); i++) {
+    int sampled_index = randi(distr_param(0, new_data[i].size() - 1));
+    proposal.proposal.col(i) = conv_to<uvec>::from(new_data[i][sampled_index]);
+    proposal.log_probability = -log(new_data[i].size());
+  }
+
+  return proposal;
 }

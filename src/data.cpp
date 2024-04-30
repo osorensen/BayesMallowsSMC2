@@ -1,6 +1,7 @@
 #include <math.h>
 #include "data.h"
 #include "misc.h"
+#include "sample_latent_rankings.h"
 using namespace arma;
 
 Rankings::Rankings(const Rcpp::List& input_timeseries) {
@@ -57,6 +58,20 @@ void PairwisePreferences::print() {
       Rcpp::Rcout << std::endl;
     }
     Rcpp::Rcout << std::endl;
+  }
+}
+
+void PairwisePreferences::update_topological_sorts(unsigned int t, int n_items) {
+  pairwise_tp new_data = timeseries[t];
+  current_topological_sorts = topological_sorts_tp(new_data.size());
+  for(size_t i{}; i < new_data.size(); i++) {
+    comparisons user_preferences = new_data[i].second;
+    umat preference_matrix{};
+    for(auto it = user_preferences.begin(); it != user_preferences.end(); it++) {
+      auto element = *it;
+      preference_matrix = join_cols(preference_matrix, urowvec{element.first, element.second});
+    }
+    current_topological_sorts[i] = all_topological_sorts(preference_matrix, n_items);
   }
 }
 

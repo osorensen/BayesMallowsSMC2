@@ -13,3 +13,5 @@ LatentRankingProposal sample_latent_rankings(
     const Rankings* data, unsigned int t, const Prior& prior);
 LatentRankingProposal sample_latent_rankings(
     const PairwisePreferences* data, unsigned int t, const Prior& prior);
+
+topological_sorts_user all_topological_sorts(const arma::umat& prefs, int n_items);
