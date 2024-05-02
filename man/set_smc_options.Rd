@@ -9,7 +9,8 @@ set_smc_options(
   n_particle_filters = 50,
   resampling_threshold = n_particles/2,
   metric = "footrule",
-  resampler = "multinomial"
+  resampler = "multinomial",
+  verbose = FALSE
 )
 }
 \arguments{

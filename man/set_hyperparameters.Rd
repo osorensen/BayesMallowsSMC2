@@ -7,7 +7,7 @@
 set_hyperparameters(
   n_items,
   alpha_shape = 1,
-  alpha_rate = 0.1,
+  alpha_rate = 0.5,
   cluster_concentration = 10,
   n_clusters = 1
 )
