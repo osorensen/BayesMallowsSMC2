@@ -45,8 +45,8 @@ Rcpp::List run_smc(
       [](const Particle& p) { return p.log_importance_weight; });
 
     vec log_normalized_importance_weights =
-      log_importance_weights - (max(log_importance_weights +
-      log(sum(exp(log_importance_weights - max(log_importance_weights))))));
+      log_importance_weights - (max(log_importance_weights) +
+      log(sum(exp(log_importance_weights - max(log_importance_weights)))));
 
     double ess = pow(norm(exp(log_normalized_importance_weights), 2), -2);
     reporter.report_ess(ess);

@@ -54,7 +54,7 @@ void Particle::run_particle_filter(
         total_distance += distfun->d(pf.latent_rankings.col(i), parameters.rho.col(c));
       }
       log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
-        parameters.alpha(c) / prior.n_items * total_distance;
+        parameters.alpha(c) * total_distance;
     }
     double maxval = log_cluster_contribution.max();
     double log_prob = maxval + log(accu(exp(log_cluster_contribution - maxval)));

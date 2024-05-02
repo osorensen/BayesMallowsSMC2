@@ -23,7 +23,7 @@ Cayley::Cayley(unsigned int n_items) : n_items { n_items } {}
 double Cayley::logz(double alpha) {
   double res{};
   for(int i{1}; i < n_items; ++i){
-    res += std::log(1.0 + i * std::exp(- alpha / n_items));
+    res += std::log(1.0 + i * std::exp(- alpha));
   }
   return res;
 }
@@ -34,7 +34,7 @@ double Hamming::logz(double alpha) {
   double res{};
   for(int i{}; i < (n_items + 1); ++i){
     res += tgamma(n_items + 1.0) * std::exp(-alpha) *
-      std::pow((std::exp(alpha / n_items) - 1.0), i) / tgamma(i + 1.0);
+      std::pow((std::exp(alpha) - 1.0), i) / tgamma(i + 1.0);
   }
   return std::log(res);
 }
@@ -44,8 +44,7 @@ Kendall::Kendall(unsigned int n_items) : n_items { n_items } {}
 double Kendall::logz(double alpha) {
   double res{};
   for(int i{1}; i < (n_items + 1); ++i){
-    res += std::log((1.0 - std::exp(-i * alpha / n_items)) /
-      (1.0 - std::exp(-alpha / n_items)));
+    res += std::log((1.0 - std::exp(-i * alpha)) / (1.0 - std::exp(-alpha)));
   }
   return res;
 }
@@ -69,7 +68,7 @@ Cardinalities::Cardinalities(unsigned int n_items, const std::string& metric) :
 }
 
 double Cardinalities::logz(double alpha) {
-  return std::log(accu(cardinalities % exp(-distances * alpha / n_items)));
+  return std::log(accu(cardinalities % exp(-distances * alpha)));
 }
 
 

@@ -10,7 +10,7 @@
 #' @export
 #'
 set_hyperparameters <- function(
-    n_items, alpha_shape = 1, alpha_rate = .1, cluster_concentration = 10,
+    n_items, alpha_shape = 1, alpha_rate = .5, cluster_concentration = 10,
     n_clusters = 1) {
   as.list(environment())
 }
