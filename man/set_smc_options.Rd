@@ -23,6 +23,8 @@ set_smc_options(
 \item{metric}{Metric}
 
 \item{resampler}{resampler}
+
+\item{verbose}{Boolean}
 }
 \value{
 A list

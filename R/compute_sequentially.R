@@ -24,6 +24,7 @@
 #' }
 #'
 #' @param hyperparameters A list returned from [set_hyperparameters()].
+#' @param smc_options A list returned from [set_smc_options()]
 #'
 #' @return An object
 #' @export

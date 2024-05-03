@@ -1,8 +1,8 @@
 devtools::load_all()
-data <- subset(partial_rankings_updated, user < 3)
+data <- subset(partial_rankings_updated, user < 5)
 
 hyperparameters <- set_hyperparameters(n_items = 5)
-smc_options <- set_smc_options(verbose = FALSE, n_particles = 1, n_particle_filters = 1, resampler = "residual")
+smc_options <- set_smc_options(verbose = FALSE, n_particles = 2, n_particle_filters = 1, resampler = "residual")
 
 
 mod <- compute_sequentially(data, hyperparameters, smc_options)

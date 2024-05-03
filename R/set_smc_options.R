@@ -5,6 +5,7 @@
 #' @param resampling_threshold Effective sample size threshold for resampling
 #' @param metric Metric
 #' @param resampler resampler
+#' @param verbose Boolean
 #'
 #' @return A list
 #' @export

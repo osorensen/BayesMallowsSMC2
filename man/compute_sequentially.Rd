@@ -34,6 +34,8 @@ If data contains pairwise preferences, it must have the following structure:
 }}
 
 \item{hyperparameters}{A list returned from \code{\link[=set_hyperparameters]{set_hyperparameters()}}.}
+
+\item{smc_options}{A list returned from \code{\link[=set_smc_options]{set_smc_options()}}}
 }
 \value{
 An object
