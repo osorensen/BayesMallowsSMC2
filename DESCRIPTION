@@ -2,7 +2,7 @@ Package: BayesMallowsSMC2
 Type: Package
 Title: Nested Sequential Monte Carlo for the Bayesian Mallows Model
 Version: 0.1.0
-Author@R: c(person("Oystein", "Sorensen",
+Authors@R: c(person("Oystein", "Sorensen",
                     email = "oystein.sorensen.1985@gmail.com",
                     role = c("aut", "cre"),
                     comment = c(ORCID = "0000-0003-0724-3542")))
