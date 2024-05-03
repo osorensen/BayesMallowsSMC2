@@ -93,6 +93,7 @@ Rcpp::List run_smc(
       alpha_trace.col(t) += particle_vector[i].parameters.alpha;
     }
     alpha_trace.col(t) /= particle_vector.size();
+    data->update_observed_users(t);
   }
 
   mat alpha(prior.n_clusters, particle_vector.size());

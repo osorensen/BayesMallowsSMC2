@@ -18,6 +18,12 @@ Rankings::Rankings(const Rcpp::List& input_timeseries) {
   }
 }
 
+void Rankings::update_observed_users(unsigned int t) {
+  for(auto obs : timeseries[t]) {
+    observed_users.insert(obs.first);
+  }
+}
+
 void Rankings::print() {
   for(auto timepoint : timeseries) {
     for(auto observation : timepoint) {
@@ -42,6 +48,12 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) {
       new_data.push_back(pairwise_obs(nm[i], user_data));
     }
     timeseries.push_back(new_data);
+  }
+}
+
+void PairwisePreferences::update_observed_users(unsigned int t) {
+  for(auto obs : timeseries[t]) {
+    observed_users.insert(obs.first);
   }
 }
 

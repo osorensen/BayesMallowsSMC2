@@ -54,6 +54,16 @@
 #' }
 "partial_rankings_heterogeneous"
 
+#' Simulated Data with Missing Values
+#'
+#' @format ## `partial_rankings_updated`
+#' A data frame with 400 rows and 7 columns:
+#' \describe{
+#'   \item{timepoint}{Timepoint}
+#'   \item{user}{User id}
+#'   \item{item1, item2, item3, item4, item5}{Ranking given to the item.}
+#' }
+"partial_rankings_updated"
 
 #' Simulated Data with Missing Values
 #'
