@@ -2,32 +2,35 @@ library(tidyverse)
 library(mvtnorm)
 n_items <- 5
 set.seed(1)
-complete_rankings_mixtures <- tibble(
-  timepoint = 1:1000,
-  user = 1:1000
+complete_rankings_heterogeneous <- tibble(
+  timepoint = sample(1:100, 200, replace = TRUE)
 ) %>%
+  arrange(timepoint) %>%
+  mutate(
+    timepoint = as.integer(as.factor(timepoint)),
+    user = row_number()
+    ) %>%
   pmap_dfr(function(timepoint, user) {
-    decreasing <- sample(c(TRUE, FALSE), 1, prob = c(.7, .3))
     tibble(
       timepoint = timepoint,
       user = user,
       item = seq_len(n_items),
-      ranking = order(rmvnorm(1, mean = seq(from = 0, to = 1, length.out = n_items)), decreasing = !!decreasing)
+      ranking = order(rmvnorm(1, mean = seq(from = 0, to = 1, length.out = n_items)))
     )
   }) %>%
   pivot_wider(names_from = item, values_from = ranking, names_prefix = "item") %>%
   as.data.frame()
 
-usethis::use_data(complete_rankings_mixtures, overwrite = TRUE)
+usethis::use_data(complete_rankings_heterogeneous, overwrite = TRUE)
 
-partial_rankings_mixtures <- complete_rankings_mixtures %>%
-  mutate(across(contains("item"), ~ if_else(runif(1000) > .8, NA_real_, .))) %>%
+partial_rankings_heterogeneous <- complete_rankings_heterogeneous %>%
+  mutate(across(contains("item"), ~ if_else(runif(nrow(complete_rankings_heterogeneous)) > .8, NA_real_, .))) %>%
   as.data.frame()
 
-usethis::use_data(partial_rankings_mixtures, overwrite = TRUE)
+usethis::use_data(partial_rankings_heterogeneous, overwrite = TRUE)
 
 possible_pairs <- combn(1:5, 2, simplify = FALSE)
-pairwise_preferences_mixtures <- complete_rankings_mixtures %>%
+pairwise_preferences_heterogeneous <- complete_rankings_heterogeneous %>%
   pivot_longer(cols = starts_with("item")) %>%
   mutate(name = str_extract(name, "[:digit:]+$")) %>%
   nest_by(timepoint, user, .keep = TRUE) %>%
@@ -44,4 +47,4 @@ pairwise_preferences_mixtures <- complete_rankings_mixtures %>%
   }) %>%
   as.data.frame()
 
-usethis::use_data(pairwise_preferences_mixtures, overwrite = TRUE)
+usethis::use_data(pairwise_preferences_heterogeneous, overwrite = TRUE)

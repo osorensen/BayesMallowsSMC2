@@ -24,7 +24,7 @@ void Particle::run_particle_filter(
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
     const std::unique_ptr<Resampler>& resampler) {
-  // resample
+
   if(t > 0) {
     ivec new_inds = resampler->resample(exp(log_normalized_particle_filter_weights));
     std::vector<ParticleFilter> tmp(particle_filters.size());
@@ -37,17 +37,13 @@ void Particle::run_particle_filter(
   }
 
   for(auto& pf : particle_filters) {
-    // sample latent rankings
     auto proposal = sample_latent_rankings(data, t, prior);
     pf.latent_rankings = proposal.proposal;
 
-    // sample cluster indicators
     uvec new_cluster_assignments = sample_cluster_assignments(pf.latent_rankings, parameters, pfun, distfun);
     pf.cluster_assignments = join_cols(pf.cluster_assignments, new_cluster_assignments);
 
-    // compute weights
     vec log_cluster_contribution(prior.n_clusters);
-
     for(size_t c{}; c < prior.n_clusters; c++) {
       unsigned int total_distance{};
       for(size_t i{}; i < pf.latent_rankings.n_cols; i++) {
@@ -62,7 +58,6 @@ void Particle::run_particle_filter(
     pf.log_weight(t) = log_prob - proposal.log_probability;
   }
 
-  // normalize weights
   Rcpp::NumericVector tmp_pf_weights(log_normalized_particle_filter_weights.size());
   std::transform(
     particle_filters.cbegin(), particle_filters.cend(), tmp_pf_weights.begin(),
@@ -142,12 +137,11 @@ bool Particle::rejuvenate(
     const std::unique_ptr<Resampler>& resampler,
     const vec& alpha_sd
 ) {
-  // sample a complete cluster assignment and compute frequencies
   int pf_index = randi(distr_param(0, particle_filters.size() - 1));
   uvec cluster_assignments = particle_filters[pf_index].cluster_assignments;
   uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
+  Rcpp::Rcout << "cluster frequencies " << cluster_frequencies.t() << std::endl;
 
-  // sample proposals
   vec alpha_proposal(prior.n_clusters);
   vec tau_proposal(prior.n_clusters);
   umat rho_proposal(prior.n_items, prior.n_clusters);
@@ -158,7 +152,6 @@ bool Particle::rejuvenate(
   }
   tau_proposal = normalise(tau_proposal, 1);
 
-  // run particle filters
   Particle proposal_particle(options, prior);
   proposal_particle.parameters = StaticParameters{alpha_proposal, rho_proposal, tau_proposal};
   vec current_log_likelihood(T + 1);
