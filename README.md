@@ -4,6 +4,8 @@
 # BayesMallowsSMC2
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of BayesMallowsSMC2 is to provide sequential inference in the

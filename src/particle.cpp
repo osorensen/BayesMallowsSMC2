@@ -43,17 +43,17 @@ void Particle::run_particle_filter(
     uvec new_cluster_assignments = sample_cluster_assignments(pf.latent_rankings, parameters, pfun, distfun);
     pf.cluster_assignments = join_cols(pf.cluster_assignments, new_cluster_assignments);
 
-    vec log_cluster_contribution(prior.n_clusters);
-    for(size_t c{}; c < prior.n_clusters; c++) {
-      unsigned int total_distance{};
-      for(size_t i{}; i < pf.latent_rankings.n_cols; i++) {
-        total_distance += distfun->d(pf.latent_rankings.col(i), parameters.rho.col(c));
+    double log_prob{};
+    for(size_t i{}; i < pf.latent_rankings.n_cols; i++) {
+      vec log_cluster_contribution(prior.n_clusters);
+      for(size_t c{}; c < prior.n_clusters; c++) {
+        log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
+          parameters.alpha(c) * distfun->d(pf.latent_rankings.col(i), parameters.rho.col(c));
       }
-      log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
-        parameters.alpha(c) * total_distance;
+      double maxval = log_cluster_contribution.max();
+      log_prob += maxval + log(accu(exp(log_cluster_contribution - maxval)));
     }
-    double maxval = log_cluster_contribution.max();
-    double log_prob = maxval + log(accu(exp(log_cluster_contribution - maxval)));
+
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - proposal.log_probability;
   }
@@ -140,7 +140,6 @@ bool Particle::rejuvenate(
   int pf_index = randi(distr_param(0, particle_filters.size() - 1));
   uvec cluster_assignments = particle_filters[pf_index].cluster_assignments;
   uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
-  Rcpp::Rcout << "cluster frequencies " << cluster_frequencies.t() << std::endl;
 
   vec alpha_proposal(prior.n_clusters);
   vec tau_proposal(prior.n_clusters);
