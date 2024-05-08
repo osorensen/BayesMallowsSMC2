@@ -1,20 +1,13 @@
 library(tidyverse)
-library(mvtnorm)
+
 n_items <- 5
 set.seed(1)
-complete_rankings <- tibble(
-  timepoint = 1:100,
-  user = 1:100
-) %>%
-  pmap_dfr(function(timepoint, user) {
-    tibble(
-      timepoint = timepoint,
-      user = user,
-      item = seq_len(n_items),
-      ranking = order(rmvnorm(1, mean = seq(from = 0, to = 1, length.out = n_items)))
-    )
-  }) %>%
-  pivot_wider(names_from = item, values_from = ranking, names_prefix = "item") %>%
+
+rankings <- BayesMallows::sample_mallows(1:5, 5, 100, thinning = 1000)
+colnames(rankings) <- paste0("item", 1:5)
+
+complete_rankings <- tibble(timepoint = 1:100, user = 1:100) %>%
+  bind_cols(rankings) %>%
   as.data.frame()
 
 usethis::use_data(complete_rankings, overwrite = TRUE)
