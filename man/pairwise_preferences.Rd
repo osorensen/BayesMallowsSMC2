@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{pairwise_preferences}}{
 
-A data frame with 400 rows and 4 columns:
+A data frame with 2000 rows and 4 columns:
 \describe{
 \item{timepoint}{Timepoint}
 \item{user}{User id}

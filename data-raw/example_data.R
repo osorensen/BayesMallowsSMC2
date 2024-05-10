@@ -18,6 +18,13 @@ partial_rankings <- complete_rankings %>%
 
 usethis::use_data(partial_rankings, overwrite = TRUE)
 
+rankings <- BayesMallows::sample_mallows(1:5, 5, 500, thinning = 1000)
+colnames(rankings) <- paste0("item", 1:5)
+
+complete_rankings <- tibble(timepoint = 1:500, user = 1:500) %>%
+  bind_cols(rankings) %>%
+  as.data.frame()
+
 possible_pairs <- combn(1:5, 2, simplify = FALSE)
 pairwise_preferences <- complete_rankings %>%
   pivot_longer(cols = starts_with("item")) %>%
