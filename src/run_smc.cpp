@@ -9,6 +9,7 @@
 #include "distances.h"
 #include "resampler.h"
 #include "progress_reporter.h"
+#include "parameter_tracer.h"
 using namespace arma;
 
 // [[Rcpp::export]]
@@ -27,9 +28,9 @@ Rcpp::List run_smc(
   auto distfun = choose_distance_function(options.metric);
   auto resampler = choose_resampler(options.resampler);
   auto reporter = ProgressReporter(options.verbose);
+  auto tracer = ParameterTracer(options.trace);
 
   int T = data->n_timepoints();
-  mat alpha_trace(prior.n_clusters, T);
   for(size_t t{}; t < T; t++) {
     reporter.report_time(t);
     data->update_topological_sorts(t, prior.n_items);
@@ -89,11 +90,8 @@ Rcpp::List run_smc(
                     [](Particle& p) { p.log_importance_weight = 1; });
     }
 
-    for(size_t i{}; i < particle_vector.size(); i++) {
-      alpha_trace.col(t) += particle_vector[i].parameters.alpha;
-    }
-    alpha_trace.col(t) /= particle_vector.size();
     data->update_observed_users(t);
+    tracer.update_trace(particle_vector, t);
   }
 
   mat alpha(prior.n_clusters, particle_vector.size());
@@ -106,7 +104,6 @@ Rcpp::List run_smc(
   }
 
   return Rcpp::List::create(
-    Rcpp::Named("alpha_trace") = alpha_trace,
     Rcpp::Named("alpha") = alpha,
     Rcpp::Named("rho") = rho,
     Rcpp::Named("tau") = tau

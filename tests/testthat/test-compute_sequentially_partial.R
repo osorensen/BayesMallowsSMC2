@@ -3,7 +3,7 @@ test_that("compute_sequentially works with partial data", {
   mod <- compute_sequentially(
     partial_rankings,
     hyperparameters = set_hyperparameters(n_items = 5),
-    smc_options = set_smc_options(n_particles = 100)
+    smc_options = set_smc_options(n_particles = 100, trace = TRUE)
   )
   expect_gt(mean(mod$alpha), .9)
   expect_lt(mean(mod$alpha), 1.1)

@@ -6,12 +6,14 @@
 #' @param metric Metric
 #' @param resampler resampler
 #' @param verbose Boolean
+#' @param trace Logical specifying whether to save static parameters at each
+#' timestep.
 #'
 #' @return A list
 #' @export
 #'
 set_smc_options <- function(
     n_particles = 1000, n_particle_filters = 50, resampling_threshold = n_particles / 2,
-    metric = "footrule", resampler = "multinomial", verbose = FALSE) {
+    metric = "footrule", resampler = "multinomial", verbose = FALSE, trace = FALSE) {
   as.list(environment())
 }

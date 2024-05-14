@@ -10,7 +10,8 @@ set_smc_options(
   resampling_threshold = n_particles/2,
   metric = "footrule",
   resampler = "multinomial",
-  verbose = FALSE
+  verbose = FALSE,
+  trace = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,9 @@ set_smc_options(
 \item{resampler}{resampler}
 
 \item{verbose}{Boolean}
+
+\item{trace}{Logical specifying whether to save static parameters at each
+timestep.}
 }
 \value{
 A list
