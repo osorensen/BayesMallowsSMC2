@@ -92,15 +92,16 @@ Rcpp::List run_smc(
                     [](Particle& p) { p.log_importance_weight = 1; });
 
       double acceptance_rate = accepted / particle_vector.size() / iter;
-      if(acceptance_rate < 0 && options.n_particle_filters < options.max_particle_filters) {
+      Rcpp::Rcout << "acceptance rate " << acceptance_rate << std::endl;
+      if(acceptance_rate < 0.2 && options.n_particle_filters < options.max_particle_filters) {
         for(auto& p : particle_vector) {
           auto tmp = p.particle_filters;
           int S = tmp.size() * 2;
           p.particle_filters.clear();
           p.particle_filters.reserve(S);
-          for(size_t i{}; i < S; i++) {
-            int new_item = randi(distr_param(0, tmp.size() - 1));
-            p.particle_filters.push_back(tmp[new_item]);
+          ivec new_inds = resampler->resample(S, exp(p.log_normalized_particle_filter_weights));
+          for(auto ni : new_inds) {
+            p.particle_filters.push_back(tmp[ni]);
           }
           p.log_normalized_particle_filter_weights = Rcpp::NumericVector(S, -log(p.particle_filters.size()));
 

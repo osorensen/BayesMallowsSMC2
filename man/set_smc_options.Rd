@@ -7,6 +7,7 @@
 set_smc_options(
   n_particles = 1000,
   n_particle_filters = 50,
+  max_particle_filters = 10000,
   resampling_threshold = n_particles/2,
   metric = "footrule",
   resampler = "multinomial",
@@ -17,7 +18,9 @@ set_smc_options(
 \arguments{
 \item{n_particles}{Number of particles}
 
-\item{n_particle_filters}{Number of particle filters for each particle}
+\item{n_particle_filters}{Iniitial number of particle filters for each particle}
+
+\item{max_particle_filters}{Maximum number of particle filters.}
 
 \item{resampling_threshold}{Effective sample size threshold for resampling}
 
