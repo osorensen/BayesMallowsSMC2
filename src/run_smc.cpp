@@ -121,7 +121,7 @@ Rcpp::List run_smc(
           p.log_importance_weight += log(Z_new) - log(Z_old);
 
         }
-        options.n_particles *= 2;
+        options.n_particle_filters *= 2;
         reporter.report_expansion(options.n_particles);
       }
     }
