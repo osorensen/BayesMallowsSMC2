@@ -32,8 +32,7 @@ void Particle::run_particle_filter(
       tmp[i] = particle_filters[new_inds[i]];
     }
     particle_filters = tmp;
-    std::fill(log_normalized_particle_filter_weights.begin(),
-              log_normalized_particle_filter_weights.end(), -log(particle_filters.size()));
+    log_normalized_particle_filter_weights = Rcpp::NumericVector(particle_filters.size(), -log(particle_filters.size()));
   }
 
   for(auto& pf : particle_filters) {

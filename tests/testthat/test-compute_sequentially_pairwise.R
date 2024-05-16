@@ -2,9 +2,9 @@ test_that("compute_sequentially works with pairwise preference data", {
   skip()
   set.seed(2)
   mod <- compute_sequentially(
-    subset(pairwise_preferences, user < 4),
+    subset(pairwise_preferences, user < 20),
     hyperparameters = set_hyperparameters(n_items = 5),
-    smc_options = set_smc_options(n_particles = 40, n_particle_filters = 3, verbose = TRUE, resampling_threshold = 40)
+    smc_options = set_smc_options(n_particles = 40, n_particle_filters = 3, verbose = TRUE, resampling_threshold = 20)
   )
   expect_gt(mean(mod$alpha), .14)
   expect_lt(mean(mod$alpha), .26)
