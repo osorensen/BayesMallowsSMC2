@@ -29,44 +29,40 @@ ivec digitize(const vec& bins, const vec& values) {
   return indices;
 }
 
-ivec stratsys(vec probs, bool stratified) {
-  size_t N = probs.size();
-  vec u(N);
-  vec rn = stratified ? randu(N) : vec(N, fill::value(randu()));
+ivec stratsys(int n_samples, vec probs, bool stratified) {
+  vec u(n_samples);
+  vec rn = stratified ? randu(n_samples) : vec(n_samples, fill::value(randu()));
 
-  for(size_t i{}; i < N; i++) u(i) = (i + rn(i)) / N;
+  for(size_t i{}; i < n_samples; i++) u(i) = (i + rn(i)) / n_samples;
   return digitize(cumsum(probs), u);
 }
 
-ivec Multinomial::resample(vec probs) {
+ivec Multinomial::resample(int n_samples, vec probs) {
   return Rcpp::sample(
-    probs.size(), probs.size(), true,
+    probs.size(), n_samples, true,
     Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(probs)), false);
 }
 
-ivec Residual::resample(vec probs) {
-  int N = probs.size();
-  vec counts = floor(probs * N);
-  int R = N - sum(counts);
-  ivec result = count_to_index(counts);
-  ivec part2{};
-
-  if(R > 0) {
-    vec residual_weights = normalise(probs - counts / N, 1);
+ivec Residual::resample(int n_samples, vec probs) {
+  vec counts = floor(n_samples * probs);
+  double R = sum(counts);
+  ivec part2;
+  if(n_samples > R) {
+    vec new_probs = (n_samples * probs - counts) / (n_samples - R);
     part2 = Rcpp::sample(
-      N, R, true,
-      Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(residual_weights)), false);
+      new_probs.size(), n_samples - R, true,
+      Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(new_probs)), false);
   }
-
-  return join_cols(result, part2);
+  ivec part1 = count_to_index(counts);
+  return join_cols(part1, part2);
 }
 
-ivec Stratified::resample(vec probs) {
-  return stratsys(probs, true);
+ivec Stratified::resample(int n_samples, vec probs) {
+  return stratsys(n_samples, probs, true);
 }
 
-ivec Systematic::resample(vec probs) {
-  return stratsys(probs, false);
+ivec Systematic::resample(int n_samples, vec probs) {
+  return stratsys(n_samples, probs, false);
 }
 
 std::unique_ptr<Resampler> choose_resampler(std::string resampler) {

@@ -26,7 +26,8 @@ void Particle::run_particle_filter(
     const std::unique_ptr<Resampler>& resampler) {
 
   if(t > 0) {
-    ivec new_inds = resampler->resample(exp(log_normalized_particle_filter_weights));
+    ivec new_inds = resampler->resample(log_normalized_particle_filter_weights.size(),
+                                        exp(log_normalized_particle_filter_weights));
     std::vector<ParticleFilter> tmp(particle_filters.size());
     for(size_t i{}; i < new_inds.size(); i++) {
       tmp[i] = particle_filters[new_inds[i]];

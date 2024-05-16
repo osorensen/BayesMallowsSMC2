@@ -27,3 +27,9 @@ void ProgressReporter::report_rejuvenation(int unique_particles) {
     Rcpp::Rcout << unique_particles << " unique particles after rejuvenation" << std::endl;
   }
 }
+
+void ProgressReporter::report_expansion(int n_particle_filters) {
+  if(verbose) {
+    Rcpp::Rcout << n_particle_filters << " particle filters after doubling" << std::endl;
+  }
+}

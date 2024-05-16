@@ -54,7 +54,8 @@ Rcpp::List run_smc(
 
     if(ess < options.resampling_threshold) {
       reporter.report_resampling();
-      ivec new_inds = resampler->resample(exp(log_normalized_importance_weights));
+      ivec new_inds = resampler->resample(log_normalized_importance_weights.size(),
+                                          exp(log_normalized_importance_weights));
       uvec unique_particles = find_unique(new_inds);
       int n_unique_particles = unique_particles.size();
 
@@ -90,32 +91,38 @@ Rcpp::List run_smc(
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p) { p.log_importance_weight = 1; });
 
-      // double acceptance_rate = accepted / particle_vector.size() / iter;
-      // Rcpp::Rcout << "acceptance rate " << acceptance_rate << std::endl;
-      // if(acceptance_rate < 1.1 && options.n_particle_filters < options.max_particle_filters) {
-      //   Rcpp::Rcout << "doubling the number of particle filters" << std::endl;
-      //   for(auto& p : particle_vector) {
-      //     auto tmp = p.particle_filters;
-      //     int S = tmp.size() * 2;
-      //     p.particle_filters.clear();
-      //     p.particle_filters.reserve(S);
-      //     for(size_t i{}; i < S; i++) {
-      //       int new_item = randi(distr_param(0, tmp.size() - 1));
-      //       p.particle_filters.push_back(tmp[new_item]);
-      //     }
-      //     p.log_normalized_particle_filter_weights = Rcpp::NumericVector(S);
-      //     Rcpp::NumericVector tmp_pf_weights(S);
-      //     std::transform(
-      //       p.particle_filters.cbegin(), p.particle_filters.cend(), tmp_pf_weights.begin(),
-      //       [t](const ParticleFilter& pf) { return pf.log_weight(t); }
-      //     );
-      //     double maxval = Rcpp::max(tmp_pf_weights);
-      //     p.log_normalized_particle_filter_weights =
-      //       tmp_pf_weights - (maxval + log(sum(exp(tmp_pf_weights - maxval))));
-      //     Rcpp::Rcout << "new weights " << p.log_normalized_particle_filter_weights << std::endl;
-      //   }
-      //   options.n_particles *= 2;
-      // }
+      double acceptance_rate = accepted / particle_vector.size() / iter;
+      if(acceptance_rate < 0 && options.n_particle_filters < options.max_particle_filters) {
+        for(auto& p : particle_vector) {
+          auto tmp = p.particle_filters;
+          int S = tmp.size() * 2;
+          p.particle_filters.clear();
+          p.particle_filters.reserve(S);
+          for(size_t i{}; i < S; i++) {
+            int new_item = randi(distr_param(0, tmp.size() - 1));
+            p.particle_filters.push_back(tmp[new_item]);
+          }
+          p.log_normalized_particle_filter_weights = Rcpp::NumericVector(S, -log(p.particle_filters.size()));
+
+          double Z_old{};
+          for(const auto& pf : tmp) {
+            double max = pf.log_weight.max();
+            Z_old += exp(max) * sum(exp(pf.log_weight - max));
+          }
+          Z_old /= tmp.size();
+          double Z_new{};
+          for(const auto& pf : p.particle_filters) {
+            double max = pf.log_weight.max();
+            Z_new += exp(max) * sum(exp(pf.log_weight - max));
+          }
+          Z_new /= p.particle_filters.size();
+
+          p.log_importance_weight += log(Z_new) - log(Z_old);
+
+        }
+        options.n_particles *= 2;
+        reporter.report_expansion(options.n_particles);
+      }
     }
 
     data->update_observed_users(t);
