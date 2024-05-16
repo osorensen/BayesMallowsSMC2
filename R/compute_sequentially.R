@@ -29,8 +29,6 @@
 #' @return An object
 #' @export
 #'
-#' @examples
-#' compute_sequentially(partial_rankings)
 compute_sequentially <- function(
     data,
     hyperparameters = set_hyperparameters(),

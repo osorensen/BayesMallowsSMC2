@@ -43,6 +43,3 @@ An object
 \description{
 Compute the Bayesian Mallows model sequentially
 }
-\examples{
-compute_sequentially(partial_rankings)
-}
