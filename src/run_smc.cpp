@@ -86,7 +86,7 @@ Rcpp::List run_smc(
         n_unique_particles = unique_particles.size();
         reporter.report_rejuvenation(n_unique_particles);
 
-      } while((2.0 * n_unique_particles < particle_vector.size()) && iter < 20);
+      } while((2.0 * n_unique_particles < particle_vector.size()) && iter < options.max_rejuvenation_steps);
 
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p) { p.log_importance_weight = 1; });

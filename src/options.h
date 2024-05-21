@@ -12,6 +12,7 @@ struct Options{
   unsigned int n_particle_filters;
   unsigned int max_particle_filters;
   unsigned int resampling_threshold;
+  unsigned int max_rejuvenation_steps;
   const bool verbose;
   const bool trace;
 };
