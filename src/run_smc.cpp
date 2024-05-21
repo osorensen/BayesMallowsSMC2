@@ -29,6 +29,7 @@ Rcpp::List run_smc(
   auto resampler = choose_resampler(options.resampler);
   auto reporter = ProgressReporter(options.verbose);
   auto tracer = ParameterTracer(options.trace);
+  Rcpp::IntegerVector n_particle_filters(data->n_timepoints());
 
   int T = data->n_timepoints();
   for(size_t t{}; t < T; t++) {
@@ -128,6 +129,7 @@ Rcpp::List run_smc(
 
     data->update_observed_users(t);
     tracer.update_trace(particle_vector, t);
+    n_particle_filters(t) = options.n_particle_filters;
   }
 
   mat alpha(prior.n_clusters, particle_vector.size());
@@ -142,6 +144,7 @@ Rcpp::List run_smc(
   return Rcpp::List::create(
     Rcpp::Named("alpha") = alpha,
     Rcpp::Named("rho") = rho,
-    Rcpp::Named("tau") = tau
+    Rcpp::Named("tau") = tau,
+    Rcpp::Named("n_particle_filters") = n_particle_filters
   );
 }
