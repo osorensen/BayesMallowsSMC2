@@ -123,7 +123,7 @@ Rcpp::List run_smc(
 
         }
         options.n_particle_filters *= 2;
-        reporter.report_expansion(options.n_particles);
+        reporter.report_expansion(options.n_particle_filters);
       }
     }
 
