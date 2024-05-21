@@ -1,7 +1,7 @@
 #' Set SMC options
 #'
 #' @param n_particles Number of particles
-#' @param n_particle_filters Iniitial number of particle filters for each particle
+#' @param n_particle_filters Initial number of particle filters for each particle
 #' @param max_particle_filters Maximum number of particle filters.
 #' @param resampling_threshold Effective sample size threshold for resampling
 #' @param metric Metric
