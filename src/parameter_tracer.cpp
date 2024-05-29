@@ -4,10 +4,10 @@
 #include "parameter_tracer.h"
 using namespace arma;
 
-ParameterTracer::ParameterTracer(bool trace) : trace { trace } {
+ParameterTracer::ParameterTracer(bool trace, const std::string& trace_directory)
+  : trace { trace }, trace_directory { trace_directory } {
   if(trace) {
-    const char* dirName = "parameter_trace";
-    int status = mkdir(dirName, 0777);
+    int status = mkdir(trace_directory.c_str(), 0777);
     if (status != 0) {
       Rcpp::stop("Error creating trace directory.");
     }
@@ -22,7 +22,7 @@ void ParameterTracer::update_trace(const std::vector<Particle>& pvec, int t) {
     }
 
     std::ostringstream filename_stream;
-    filename_stream << "parameter_trace/alpha_" << t << ".txt";
+    filename_stream << trace_directory << "/alpha_" << t << ".txt";
     std::string filename = filename_stream.str();
 
     alpha.save(filename, arma_ascii);
@@ -35,7 +35,7 @@ void ParameterTracer::update_trace(const std::vector<Particle>& pvec, int t) {
     }
 
     std::ostringstream filename_stream_rho;
-    filename_stream_rho << "parameter_trace/rho_" << t << ".txt";
+    filename_stream_rho << trace_directory << "/rho_" << t << ".txt";
     std::string filename_rho = filename_stream_rho.str();
 
     rho.save(filename_rho, arma_ascii);
@@ -46,7 +46,7 @@ void ParameterTracer::update_trace(const std::vector<Particle>& pvec, int t) {
     }
 
     std::ostringstream filename_stream_tau;
-    filename_stream_tau << "parameter_trace/tau_" << t << ".txt";
+    filename_stream_tau << trace_directory << "/tau_" << t << ".txt";
     std::string filename_tau = filename_stream_tau.str();
 
     tau.save(filename_tau, arma_ascii);

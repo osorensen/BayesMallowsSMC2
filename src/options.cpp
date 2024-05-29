@@ -9,4 +9,5 @@ Options::Options(const Rcpp::List& input_options) :
   resampling_threshold{input_options["resampling_threshold"]},
   max_rejuvenation_steps{input_options["max_rejuvenation_steps"]},
   verbose{input_options["verbose"]},
-  trace{input_options["trace"]}{}
+  trace{input_options["trace"]},
+  trace_directory(input_options["trace_directory"]){}

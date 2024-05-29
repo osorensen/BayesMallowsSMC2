@@ -13,7 +13,8 @@ set_smc_options(
   metric = "footrule",
   resampler = "multinomial",
   verbose = FALSE,
-  trace = FALSE
+  trace = FALSE,
+  trace_directory = NULL
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ after this many steps, the rejuvenation is still stopped.}
 
 \item{trace}{Logical specifying whether to save static parameters at each
 timestep.}
+
+\item{trace_directory}{Character specifying directory to create in which to
+put parameter trace. Only used if \code{trace = TRUE}.}
 }
 \value{
 A list

@@ -28,7 +28,7 @@ Rcpp::List run_smc(
   auto distfun = choose_distance_function(options.metric);
   auto resampler = choose_resampler(options.resampler);
   auto reporter = ProgressReporter(options.verbose);
-  auto tracer = ParameterTracer(options.trace);
+  auto tracer = ParameterTracer(options.trace, options.trace_directory);
   Rcpp::IntegerVector n_particle_filters(data->n_timepoints());
 
   int T = data->n_timepoints();
