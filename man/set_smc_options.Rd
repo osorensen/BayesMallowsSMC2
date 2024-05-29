@@ -14,7 +14,7 @@ set_smc_options(
   resampler = "multinomial",
   verbose = FALSE,
   trace = FALSE,
-  trace_directory = NULL
+  trace_directory = ""
 )
 }
 \arguments{
