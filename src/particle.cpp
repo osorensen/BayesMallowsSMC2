@@ -26,22 +26,26 @@ void Particle::run_particle_filter(
     const std::unique_ptr<Resampler>& resampler) {
 
   if(t > 0) {
-    ivec new_inds = resampler->resample(log_normalized_particle_filter_weights.size(),
-                                        exp(log_normalized_particle_filter_weights));
+    ivec new_inds = resampler->resample(
+      log_normalized_particle_filter_weights.size(),
+      exp(log_normalized_particle_filter_weights));
     std::vector<ParticleFilter> tmp(particle_filters.size());
     for(size_t i{}; i < new_inds.size(); i++) {
       tmp[i] = particle_filters[new_inds[i]];
     }
     particle_filters = tmp;
-    log_normalized_particle_filter_weights = Rcpp::NumericVector(particle_filters.size(), -log(particle_filters.size()));
+    log_normalized_particle_filter_weights =
+      Rcpp::NumericVector(particle_filters.size(), -log(particle_filters.size()));
   }
 
   for(auto& pf : particle_filters) {
     auto proposal = sample_latent_rankings(data, t, prior);
     pf.latent_rankings = proposal.proposal;
 
-    uvec new_cluster_assignments = sample_cluster_assignments(pf.latent_rankings, parameters, pfun, distfun);
-    pf.cluster_assignments = join_cols(pf.cluster_assignments, new_cluster_assignments);
+    uvec new_cluster_assignments =
+      sample_cluster_assignments(pf.latent_rankings, parameters, pfun, distfun);
+    pf.cluster_assignments =
+      join_cols(pf.cluster_assignments, new_cluster_assignments);
 
     double log_prob{};
     for(size_t i{}; i < pf.latent_rankings.n_cols; i++) {
