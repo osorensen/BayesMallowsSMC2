@@ -35,6 +35,7 @@ Rcpp::List run_smc(
   for(size_t t{}; t < T; t++) {
     reporter.report_time(t);
     data->update_topological_sorts(t, prior.n_items);
+
     for(auto& p : particle_vector) {
       p.run_particle_filter(t, prior, data, pfun, distfun, resampler);
       p.log_importance_weight += p.log_incremental_likelihood(t);

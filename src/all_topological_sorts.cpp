@@ -6,6 +6,9 @@
 #include <RcppArmadillo.h>
 #include <vector>
 #include <list>
+#include <string>
+#include <sstream>
+#include <filesystem>
 #include "typedefs.h"
 using namespace std;
 
@@ -82,4 +85,52 @@ topological_sorts_user all_topological_sorts(const arma::umat& prefs, int n_item
   }
 
   return ret;
+}
+
+//' Precompute All Topological Sorts
+//'
+//' This function precomputes all topological sorts for a given preference matrix and
+//' saves them to a specified output directory. It ensures the output directory exists
+//' and creates it if it does not.
+//'
+//' @param prefs An integer matrix (`arma::umat`) representing the preference relations.
+//' @param n_items An integer specifying the number of items to sort.
+//' @param output_directory A string specifying the directory where the output files will be saved.
+//' @param max_files_to_save An integer specifying an upper limit on the number of files to save. If
+//'  the number of topological sorts exceeds `max_files_to_save`, a random sample of size `max_files_to_save`
+//'  is taken at random, and the corresponding sorts saved.
+//'
+//' @details
+//' The function generates all possible topological sorts for the provided preference matrix
+//' and saves each sort as a binary file in the specified output directory. The output files
+//' are named sequentially as `sort0.bin`, `sort1.bin`, and so on.
+//'
+//' @return This function does not return a value. It performs its operations as a side effect.
+//'
+//' @export
+// [[Rcpp::export]]
+void precompute_topological_sorts(
+    const arma::umat& prefs, int n_items, std::string output_directory,
+    int max_files_to_save) {
+ if (!std::filesystem::exists(output_directory)) {
+   std::filesystem::create_directory(output_directory);
+ }
+
+ auto sorts = all_topological_sorts(prefs, n_items);
+ topological_sorts_user temp_sorts;
+
+ if(sorts.size() > max_files_to_save) {
+   Rcpp::IntegerVector inds_to_keep = Rcpp::sample(sorts.size(), max_files_to_save);
+   for(auto i : inds_to_keep) {
+     temp_sorts.push_back(sorts[i]);
+   }
+   sorts = std::move(temp_sorts);
+ }
+
+ for (size_t i = 0; i < sorts.size(); i++) {
+   std::ostringstream filename_stream;
+   filename_stream << output_directory << "/sort" << i << ".bin";
+   std::string filename = filename_stream.str();
+   sorts[i].save(filename);
+ }
 }
