@@ -1,8 +1,11 @@
 #include <RcppArmadillo.h>
+#include <filesystem>
+#include <vector>
 #include "sample_latent_rankings.h"
 #include "data.h"
 #include "misc.h"
 using namespace arma;
+namespace fs = std::filesystem;
 
 LatentRankingProposal sample_latent_rankings(
     const std::unique_ptr<Data>& data, unsigned int t, const Prior& prior
@@ -42,12 +45,36 @@ LatentRankingProposal sample_latent_rankings(
 LatentRankingProposal sample_latent_rankings(
     const PairwisePreferences* data, unsigned int t, const Prior& prior) {
   LatentRankingProposal proposal;
-  proposal.proposal = umat(prior.n_items, data->current_topological_sorts.size());
+  proposal.proposal = umat(prior.n_items, data->timeseries[t].size());
 
-  for(size_t i{}; i < data->current_topological_sorts.size(); i++) {
-    int sampled_index = randi(distr_param(0, data->current_topological_sorts[i].size() - 1));
-    proposal.proposal.col(i) = conv_to<uvec>::from(data->current_topological_sorts[i][sampled_index]);
-    proposal.log_probability = -log(data->current_topological_sorts[i].size());
+  for(size_t i{}; i < data->timeseries[t].size(); i++) {
+    std::string user = data->timeseries[t][i].first;
+    std::string directory_path = data->topological_sorts_directory + std::string("/user") + user;
+    std::vector<fs::path> file_paths;
+
+    for(const auto& entry : fs::directory_iterator(directory_path)) {
+      if(entry.is_regular_file()) {
+        file_paths.push_back(entry.path());
+      }
+    }
+
+    if(file_paths.empty()) {
+      Rcpp::stop("Found no files.");
+    }
+
+    int file_index = randi(distr_param(0, file_paths.size() - 1));
+    fs::path random_file_path = file_paths[file_index];
+
+    ivec tmp;
+    bool ok = tmp.load(random_file_path.string(), arma_binary);
+    if(ok == false) {
+      Rcpp::stop("Could not find file.");
+    }
+
+    Rcpp::CharacterVector nn = data->num_topological_sorts.names();
+    Rcpp::IntegerVector matching_index = Rcpp::match(Rcpp::CharacterVector::create(user), nn) - 1;
+    proposal.proposal.col(i) = conv_to<uvec>::from(tmp);
+    proposal.log_probability = -log(data->num_topological_sorts[matching_index[0]]);
   }
 
   return proposal;

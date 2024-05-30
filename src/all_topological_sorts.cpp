@@ -105,11 +105,11 @@ topological_sorts_user all_topological_sorts(const arma::umat& prefs, int n_item
 //' and saves each sort as a binary file in the specified output directory. The output files
 //' are named sequentially as `sort0.bin`, `sort1.bin`, and so on.
 //'
-//' @return This function does not return a value. It performs its operations as a side effect.
+//' @return This function returns the normal of topological sorts.
 //'
 //' @export
 // [[Rcpp::export]]
-void precompute_topological_sorts(
+int precompute_topological_sorts(
     const arma::umat& prefs, int n_items, std::string output_directory,
     int max_files_to_save) {
  if (!std::filesystem::exists(output_directory)) {
@@ -117,6 +117,7 @@ void precompute_topological_sorts(
  }
 
  auto sorts = all_topological_sorts(prefs, n_items);
+ int n_sorts = sorts.size();
  topological_sorts_user temp_sorts;
 
  if(sorts.size() > max_files_to_save) {
@@ -133,4 +134,5 @@ void precompute_topological_sorts(
    std::string filename = filename_stream.str();
    sorts[i].save(filename);
  }
+ return n_sorts;
 }

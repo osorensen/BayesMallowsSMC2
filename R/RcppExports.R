@@ -19,11 +19,11 @@
 #' and saves each sort as a binary file in the specified output directory. The output files
 #' are named sequentially as `sort0.bin`, `sort1.bin`, and so on.
 #'
-#' @return This function does not return a value. It performs its operations as a side effect.
+#' @return This function returns the normal of topological sorts.
 #'
 #' @export
 precompute_topological_sorts <- function(prefs, n_items, output_directory, max_files_to_save) {
-    invisible(.Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, output_directory, max_files_to_save))
+    .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, output_directory, max_files_to_save)
 }
 
 run_smc <- function(input_timeseries, input_prior, input_options) {

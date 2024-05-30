@@ -12,16 +12,17 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // precompute_topological_sorts
-void precompute_topological_sorts(const arma::umat& prefs, int n_items, std::string output_directory, int max_files_to_save);
+int precompute_topological_sorts(const arma::umat& prefs, int n_items, std::string output_directory, int max_files_to_save);
 RcppExport SEXP _BayesMallowsSMC2_precompute_topological_sorts(SEXP prefsSEXP, SEXP n_itemsSEXP, SEXP output_directorySEXP, SEXP max_files_to_saveSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::umat& >::type prefs(prefsSEXP);
     Rcpp::traits::input_parameter< int >::type n_items(n_itemsSEXP);
     Rcpp::traits::input_parameter< std::string >::type output_directory(output_directorySEXP);
     Rcpp::traits::input_parameter< int >::type max_files_to_save(max_files_to_saveSEXP);
-    precompute_topological_sorts(prefs, n_items, output_directory, max_files_to_save);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(precompute_topological_sorts(prefs, n_items, output_directory, max_files_to_save));
+    return rcpp_result_gen;
 END_RCPP
 }
 // run_smc
