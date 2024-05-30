@@ -34,7 +34,6 @@ Rcpp::List run_smc(
   int T = data->n_timepoints();
   for(size_t t{}; t < T; t++) {
     reporter.report_time(t);
-    data->update_topological_sorts(t, prior.n_items);
 
     for(auto& p : particle_vector) {
       p.run_particle_filter(t, prior, data, pfun, distfun, resampler);

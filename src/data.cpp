@@ -33,7 +33,9 @@ void Rankings::print() {
   }
 }
 
-PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) {
+PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
+  topological_sorts_directory (input_timeseries.attr("topological_sorts_directory")),
+  num_topological_sorts (input_timeseries.attr("num_topological_sorts")) {
   timeseries.reserve(input_timeseries.size());
   for(Rcpp::List a : input_timeseries) {
     pairwise_tp new_data;
@@ -70,20 +72,6 @@ void PairwisePreferences::print() {
       Rcpp::Rcout << std::endl;
     }
     Rcpp::Rcout << std::endl;
-  }
-}
-
-void PairwisePreferences::update_topological_sorts(unsigned int t, int n_items) {
-  pairwise_tp new_data = timeseries[t];
-  current_topological_sorts = topological_sorts_tp(new_data.size());
-  for(size_t i{}; i < new_data.size(); i++) {
-    comparisons user_preferences = new_data[i].second;
-    umat preference_matrix{};
-    for(auto it = user_preferences.begin(); it != user_preferences.end(); it++) {
-      auto element = *it;
-      preference_matrix = join_cols(preference_matrix, urowvec{element.first, element.second});
-    }
-    current_topological_sorts[i] = all_topological_sorts(preference_matrix, n_items);
   }
 }
 

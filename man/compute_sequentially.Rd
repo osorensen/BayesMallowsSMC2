@@ -7,7 +7,9 @@
 compute_sequentially(
   data,
   hyperparameters = set_hyperparameters(),
-  smc_options = set_smc_options()
+  smc_options = set_smc_options(),
+  topological_sorts_directory = NULL,
+  num_topological_sorts = NULL
 )
 }
 \arguments{
@@ -23,7 +25,8 @@ columns:
 \item etc.
 }
 
-If data contains pairwise preferences, it must have the following structure:
+If data contains pairwise preferences, it must have the following
+structure:
 
 \itemize{
 \item \code{timepoint}: a numeric vector denoting the timepoint, starting at 1.
@@ -36,6 +39,15 @@ If data contains pairwise preferences, it must have the following structure:
 \item{hyperparameters}{A list returned from \code{\link[=set_hyperparameters]{set_hyperparameters()}}.}
 
 \item{smc_options}{A list returned from \code{\link[=set_smc_options]{set_smc_options()}}}
+
+\item{topological_sorts_directory}{Path to a directory where precomputed
+topological sorts can be found. Must contain subdirectories with names
+\code{user1}, \code{user2}, etc., exactly matching the \code{user} column of \code{data}. See
+\code{\link[=precompute_topological_sorts]{precompute_topological_sorts()}}. Defaults to \code{NULL}, but has to be
+provided when data contain pairwise preferences.}
+
+\item{num_topological_sorts}{Integer vector containing the number of
+topological sorts for each user.}
 }
 \value{
 An object
