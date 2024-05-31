@@ -19,7 +19,7 @@
 #' and saves each sort as a binary file in the specified output directory. The output files
 #' are named sequentially as `sort0.bin`, `sort1.bin`, and so on.
 #'
-#' @return This function returns the normal of topological sorts.
+#' @return This function returns the number of topological sorts.
 #'
 #' @export
 precompute_topological_sorts <- function(prefs, n_items, output_directory, max_files_to_save) {

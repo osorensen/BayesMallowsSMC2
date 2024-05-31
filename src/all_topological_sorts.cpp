@@ -14,7 +14,7 @@ using namespace std;
 
 class Graph {
   int n_items;
-  list<int> *adj;
+  std::vector<std::list<int>> adj;
   vector<int> indegree;
   void alltopologicalSortUtil(vector<int>& res, vector<bool>& visited);
 
@@ -25,10 +25,8 @@ public:
   vector<vector<int>> m;
 };
 
-Graph::Graph(int n_items) : n_items { n_items } {
-  adj = new list<int>[n_items];
-  for (int i = 0; i < n_items; i++) indegree.push_back(0);
-}
+Graph::Graph(int n_items) : n_items { n_items }, adj(n_items),
+indegree(n_items, 0) {}
 
 void Graph::addEdge(int v, int w) {
   adj[v].push_back(w);
@@ -37,9 +35,8 @@ void Graph::addEdge(int v, int w) {
 
 void Graph::alltopologicalSortUtil(vector<int>& res, vector<bool>& visited) {
   bool flag = false;
-  Rcpp::IntegerVector visit_order = Rcpp::sample(n_items, n_items) - 1;
 
-  for (int i : visit_order) {
+  for (size_t i{}; i < n_items; i++) {
     if (indegree[i] == 0 && !visited[i]) {
       list<int>:: iterator j;
       for (j = adj[i].begin(); j != adj[i].end(); j++)
@@ -64,9 +61,7 @@ void Graph::alltopologicalSortUtil(vector<int>& res, vector<bool>& visited) {
 }
 
 void Graph::alltopologicalSort() {
-  vector<bool> visited;
-  visited.resize(n_items);
-  fill(visited.begin(), visited.end(), false);
+  vector<bool> visited(n_items, false);
   vector<int> res;
   alltopologicalSortUtil(res, visited);
 }
@@ -105,15 +100,17 @@ topological_sorts_user all_topological_sorts(const arma::umat& prefs, int n_item
 //' and saves each sort as a binary file in the specified output directory. The output files
 //' are named sequentially as `sort0.bin`, `sort1.bin`, and so on.
 //'
-//' @return This function returns the normal of topological sorts.
+//' @return This function returns the number of topological sorts.
 //'
 //' @export
 // [[Rcpp::export]]
 int precompute_topological_sorts(
-    const arma::umat& prefs, int n_items, std::string output_directory,
+    arma::umat prefs, int n_items, std::string output_directory,
     int max_files_to_save) {
  if (!std::filesystem::exists(output_directory)) {
-   std::filesystem::create_directory(output_directory);
+   if (!std::filesystem::create_directory(output_directory)) {
+     Rcpp::stop("Failed to create directory " + output_directory);
+   }
  }
 
  auto sorts = all_topological_sorts(prefs, n_items);
