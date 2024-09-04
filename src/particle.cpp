@@ -97,11 +97,16 @@ std::vector<ParticleFilter> create_particle_filters(const Options& options) {
   return result;
 }
 
-vec extract_log_importance_weights(const std::vector<Particle> particle_vector) {
+vec normalize_importance_weights(const std::vector<Particle>& particle_vector) {
   vec log_importance_weights(particle_vector.size());
   std::transform(
     particle_vector.cbegin(), particle_vector.cend(),
     log_importance_weights.begin(),
     [](const Particle& p) { return p.log_importance_weight; });
-  return log_importance_weights;
+
+  vec normalized_log_importance_weights =
+    log_importance_weights - (max(log_importance_weights) +
+    log(sum(exp(log_importance_weights - max(log_importance_weights)))));
+
+  return exp(normalized_log_importance_weights);
 }
