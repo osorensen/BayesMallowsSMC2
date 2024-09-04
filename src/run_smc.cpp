@@ -1,6 +1,7 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <numeric>
+#include <limits>
 #include "prior.h"
 #include "data.h"
 #include "particle.h"
@@ -30,6 +31,7 @@ Rcpp::List run_smc(
   auto reporter = ProgressReporter(options.verbose);
   auto tracer = ParameterTracer(options.trace, options.trace_directory);
   Rcpp::IntegerVector n_particle_filters(data->n_timepoints());
+  double log_marginal_likelihood{0};
 
   int T = data->n_timepoints();
   for(size_t t{}; t < T; t++) {
@@ -40,23 +42,31 @@ Rcpp::List run_smc(
       p.log_importance_weight += p.log_incremental_likelihood(t);
     }
 
-    vec log_importance_weights(particle_vector.size());
-    std::transform(
-      particle_vector.cbegin(), particle_vector.cend(),
-      log_importance_weights.begin(),
-      [](const Particle& p) { return p.log_importance_weight; });
+    vec normalized_importance_weights = normalize_importance_weights(particle_vector);
 
-    vec log_normalized_importance_weights =
-      log_importance_weights - (max(log_importance_weights) +
-      log(sum(exp(log_importance_weights - max(log_importance_weights)))));
+    double log_marginal_likelihood_contribution = -std::numeric_limits<double>::infinity();
+    vec log_incremental_likelihoods(normalized_importance_weights.size());
 
-    double ess = pow(norm(exp(log_normalized_importance_weights), 2), -2);
+    for(size_t i{}; i < normalized_importance_weights.size(); i++) {
+      log_incremental_likelihoods(i) =
+        log(normalized_importance_weights(i)) + particle_vector[i].log_incremental_likelihood(t);
+    }
+
+    double max_log_incremental_likelihood = log_incremental_likelihoods.max();
+    double sum_exp_term = 0.0;
+    for(size_t i{}; i < normalized_importance_weights.size(); i++) {
+      sum_exp_term += exp(log_incremental_likelihoods(i) - max_log_incremental_likelihood);
+    }
+    log_marginal_likelihood_contribution = max_log_incremental_likelihood + log(sum_exp_term);
+    log_marginal_likelihood += log_marginal_likelihood_contribution;
+
+    double ess = pow(norm(normalized_importance_weights, 2), -2);
     reporter.report_ess(ess);
 
     if(ess < options.resampling_threshold) {
       reporter.report_resampling();
-      ivec new_inds = resampler->resample(log_normalized_importance_weights.size(),
-                                          exp(log_normalized_importance_weights));
+      ivec new_inds = resampler->resample(normalized_importance_weights.size(),
+                                          normalized_importance_weights);
       uvec unique_particles = find_unique(new_inds);
       int n_unique_particles = unique_particles.size();
 
@@ -145,6 +155,8 @@ Rcpp::List run_smc(
     Rcpp::Named("alpha") = alpha,
     Rcpp::Named("rho") = rho,
     Rcpp::Named("tau") = tau,
-    Rcpp::Named("n_particle_filters") = n_particle_filters
+    Rcpp::Named("n_particle_filters") = n_particle_filters,
+    Rcpp::Named("importance_weights") = normalize_importance_weights(particle_vector),
+    Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood
   );
 }
