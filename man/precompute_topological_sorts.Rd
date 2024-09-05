@@ -23,7 +23,7 @@ the number of topological sorts exceeds \code{max_files_to_save}, a random sampl
 is taken at random, and the corresponding sorts saved.}
 }
 \value{
-This function returns the normal of topological sorts.
+This function returns the number of topological sorts.
 }
 \description{
 This function precomputes all topological sorts for a given preference matrix and

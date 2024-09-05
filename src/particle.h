@@ -34,7 +34,8 @@ struct Particle{
       unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
       const std::unique_ptr<PartitionFunction>& pfun,
       const std::unique_ptr<Distance>& distfun,
-      const std::unique_ptr<Resampler>& resampler);
+      const std::unique_ptr<Resampler>& resampler,
+      std::string latent_rank_proposal);
   bool rejuvenate(
     unsigned int T, const Options& options, const Prior& prior,
     const std::unique_ptr<Data>& data,

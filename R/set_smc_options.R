@@ -10,6 +10,7 @@
 #'   after this many steps, the rejuvenation is still stopped.
 #' @param metric Metric
 #' @param resampler resampler
+#' @param latent_rank_proposal latent rank proposal
 #' @param verbose Boolean
 #' @param trace Logical specifying whether to save static parameters at each
 #'   timestep.
@@ -22,7 +23,8 @@
 set_smc_options <- function(
     n_particles = 1000, n_particle_filters = 50, max_particle_filters = 10000,
     resampling_threshold = n_particles / 2, max_rejuvenation_steps = 20,
-    metric = "footrule", resampler = "multinomial", verbose = FALSE,
+    metric = "footrule", resampler = "multinomial",
+    latent_rank_proposal = "uniform", verbose = FALSE,
     trace = FALSE, trace_directory = "") {
   as.list(environment())
 }

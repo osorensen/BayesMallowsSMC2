@@ -23,7 +23,8 @@ void Particle::run_particle_filter(
     unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
-    const std::unique_ptr<Resampler>& resampler) {
+    const std::unique_ptr<Resampler>& resampler,
+    std::string latent_rank_proposal) {
 
   if(t > 0) {
     ivec new_inds = resampler->resample(
@@ -39,7 +40,8 @@ void Particle::run_particle_filter(
   }
 
   for(auto& pf : particle_filters) {
-    auto proposal = sample_latent_rankings(data, t, prior);
+    auto proposal = sample_latent_rankings(data, t, prior, latent_rank_proposal,
+                                           parameters);
     pf.latent_rankings = proposal.proposal;
 
     uvec new_cluster_assignments =

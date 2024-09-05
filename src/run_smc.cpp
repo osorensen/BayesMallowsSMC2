@@ -38,7 +38,7 @@ Rcpp::List run_smc(
     reporter.report_time(t);
 
     for(auto& p : particle_vector) {
-      p.run_particle_filter(t, prior, data, pfun, distfun, resampler);
+      p.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
       p.log_importance_weight += p.log_incremental_likelihood(t);
     }
 
@@ -87,7 +87,8 @@ Rcpp::List run_smc(
       do {
         iter++;
         for(size_t i{}; i < particle_vector.size(); i++) {
-          accepted += particle_vector[i].rejuvenate(t, options, prior, data, pfun, distfun, resampler, alpha_sd.t());
+          accepted += particle_vector[i].rejuvenate(
+            t, options, prior, data, pfun, distfun, resampler, alpha_sd.t());
         }
         std::transform(
           particle_vector.cbegin(), particle_vector.cend(), alpha0_tmp.begin(),

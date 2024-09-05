@@ -12,6 +12,7 @@ set_smc_options(
   max_rejuvenation_steps = 20,
   metric = "footrule",
   resampler = "multinomial",
+  latent_rank_proposal = "uniform",
   verbose = FALSE,
   trace = FALSE,
   trace_directory = ""
@@ -34,6 +35,8 @@ after this many steps, the rejuvenation is still stopped.}
 \item{metric}{Metric}
 
 \item{resampler}{resampler}
+
+\item{latent_rank_proposal}{latent rank proposal}
 
 \item{verbose}{Boolean}
 

@@ -8,6 +8,7 @@ struct Options{
 
   const std::string metric;
   const std::string resampler;
+  const std::string latent_rank_proposal;
   unsigned int n_particles;
   unsigned int n_particle_filters;
   unsigned int max_particle_filters;
