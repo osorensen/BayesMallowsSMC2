@@ -71,7 +71,7 @@ bool Particle::rejuvenate(
   vec current_log_likelihood(T + 1);
 
   for(size_t t{}; t < T + 1; t++) {
-    proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler);
+    proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
     proposal_particle.log_importance_weight += proposal_particle.log_incremental_likelihood(t);
   }
 

@@ -3,6 +3,7 @@
 Options::Options(const Rcpp::List& input_options) :
   metric ( input_options["metric"] ),
   resampler ( input_options["resampler"] ),
+  latent_rank_proposal ( input_options["latent_rank_proposal"] ),
   n_particles {input_options["n_particles"]},
   n_particle_filters {input_options["n_particle_filters"]},
   max_particle_filters {input_options["max_particle_filters"]},
