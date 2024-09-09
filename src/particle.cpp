@@ -41,7 +41,7 @@ void Particle::run_particle_filter(
 
   for(auto& pf : particle_filters) {
     auto proposal = sample_latent_rankings(data, t, prior, latent_rank_proposal,
-                                           parameters);
+                                           parameters, pf.latent_rankings);
 
     uvec new_cluster_assignments =
       sample_cluster_assignments(proposal.proposal, parameters, pfun, distfun);

@@ -10,10 +10,11 @@ namespace fs = std::filesystem;
 LatentRankingProposal sample_latent_rankings(
     const std::unique_ptr<Data>& data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
-    const StaticParameters& parameters
+    const StaticParameters& parameters,
+    const umat& current_latent_rankings
 ) {
   if(Rankings* r = dynamic_cast<Rankings*>(data.get())) {
-    return sample_latent_rankings(r, t, prior, latent_rank_proposal, parameters);
+    return sample_latent_rankings(r, t, prior, latent_rank_proposal, parameters, current_latent_rankings);
   } else if (PairwisePreferences* pp = dynamic_cast<PairwisePreferences*>(data.get())) {
     return sample_latent_rankings(pp, t, prior);
   } else {
@@ -24,7 +25,8 @@ LatentRankingProposal sample_latent_rankings(
 LatentRankingProposal sample_latent_rankings(
     const Rankings* data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
-    const StaticParameters& parameters)  {
+    const StaticParameters& parameters,
+    const umat& current_latent_rankings)  {
   LatentRankingProposal proposal;
   ranking_tp new_data = data->timeseries[t];
   uvec all_items = regspace<uvec>(0, prior.n_items - 1);
@@ -32,12 +34,22 @@ LatentRankingProposal sample_latent_rankings(
   proposal.proposal = umat(prior.n_items, new_data.size());
 
   for(size_t i{}; i < new_data.size(); i++) {
-    if(data->observed_users.find(new_data[i].first) == data->observed_users.end()) {
-      //Rcpp::Rcout << "User " << new_data[i].first << " not observed before." << std::endl;
-      proposal.new_users.insert(new_data[i].first);
+    auto it = std::find(data->observed_users.begin(), data->observed_users.end(), new_data[i].first);
+    if(it == data->observed_users.end()) {
+      proposal.new_users.push_back(new_data[i].first);
     } else {
-      //Rcpp::Rcout << "User " << new_data[i].first << " observed before." << std::endl;
-      proposal.updated_consistent_users.insert(new_data[i].first);
+      int lr_index = std::distance(data->observed_users.begin(), it);
+
+      uvec new_observed_indices = find(new_data[i].second);
+      uvec v1 = new_data[i].second(new_observed_indices);
+      uvec v2 = current_latent_rankings.col(lr_index);
+      v2 = v2.rows(new_observed_indices);
+      if(all(v1 == v2)) {
+        proposal.updated_consistent_users.push_back(new_data[i].first);
+        continue;
+      } else {
+        proposal.updated_inconsistent_users.push_back(new_data[i].first);
+      }
     }
 
     uvec observed_ranking = new_data[i].second;

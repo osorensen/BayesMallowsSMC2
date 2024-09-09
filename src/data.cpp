@@ -20,7 +20,7 @@ Rankings::Rankings(const Rcpp::List& input_timeseries) {
 
 void Rankings::update_observed_users(unsigned int t) {
   for(auto obs : timeseries[t]) {
-    observed_users.insert(obs.first);
+    observed_users.push_back(obs.first);
   }
 }
 
@@ -55,7 +55,7 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
 
 void PairwisePreferences::update_observed_users(unsigned int t) {
   for(auto obs : timeseries[t]) {
-    observed_users.insert(obs.first);
+    observed_users.push_back(obs.first);
   }
 }
 
