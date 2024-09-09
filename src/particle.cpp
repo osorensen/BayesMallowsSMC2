@@ -62,6 +62,18 @@ void Particle::run_particle_filter(
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - proposal.log_probability;
 
+    for(const auto & uiu : proposal.updated_inconsistent_users) {
+      auto it = std::find(data->observed_users.begin(), data->observed_users.end(), uiu);
+      int uiu_index = std::distance(data->observed_users.begin(), it);
+
+      auto propit = std::find(proposal.updated_inconsistent_users.begin(),
+                              proposal.updated_inconsistent_users.end(), uiu);
+      int prop_index = std::distance(proposal.updated_inconsistent_users.begin(), propit);
+
+      pf.latent_rankings.col(uiu_index) = proposal.proposal.col(prop_index);
+      proposal.proposal.shed_col(prop_index);
+    }
+
     pf.latent_rankings = join_horiz(pf.latent_rankings, proposal.proposal);
   }
 
