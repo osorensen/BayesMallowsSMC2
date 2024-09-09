@@ -42,19 +42,18 @@ void Particle::run_particle_filter(
   for(auto& pf : particle_filters) {
     auto proposal = sample_latent_rankings(data, t, prior, latent_rank_proposal,
                                            parameters);
-    pf.latent_rankings = proposal.proposal;
 
     uvec new_cluster_assignments =
-      sample_cluster_assignments(pf.latent_rankings, parameters, pfun, distfun);
+      sample_cluster_assignments(proposal.proposal, parameters, pfun, distfun);
     pf.cluster_assignments =
       join_cols(pf.cluster_assignments, new_cluster_assignments);
 
     double log_prob{};
-    for(size_t i{}; i < pf.latent_rankings.n_cols; i++) {
+    for(size_t i{}; i < proposal.proposal.n_cols; i++) {
       vec log_cluster_contribution(prior.n_clusters);
       for(size_t c{}; c < prior.n_clusters; c++) {
         log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
-          parameters.alpha(c) * distfun->d(pf.latent_rankings.col(i), parameters.rho.col(c));
+          parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
       }
       double maxval = log_cluster_contribution.max();
       log_prob += maxval + log(accu(exp(log_cluster_contribution - maxval)));
@@ -62,6 +61,7 @@ void Particle::run_particle_filter(
 
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - proposal.log_probability;
+    pf.latent_rankings = proposal.proposal;
   }
 
   Rcpp::NumericVector tmp_pf_weights(log_normalized_particle_filter_weights.size());
