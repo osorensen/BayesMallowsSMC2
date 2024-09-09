@@ -32,6 +32,14 @@ LatentRankingProposal sample_latent_rankings(
   proposal.proposal = umat(prior.n_items, new_data.size());
 
   for(size_t i{}; i < new_data.size(); i++) {
+    if(data->observed_users.find(new_data[i].first) == data->observed_users.end()) {
+      //Rcpp::Rcout << "User " << new_data[i].first << " not observed before." << std::endl;
+      proposal.new_users.insert(new_data[i].first);
+    } else {
+      //Rcpp::Rcout << "User " << new_data[i].first << " observed before." << std::endl;
+      proposal.updated_consistent_users.insert(new_data[i].first);
+    }
+
     uvec observed_ranking = new_data[i].second;
     uvec observed_items = find(observed_ranking);
     uvec available_items = setdiff(all_items, observed_items);

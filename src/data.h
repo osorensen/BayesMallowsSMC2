@@ -14,7 +14,7 @@ struct Data{
   virtual void print() = 0;
   virtual unsigned int n_timepoints() = 0;
   virtual void update_observed_users(unsigned int t) = 0;
-  std::set<std::string> observed_users{};
+  std::unordered_set<std::string> observed_users{};
 };
 
 struct Rankings : Data {

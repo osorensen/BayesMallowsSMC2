@@ -5,6 +5,8 @@
 struct LatentRankingProposal{
   arma::umat proposal;
   double log_probability{};
+  std::unordered_set<std::string> new_users{};
+  std::unordered_set<std::string> updated_consistent_users{};
 };
 
 LatentRankingProposal sample_latent_rankings(
