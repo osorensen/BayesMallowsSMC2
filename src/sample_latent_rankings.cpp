@@ -31,7 +31,6 @@ LatentRankingProposal sample_latent_rankings(
   ranking_tp new_data = data->timeseries[t];
   uvec all_items = regspace<uvec>(0, prior.n_items - 1);
   uvec all_rankings = regspace<uvec>(1, prior.n_items);
-  proposal.proposal = umat(prior.n_items, new_data.size());
 
   for(size_t i{}; i < new_data.size(); i++) {
     auto it = std::find(data->observed_users.begin(), data->observed_users.end(), new_data[i].first);
@@ -60,7 +59,7 @@ LatentRankingProposal sample_latent_rankings(
 
     if(latent_rank_proposal == "uniform") {
       tmp(available_items) = shuffle(available_rankings);
-      proposal.proposal.col(i) = tmp;
+      proposal.proposal = join_horiz(proposal.proposal, tmp);
       proposal.log_probability -= lgamma(available_rankings.size() + 1.0);
     } else if(latent_rank_proposal == "pseudo") {
       if(parameters.alpha.size() > 1) {
@@ -99,7 +98,7 @@ LatentRankingProposal sample_latent_rankings(
         Rcpp::stop("Not a ranking.");
       }
 
-      proposal.proposal.col(i) = tmp;
+      proposal.proposal = join_horiz(proposal.proposal, tmp);
       proposal.log_probability += logprob;
 
     } else {

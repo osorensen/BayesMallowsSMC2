@@ -61,6 +61,7 @@ void Particle::run_particle_filter(
 
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - proposal.log_probability;
+
     pf.latent_rankings = join_horiz(pf.latent_rankings, proposal.proposal);
   }
 
