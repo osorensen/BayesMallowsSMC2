@@ -61,7 +61,7 @@ void Particle::run_particle_filter(
 
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - proposal.log_probability;
-    pf.latent_rankings = proposal.proposal;
+    pf.latent_rankings = join_horiz(pf.latent_rankings, proposal.proposal);
   }
 
   Rcpp::NumericVector tmp_pf_weights(log_normalized_particle_filter_weights.size());
