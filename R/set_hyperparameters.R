@@ -12,5 +12,6 @@
 set_hyperparameters <- function(
     n_items, alpha_shape = 1, alpha_rate = .5, cluster_concentration = 10,
     n_clusters = 1) {
+  if(missing(n_items)) stop("n_items must be provided")
   as.list(environment())
 }
