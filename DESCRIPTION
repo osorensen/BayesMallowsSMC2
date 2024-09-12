@@ -1,0 +1,27 @@
+Package: BayesMallowsSMC2
+Type: Package
+Title: Nested Sequential Monte Carlo for the Bayesian Mallows Model
+Version: 0.0.0.9000
+Date: 2024-09-10
+Author: Authors@R: c(person("Oystein", "Sorensen", 
+                    email = "oystein.sorensen.1985@gmail.com", 
+                    role = c("aut", "cre"),
+                    comment = c(ORCID = "0000-0003-0724-3542")))
+Maintainer: Oystein Sorensen <oystein.sorensen.1985@gmail.com>
+Description: Estimation of Mallows' rank model using the SMC2 algorithm
+    (Chopin et al. (2013) <doi:10.1111/j.1467-9868.2012.01046.x>). Supports data
+    in the form of complete and partial rankings, and pairwise preferences.
+License: GPL-3
+Imports: Rcpp (>= 1.0.13),
+    Rdpack
+LinkingTo: Rcpp, RcppArmadillo
+RoxygenNote: 7.3.2
+Encoding: UTF-8
+Depends: 
+    R (>= 2.10)
+LazyData: true
+RdMacros: Rdpack
+Roxygen: list(markdown = TRUE)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
