@@ -11,7 +11,7 @@ Particle::Particle(
 ) : 
   log_weight { zeros(data->n_timepoints())},
   log_likelihood_increment { zeros(data->n_timepoints())},
-  particle_filters { create_particle_filter_vectors(smc_options, data) } {
+  particle_filters { create_particle_filter_vectors(smc_options, data, prior) } {
   parameters.alpha = randg(
     prior.n_clusters, 
     distr_param(prior.alpha_shape, 1 / prior.alpha_rate)
@@ -36,7 +36,7 @@ Particle::Particle(
 ) : 
   log_weight { zeros(data->n_timepoints())},
   log_likelihood_increment { zeros(data->n_timepoints())},
-  particle_filters { create_particle_filter_vectors(smc_options, data) }
+  particle_filters { create_particle_filter_vectors(smc_options, data, prior) }
   {
     parameters.alpha = static_parameters.alpha;
     parameters.rho = static_parameters.rho;

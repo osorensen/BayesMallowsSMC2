@@ -3,6 +3,7 @@
 
 #include "data.h"
 #include "distances.h"
+#include "latent_proposer.h"
 #include "model_options.h"
 #include "particle.h"
 #include "partition_functions.h"
@@ -28,13 +29,15 @@ Rcpp::List run_smc(
   auto distfun = choose_distance_function(model_options);
   auto resampler = choose_resampler(smc_options);
   auto pfun = choose_partition_function(prior, model_options);
+  auto latent_proposer = choose_latent_proposer(smc_options);
   int T = data->n_timepoints();
   auto particle_vector = create_particle_vector(prior, smc_options, data);
   vec log_marginal_likelihood(T);
 
   for(size_t t{}; t < T; t++) {
     for(auto& particle : particle_vector) {
-      particle.run_particle_filter(t, data, distfun, pfun);
+      particle.run_particle_filter(
+        t, data, distfun, pfun, resampler, latent_proposer, prior);
     }
 
     vec log_weights = extract_weights(particle_vector, t);
@@ -57,8 +60,8 @@ Rcpp::List run_smc(
       int iter{};
       do{
         for(auto& particle : particle_vector) {
-          particle.rejuvenate(t, data, distfun, pfun, prior,
-                              smc_options, alpha_summaries);
+          particle.rejuvenate(t, data, distfun, pfun, resampler, latent_proposer, 
+                              prior, smc_options, alpha_summaries);
         }
         mat alpha_values = extract_alpha_values(particle_vector, prior);
         unq = count_unique_cols(alpha_values);

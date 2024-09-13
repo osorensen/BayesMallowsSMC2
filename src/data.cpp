@@ -15,15 +15,28 @@ int MatrixData::n_timepoints() {
 }
 
 int MatrixData::n_users() {
-  ivec user_indices = matrix.col(1);
-  std::set<int> unique_elements(user_indices.begin(), user_indices.end());
-  return unique_elements.size();
+  ivec users = unique(matrix.col(1));
+  return users.size();
 }
 
 uvec MatrixData::get_users_at_timepoint(int t) {
   uvec timepoint_inds = find(matrix.col(0) == t);
   ivec user_indices = matrix.col(1);
-  return conv_to<uvec>::from(user_indices.elem(timepoint_inds));
+  return unique(conv_to<uvec>::from(user_indices.elem(timepoint_inds)));
+}
+
+uvec MatrixData::get_users_before_timepoint(int t) {
+  uvec timepoint_inds = find(matrix.col(0) < t);
+  ivec user_indices = matrix.col(1);
+  return unique(conv_to<uvec>::from(user_indices.elem(timepoint_inds)));
+}
+
+ivec MatrixData::get_user_data(int t, int u) {
+  uvec indices = find(matrix.col(0) == t && matrix.col(1) == u);
+  imat submatrix = matrix.rows(indices);
+  submatrix = submatrix.cols(2, submatrix.n_cols - 1);
+  ivec ret = submatrix.row(0).t();
+  return ret;
 }
 
 imat MatrixData::get_timepoint_data(int t) {

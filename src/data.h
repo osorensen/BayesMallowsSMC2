@@ -10,6 +10,8 @@ struct Data {
   virtual std::string type() const = 0;
   virtual arma::imat get_timepoint_data(int t) = 0;
   virtual arma::uvec get_users_at_timepoint(int t) = 0;
+  virtual arma::uvec get_users_before_timepoint(int t) = 0;
+  virtual arma::ivec get_user_data(int t, int u) = 0;
 };
 
 struct MatrixData : Data {
@@ -20,6 +22,8 @@ struct MatrixData : Data {
   int n_users() override;
   arma::imat get_timepoint_data(int t) override;
   arma::uvec get_users_at_timepoint(int t) override;
+  arma::uvec get_users_before_timepoint(int t) override;
+  arma::ivec get_user_data(int t, int u) override;
 };
 
 struct CompleteRankings : MatrixData {

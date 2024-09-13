@@ -3,9 +3,11 @@
 
 #include "data.h"
 #include "distances.h"
+#include "latent_proposer.h"
 #include "particle_filter.h"
 #include "partition_functions.h"
 #include "prior.h"
+#include "resampler.h"
 #include "smc_options.h"
 
 struct StaticParameters{
@@ -43,13 +45,18 @@ struct Particle{
       int t,
       const std::unique_ptr<Data>& data,
       const std::unique_ptr<Distance>& distfun,
-      const std::unique_ptr<PartitionFunction>& pfun
+      const std::unique_ptr<PartitionFunction>& pfun,
+      const std::unique_ptr<Resampler>& resampler,
+      const std::unique_ptr<LatentProposer>& latent_proposer,
+      const Prior& prior
   );
   bool rejuvenate(
     int t,
     const std::unique_ptr<Data>& data,
     const std::unique_ptr<Distance>& distfun,
     const std::unique_ptr<PartitionFunction>& pfun,
+    const std::unique_ptr<Resampler>& resampler,
+    const std::unique_ptr<LatentProposer>& latent_proposer,
     const Prior& prior,
     const SMCOptions& smc_options,
     const AlphaSummaries& alpha_summaries

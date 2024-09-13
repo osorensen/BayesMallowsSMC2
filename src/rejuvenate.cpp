@@ -20,6 +20,8 @@ bool Particle::rejuvenate(
     const std::unique_ptr<Data>& data,
     const std::unique_ptr<Distance>& distfun,
     const std::unique_ptr<PartitionFunction>& pfun,
+    const std::unique_ptr<Resampler>& resampler,
+    const std::unique_ptr<LatentProposer>& latent_proposer,
     const Prior& prior,
     const SMCOptions& smc_options,
     const AlphaSummaries& alpha_summaries
@@ -35,7 +37,9 @@ bool Particle::rejuvenate(
                              parameters};
   
   for(size_t t_index{}; t_index < t + 1; t_index++) {
-    proposal_particle.run_particle_filter(t_index, data, distfun, pfun);
+    proposal_particle.run_particle_filter(
+      t_index, data, distfun, pfun, resampler, latent_proposer, prior
+    );
   }
   
   double log_Z_proposal = sum(proposal_particle.log_likelihood_increment);
