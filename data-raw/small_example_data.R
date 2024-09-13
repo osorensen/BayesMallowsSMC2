@@ -23,3 +23,4 @@ partial_rankings <- complete_rankings
 partial_rankings[, -(1:2)][partial_rankings[, -(1:2)] > 3] <- NA
 
 usethis::use_data(partial_rankings, overwrite = TRUE)
+

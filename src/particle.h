@@ -62,7 +62,7 @@ std::vector<Particle> create_particle_vector(
     const std::unique_ptr<Data>& data
 );
 
-int count_unique_rows(const arma::mat& matrix);
+int count_unique_cols(const arma::mat& matrix);
 
 AlphaSummaries compute_alpha_summaries(
   const std::vector<Particle>& particle_vector,

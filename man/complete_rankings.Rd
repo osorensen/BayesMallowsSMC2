@@ -5,7 +5,7 @@
 \alias{complete_rankings}
 \title{Simulated data with complete rankings}
 \format{
-A data frame with 400 rows and 7 columns:
+A data frame with 400 rows and 12 columns:
 \describe{
 \item{timepoint}{Integer specifying the timepoint.}
 \item{user}{Integer specifying the user id.}

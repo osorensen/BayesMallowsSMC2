@@ -57,7 +57,7 @@ Rcpp::List run_smc(
                               smc_options, alpha_summaries);
         }
         mat alpha_values = extract_alpha_values(particle_vector, prior);
-        unq = count_unique_rows(alpha_values);
+        unq = count_unique_cols(alpha_values);
         iter++;
       } while (unq < particle_vector.size() / 2.0 && 
         iter < smc_options.max_rejuvenation_steps);

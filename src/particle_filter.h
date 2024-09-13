@@ -7,6 +7,7 @@
 struct ParticleFilter{
   ParticleFilter(const std::unique_ptr<Data>& data);
   arma::vec log_weight{};
+  arma::ivec cluster_labels{};
 };
 
 std::vector<ParticleFilter> create_particle_filter_vectors(

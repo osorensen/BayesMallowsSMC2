@@ -66,15 +66,15 @@ std::vector<Particle> create_particle_vector(
   return result;
 }
 
-int count_unique_rows(const arma::mat& matrix) {
-  std::set<std::vector<double>> unique_rows;
+int count_unique_cols(const arma::mat& matrix) {
+  std::set<std::vector<double>> unique_cols;
   
-  for (size_t i = 0; i < matrix.n_rows; ++i) {
-    std::vector<double> row = arma::conv_to<std::vector<double>>::from(matrix.row(i));
-    unique_rows.insert(row);
+  for (size_t i = 0; i < matrix.n_cols; ++i) {
+    std::vector<double> col = arma::conv_to<std::vector<double>>::from(matrix.col(i));
+    unique_cols.insert(col);
   }
   
-  return unique_rows.size();
+  return unique_cols.size();
 }
 
 AlphaSummaries compute_alpha_summaries(
@@ -82,5 +82,5 @@ AlphaSummaries compute_alpha_summaries(
     const Prior& prior
 ) {
   mat alpha_values = extract_alpha_values(particle_vector, prior);
-  return AlphaSummaries{mean(alpha_values, 0), stddev(alpha_values, 0, 0)};
+  return AlphaSummaries{mean(alpha_values, 1), stddev(alpha_values, 0, 1)};
 }
