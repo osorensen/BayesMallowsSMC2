@@ -66,6 +66,23 @@ std::vector<Particle> create_particle_vector(
   return result;
 }
 
+double Particle::compute_log_likelihood_contribution(
+    const ivec& ranking,
+    const std::unique_ptr<Distance>& distfun,
+    const std::unique_ptr<PartitionFunction>& pfun
+) {
+  vec log_cluster_contribution = zeros(parameters.alpha.size());
+  
+  for(size_t c{}; c < log_cluster_contribution.size(); c++) {
+    log_cluster_contribution(c) = log(parameters.tau(c)) -
+      pfun->logz(parameters.alpha(c)) - parameters.alpha(c) *
+      distfun->d(ranking, parameters.rho.col(c));
+  }
+  double max_log = log_cluster_contribution.max();
+  
+  return max_log + log(sum(exp(log_cluster_contribution - max_log)));
+}
+
 int count_unique_cols(const arma::mat& matrix) {
   std::set<std::vector<double>> unique_cols;
   

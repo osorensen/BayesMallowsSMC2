@@ -60,16 +60,51 @@ void Particle::run_particle_filter(
     uvec new_users = setdiff(users_at_timepoint, users_before_timepoint);
     uvec updated_users = setdiff(users_at_timepoint, new_users);
     
-    for(const auto& nu : new_users) {
+    for(auto& pf : particle_filters) {
+      double log_proposal_probability{};
+      double updated_users_previous{};
+      double new_and_updated_users{};
       
-      auto obs = data->get_user_data(t, nu);
-      auto prop = latent_proposer->propose(obs, prior);
+      for(int nu : new_users) {
+        ivec obs = data->get_user_data(t, nu);
       
-      Rcpp::Rcout << "user data " << obs << std::endl
-                  << "proposal " << prop.proposal << std::endl
-                  << "has log-prob " << prop.log_probability << std::endl;
+        auto prop = latent_proposer->propose(obs, prior);
+        pf.latent_rankings = join_vert(
+          pf.latent_rankings, 
+          join_horiz(ivec{nu}, prop.proposal.t())
+          );
+        log_proposal_probability += prop.log_probability;
+        new_and_updated_users += compute_log_likelihood_contribution(
+          prop.proposal, distfun, pfun
+        );
+      }
+      for(int uu : updated_users) {
+        auto obs = data->get_user_data(t, uu);
+        uvec observed_inds = find(obs > 0);
+        
+        ivec current_latent_ranking = pf.extract_latent_ranking(uu);
+        bool consistent = 
+          check_rank_consistency(current_latent_ranking, obs, observed_inds);
+        
+        if(!consistent) {
+          updated_users_previous += compute_log_likelihood_contribution(
+            current_latent_ranking, distfun, pfun
+          );
+          auto prop = latent_proposer->propose(obs, prior);
+          pf.insert_latent_ranking(prop.proposal, uu);
+          log_proposal_probability += prop.log_probability;
+          
+          new_and_updated_users += compute_log_likelihood_contribution(
+            prop.proposal, distfun, pfun
+          );
+        }
+      }
       
+      log_likelihood_increment(t) = 
+        new_and_updated_users - log_proposal_probability - updated_users_previous;
+      log_weight(t) += log_likelihood_increment(t);
     }
+    
     
   } else {
     Rcpp::stop("Not implemented yet.");

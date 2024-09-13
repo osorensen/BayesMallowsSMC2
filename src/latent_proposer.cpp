@@ -15,7 +15,7 @@ LatentRankProposal Uniform::propose(
     );
   
   proposal(missing_inds) = shuffle(available_rankings);
-  return LatentRankProposal{proposal, lgamma(missing_inds.size() + 1)};
+  return LatentRankProposal{proposal, -lgamma(missing_inds.size() + 1)};
 }
 
 std::unique_ptr<LatentProposer> choose_latent_proposer(const SMCOptions& smc_options) {

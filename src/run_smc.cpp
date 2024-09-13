@@ -35,6 +35,7 @@ Rcpp::List run_smc(
   vec log_marginal_likelihood(T);
 
   for(size_t t{}; t < T; t++) {
+    Rcpp::Rcout << "t = " << t << std::endl;
     for(auto& particle : particle_vector) {
       particle.run_particle_filter(
         t, data, distfun, pfun, resampler, latent_proposer, prior);
@@ -49,6 +50,7 @@ Rcpp::List run_smc(
     double ess = 1.0 / pow(norm(normalized_weights), 2.0);
     
     if(ess < smc_options.n_particles / 2) {
+      Rcpp::Rcout << "ess = " << ess << std::endl;
       ivec new_inds =
         resampler->resample(smc_options.n_particles, normalized_weights);
       particle_vector = replace_elements(particle_vector, new_inds);

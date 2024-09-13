@@ -61,6 +61,11 @@ struct Particle{
     const SMCOptions& smc_options,
     const AlphaSummaries& alpha_summaries
   );
+  double compute_log_likelihood_contribution(
+      const arma::ivec& ranking,
+      const std::unique_ptr<Distance>& distfun,
+      const std::unique_ptr<PartitionFunction>& pfun
+  );
 };
 
 std::vector<Particle> create_particle_vector(
