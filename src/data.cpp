@@ -6,11 +6,24 @@ using namespace arma;
 MatrixData::MatrixData(const Rcpp::List& input_data, const std::string& key)
   : matrix(input_data[key]) {
   matrix.col(0) -= 1;
+  matrix.col(1) -= 1;
 }
 
 int MatrixData::n_timepoints() {
   ivec timepoints = unique(matrix.col(0));
   return timepoints.n_elem;
+}
+
+int MatrixData::n_users() {
+  ivec user_indices = matrix.col(1);
+  std::set<int> unique_elements(user_indices.begin(), user_indices.end());
+  return unique_elements.size();
+}
+
+uvec MatrixData::get_users_at_timepoint(int t) {
+  uvec timepoint_inds = find(matrix.col(0) == t);
+  ivec user_indices = matrix.col(1);
+  return conv_to<uvec>::from(user_indices.elem(timepoint_inds));
 }
 
 imat MatrixData::get_timepoint_data(int t) {

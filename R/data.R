@@ -55,4 +55,4 @@
 #' 
 #' @references 
 #' \insertAllCited{}
-"partial_rankings"
+"complete_cluster_rankings"

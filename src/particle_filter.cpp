@@ -4,7 +4,8 @@ using namespace arma;
 
 ParticleFilter::ParticleFilter(
   const std::unique_ptr<Data>& data
-) : log_weight { zeros(data->n_timepoints()) } {}
+) : log_weight { zeros(data->n_timepoints()) }, 
+cluster_labels { zeros<ivec>(data->n_users()) } {}
 
 std::vector<ParticleFilter> create_particle_filter_vectors(
     const SMCOptions& smc_options,

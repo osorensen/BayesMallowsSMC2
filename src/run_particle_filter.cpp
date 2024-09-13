@@ -22,11 +22,24 @@ void Particle::run_particle_filter(
     
     log_likelihood_increment(t) = 
       max_log + log(sum(exp(log_cluster_contribution - max_log)));
-    particle_filters[0].log_weight(t) = log_likelihood_increment(t);
+    for(auto& pf : particle_filters) {
+      pf.log_weight(t) = log_likelihood_increment(t);
+    }
+    
     log_weight(t) += log_likelihood_increment(t);
     
-    vec log_cluster_probabilities = log_cluster_contribution - log_likelihood_increment(t);
-    Rcpp::Rcout << "cluster probabilities: " << std::endl << exp(log_cluster_probabilities).t() << std::endl;
+    if(log_cluster_contribution.size() > 1) {
+      vec log_cluster_probabilities = log_cluster_contribution - log_likelihood_increment(t);
+      ivec new_cluster_labels = Rcpp::sample(
+        log_cluster_probabilities.size(), mat.n_rows, true, 
+        Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(log_cluster_probabilities)))
+      );
+      
+      uvec inds = data->get_users_at_timepoint(t);
+      for(auto& pf : particle_filters) {
+        pf.cluster_labels.elem(inds) = new_cluster_labels;
+      }
+    }
   } else {
     Rcpp::stop("Not implemented yet.");
   }

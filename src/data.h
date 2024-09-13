@@ -6,8 +6,10 @@ struct Data {
   Data() {};
   virtual ~Data() = default;
   virtual int n_timepoints() = 0;
+  virtual int n_users() = 0;
   virtual std::string type() const = 0;
   virtual arma::imat get_timepoint_data(int t) = 0;
+  virtual arma::uvec get_users_at_timepoint(int t) = 0;
 };
 
 struct MatrixData : Data {
@@ -15,7 +17,9 @@ struct MatrixData : Data {
   
   MatrixData(const Rcpp::List& input_data, const std::string& key);
   int n_timepoints() override;
+  int n_users() override;
   arma::imat get_timepoint_data(int t) override;
+  arma::uvec get_users_at_timepoint(int t) override;
 };
 
 struct CompleteRankings : MatrixData {

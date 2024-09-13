@@ -12,5 +12,4 @@ test_that("compute_sequentially works with complete data", {
   expect_gt(wm, .2)
   expect_lt(wm, .4)
   
-  
 })

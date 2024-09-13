@@ -24,3 +24,5 @@ complete_cluster_rankings <- cbind(
   ),
   rankings[sample(nrow(rankings)), ]
 )
+
+usethis::use_data(complete_cluster_rankings, overwrite = TRUE)

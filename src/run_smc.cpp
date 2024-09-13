@@ -30,6 +30,7 @@ Rcpp::List run_smc(
   auto pfun = choose_partition_function(prior, model_options);
   int T = data->n_timepoints();
   auto particle_vector = create_particle_vector(prior, smc_options, data);
+  vec log_marginal_likelihood(T);
 
   for(size_t t{}; t < T; t++) {
     for(auto& particle : particle_vector) {
@@ -38,6 +39,9 @@ Rcpp::List run_smc(
 
     vec log_weights = extract_weights(particle_vector, t);
     vec normalized_weights = softmax(log_weights);
+    log_marginal_likelihood(t) = extract_marginal_likelihood(
+      particle_vector, normalized_weights, t
+    );
 
     double ess = 1.0 / pow(norm(normalized_weights), 2.0);
     
@@ -66,7 +70,10 @@ Rcpp::List run_smc(
 
   return Rcpp::List::create(
     Rcpp::Named("alpha") = extract_alpha_values(particle_vector, prior),
-    Rcpp::Named("weights") = softmax(extract_weights(particle_vector, T - 1))
+    Rcpp::Named("rho") = extract_rho_values(particle_vector, prior),
+    Rcpp::Named("tau") = extract_tau_values(particle_vector, prior),
+    Rcpp::Named("weights") = softmax(extract_weights(particle_vector, T - 1)),
+    Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood
   );
 }
 

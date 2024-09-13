@@ -3,6 +3,18 @@
 
 using namespace arma;
 
+ivec cluster_count(const ivec& cluster_labels, int n_clusters) {
+  ivec histogram(n_clusters, fill::zeros);
+  
+  for (size_t i = 0; i < cluster_labels.n_elem; ++i) {
+    int value = cluster_labels(i);
+    if (value >= 1 && value <= n_clusters) {
+      histogram(value - 1)++;
+    }
+  }
+  return histogram;
+}
+
 bool Particle::rejuvenate(
     int t,
     const std::unique_ptr<Data>& data,
@@ -46,11 +58,27 @@ bool Particle::rejuvenate(
         (proposal_particle.parameters.alpha - parameters.alpha)
     );
   
+  ivec cluster_frequencies(prior.n_clusters);
   bool accept = log_MH_ratio > log(randu());
   if(accept) {
     parameters.alpha = proposal_particle.parameters.alpha;
     parameters.rho = proposal_particle.parameters.rho;
     k = k_proposal;
+    cluster_frequencies =
+      cluster_count(proposal_particle.particle_filters[k].cluster_labels,
+                    prior.n_clusters);
+  } else {
+    cluster_frequencies =
+      cluster_count(particle_filters[k].cluster_labels, prior.n_clusters);
   }
+  
+  if(prior.n_clusters > 1) {
+    for(size_t c{}; c < prior.n_clusters; c++) {
+      parameters.tau(c) = randg(
+        distr_param(cluster_frequencies(c) + prior.cluster_concentration, 1));
+    }
+    parameters.tau = normalise(parameters.tau, 1);
+  }
+  
   return accept;
 }
