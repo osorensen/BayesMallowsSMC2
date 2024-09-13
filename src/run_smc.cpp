@@ -6,6 +6,7 @@
 #include "model_options.h"
 #include "particle.h"
 #include "partition_functions.h"
+#include "post_process.h"
 #include "prior.h"
 #include "resampler.h"
 #include "smc_options.h"
@@ -40,21 +41,16 @@ Rcpp::List run_smc(
 
     double ess = 1.0 / pow(norm(normalized_weights), 2.0);
     
-    Rcpp::Rcout << "t = " << t << ", ESS = " << ess << std::endl;
-
-    int unq{};
-    int iter{};
     if(ess < smc_options.n_particles / 2) {
-      iter++;
-      
-      Rcpp::Rcout << "resampling" << std::endl;
       ivec new_inds =
         resampler->resample(smc_options.n_particles, normalized_weights);
       particle_vector = replace_elements(particle_vector, new_inds);
 
       AlphaSummaries alpha_summaries =
         compute_alpha_summaries(particle_vector, prior);
-
+      
+      int unq{};
+      int iter{};
       do{
         for(auto& particle : particle_vector) {
           particle.rejuvenate(t, data, distfun, pfun, prior,
@@ -62,14 +58,15 @@ Rcpp::List run_smc(
         }
         mat alpha_values = extract_alpha_values(particle_vector, prior);
         unq = count_unique_rows(alpha_values);
+        iter++;
       } while (unq < particle_vector.size() / 2.0 && 
         iter < smc_options.max_rejuvenation_steps);
     }
-
   }
 
   return Rcpp::List::create(
-    Rcpp::Named("alpha") = extract_alpha_values(particle_vector, prior)
+    Rcpp::Named("alpha") = extract_alpha_values(particle_vector, prior),
+    Rcpp::Named("weights") = softmax(extract_weights(particle_vector, T - 1))
   );
 }
 

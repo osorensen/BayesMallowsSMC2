@@ -7,7 +7,8 @@
 set_smc_options(
   n_particles,
   n_particle_filters,
-  resampler = c("multinomial", "residual", "stratified", "systematic")
+  resampler = c("multinomial", "residual", "stratified", "systematic"),
+  max_rejuvenation_steps = 10
 )
 }
 \arguments{
@@ -19,6 +20,9 @@ to run for each top-level particle.}
 
 \item{resampler}{Resampler to use. One of "multinomial", "residual",
 "stratified", or "systematic".}
+
+\item{max_rejuvenation_steps}{Maximum number of MCMC steps in rejuvenation
+algorithm.}
 }
 \value{
 An object to be provided to the \code{smc_options} argument of

@@ -1,5 +1,6 @@
 #include "leap_and_shift.h"
 #include "particle.h"
+#include "post_process.h"
 
 using namespace arma;
 
@@ -63,19 +64,6 @@ std::vector<Particle> create_particle_vector(
   }
   
   return result;
-}
-
-mat extract_alpha_values(
-    const std::vector<Particle>& particle_vector,
-    const Prior& prior
-) {
-  mat alpha_values(particle_vector.size(), prior.n_clusters);
-  
-  for(size_t i{}; i < particle_vector.size(); i++) {
-    alpha_values.row(i) = particle_vector[i].parameters.alpha.t();
-  }
-  
-  return alpha_values;
 }
 
 int count_unique_rows(const arma::mat& matrix) {

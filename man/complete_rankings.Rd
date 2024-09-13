@@ -5,7 +5,7 @@
 \alias{complete_rankings}
 \title{Simulated data with complete rankings}
 \format{
-A data frame with 40 rows and 7 columns:
+A data frame with 400 rows and 7 columns:
 \describe{
 \item{timepoint}{Integer specifying the timepoint.}
 \item{user}{Integer specifying the user id.}
@@ -16,8 +16,8 @@ A data frame with 40 rows and 7 columns:
 complete_rankings
 }
 \description{
-A simulated dataset containing complete rankings of five items by 40 users,
-at 40 separate timepoints. The dataset was simulated using the
+A simulated dataset containing complete rankings of ten items by 400 users,
+at 400 separate timepoints. The dataset was simulated using the
 \code{sample_mallows} function of the \code{BayesMallows} package
 \insertCite{sorensenBayesMallowsPackageBayesian2020}{BayesMallowsSMC2}.
 }

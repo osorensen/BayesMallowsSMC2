@@ -1,12 +1,12 @@
 #' Simulated data with complete rankings
 #'
-#' A simulated dataset containing complete rankings of five items by 40 users,
-#' at 40 separate timepoints. The dataset was simulated using the 
+#' A simulated dataset containing complete rankings of ten items by 400 users,
+#' at 400 separate timepoints. The dataset was simulated using the 
 #' `sample_mallows` function of the `BayesMallows` package 
 #' \insertCite{sorensenBayesMallowsPackageBayesian2020}{BayesMallowsSMC2}.
 #'
 #' @format 
-#' A data frame with 40 rows and 7 columns:
+#' A data frame with 400 rows and 7 columns:
 #' \describe{
 #'   \item{timepoint}{Integer specifying the timepoint.}
 #'   \item{user}{Integer specifying the user id.}
@@ -19,14 +19,14 @@
 
 #' Simulated data with top-3 rankings
 #'
-#' A simulated dataset containing top-3 rankings of five items by 40 users,
-#' at 40 separate timepoints. The dataset was simulated using the 
+#' A simulated dataset containing top-3 rankings of ten items by 400 users,
+#' at 400 separate timepoints. The dataset was simulated using the 
 #' `sample_mallows` function of the `BayesMallows` package 
 #' \insertCite{sorensenBayesMallowsPackageBayesian2020}{BayesMallowsSMC2}, and 
 #' is identical to [complete_rankings] with rankings below 3 set to `NA`
 #'
 #' @format 
-#' A data frame with 40 rows and 7 columns:
+#' A data frame with 400 rows and 7 columns:
 #' \describe{
 #'   \item{timepoint}{Integer specifying the timepoint.}
 #'   \item{user}{Integer specifying the user id.}
