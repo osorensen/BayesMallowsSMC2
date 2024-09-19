@@ -89,10 +89,7 @@ Rcpp::List run_smc(
           
           particle.log_weight += particle.log_weight + logZ_new - logZ_old;
         }
-        
       }
-      
-      
     }
   }
 
