@@ -5,6 +5,13 @@
 
 using namespace arma;
 
+int sample_cluster_label(const LogClusterContribution& llc) {
+  return Rcpp::sample(
+    llc.log_contribution.size(), 1, true, 
+    Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(llc.log_contribution - llc.log_sum)))
+  )(0);
+}
+
 void Particle::run_particle_filter(
     int t,
     const std::unique_ptr<Data>& data,
@@ -48,12 +55,7 @@ void Particle::run_particle_filter(
           prop.proposal, distfun, pfun
         );
         
-        int new_cluster_label = Rcpp::sample(
-          llc.log_contribution.size(), 1, true, 
-          Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(llc.log_contribution - llc.log_sum)))
-        )(0);
-        pf.cluster_labels(nu) = new_cluster_label;
-        
+        pf.cluster_labels(nu) = sample_cluster_label(llc);
         new_and_updated_users += llc.log_sum;
       }
       for(int uu : updated_users) {
@@ -88,9 +90,15 @@ void Particle::run_particle_filter(
     uvec new_users = data->get_users_at_timepoint(t);
     
     for(int nu : new_users) {
-      log_likelihood_increment(t) += 
-        compute_log_likelihood_contribution(
-          data->get_user_data(t, nu), distfun, pfun).log_sum;
+      auto llc = compute_log_likelihood_contribution(
+        data->get_user_data(t, nu), distfun, pfun);
+      
+      for(auto& pf : particle_filters) {
+        pf.cluster_labels(nu) = sample_cluster_label(llc);
+      }
+      
+      
+      log_likelihood_increment(t) += llc.log_sum;
     }
     log_weight(t) += log_likelihood_increment(t);
   }
