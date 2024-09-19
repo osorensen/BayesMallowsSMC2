@@ -5,8 +5,8 @@
 #include "smc_options.h"
 
 struct LatentRankProposal{
-  arma::ivec proposal;
-  double log_probability;
+  arma::ivec proposal{};
+  double log_probability{};
 };
 
 struct LatentProposer{

@@ -5,7 +5,7 @@
 \alias{partial_rankings}
 \title{Simulated data with top-3 rankings}
 \format{
-A data frame with 400 rows and 12 columns:
+A data frame with 100 rows and 12 columns:
 \describe{
 \item{timepoint}{Integer specifying the timepoint.}
 \item{user}{Integer specifying the user id.}
@@ -16,8 +16,8 @@ A data frame with 400 rows and 12 columns:
 partial_rankings
 }
 \description{
-A simulated dataset containing top-3 rankings of ten items by 400 users,
-at 400 separate timepoints. The dataset was simulated using the
+A simulated dataset containing top-3 rankings of ten items by 100 users,
+at 100 separate timepoints. The dataset was simulated using the
 \code{sample_mallows} function of the \code{BayesMallows} package
 \insertCite{sorensenBayesMallowsPackageBayesian2020}{BayesMallowsSMC2}, and
 is identical to \link{complete_rankings} with rankings below 3 set to \code{NA}.

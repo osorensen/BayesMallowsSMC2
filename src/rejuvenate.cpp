@@ -62,21 +62,24 @@ bool Particle::rejuvenate(
         (proposal_particle.parameters.alpha - parameters.alpha)
     );
   
-  ivec cluster_frequencies(prior.n_clusters);
   bool accept = log_MH_ratio > log(randu());
   if(accept) {
     parameters.alpha = proposal_particle.parameters.alpha;
     parameters.rho = proposal_particle.parameters.rho;
     k = k_proposal;
-    cluster_frequencies =
-      cluster_count(proposal_particle.particle_filters[k].cluster_labels,
-                    prior.n_clusters);
-  } else {
-    cluster_frequencies =
-      cluster_count(particle_filters[k].cluster_labels, prior.n_clusters);
   }
   
   if(prior.n_clusters > 1) {
+    ivec cluster_frequencies(prior.n_clusters);
+    if(accept) {
+      cluster_frequencies =
+        cluster_count(proposal_particle.particle_filters[k].cluster_labels,
+                      prior.n_clusters);
+    } else {
+      cluster_frequencies =
+        cluster_count(particle_filters[k].cluster_labels, prior.n_clusters);
+    }
+    
     for(size_t c{}; c < prior.n_clusters; c++) {
       parameters.tau(c) = randg(
         distr_param(cluster_frequencies(c) + prior.cluster_concentration, 1));

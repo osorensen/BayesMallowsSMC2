@@ -35,7 +35,6 @@ Rcpp::List run_smc(
   vec log_marginal_likelihood(T);
 
   for(size_t t{}; t < T; t++) {
-    Rcpp::Rcout << "t = " << t << std::endl;
     for(auto& particle : particle_vector) {
       particle.run_particle_filter(
         t, data, distfun, pfun, resampler, latent_proposer, prior);
@@ -50,7 +49,6 @@ Rcpp::List run_smc(
     double ess = 1.0 / pow(norm(normalized_weights), 2.0);
     
     if(ess < smc_options.n_particles / 2) {
-      Rcpp::Rcout << "ess = " << ess << std::endl;
       ivec new_inds =
         resampler->resample(smc_options.n_particles, normalized_weights);
       particle_vector = replace_elements(particle_vector, new_inds);
@@ -60,16 +58,41 @@ Rcpp::List run_smc(
       
       int unq{};
       int iter{};
+      double acceptance_rate{};
       do{
         for(auto& particle : particle_vector) {
-          particle.rejuvenate(t, data, distfun, pfun, resampler, latent_proposer, 
-                              prior, smc_options, alpha_summaries);
+          acceptance_rate += 
+            particle.rejuvenate(
+              t, data, distfun, pfun, resampler, latent_proposer, 
+              prior, smc_options, alpha_summaries);
         }
         mat alpha_values = extract_alpha_values(particle_vector, prior);
         unq = count_unique_cols(alpha_values);
         iter++;
       } while (unq < particle_vector.size() / 2.0 && 
         iter < smc_options.max_rejuvenation_steps);
+      
+      acceptance_rate /= (iter * particle_vector.size());
+      
+      if(acceptance_rate < .2) {
+        for(auto& particle : particle_vector) {
+          double logZ_old = sum(particle.log_likelihood_increment);
+          
+          vec log_weights = extract_weights(particle.particle_filters, t);
+          vec normalized_weights = softmax(log_weights);
+          ivec new_inds = resampler->resample(particle.particle_filters.size() * 2, normalized_weights);
+          particle.particle_filters = replace_elements(particle.particle_filters, new_inds);
+          particle.run_particle_filter(
+            t, data, distfun, pfun, resampler, latent_proposer, prior);
+          
+          double logZ_new = sum(particle.log_likelihood_increment);
+          
+          particle.log_weight += particle.log_weight + logZ_new - logZ_old;
+        }
+        
+      }
+      
+      
     }
   }
 

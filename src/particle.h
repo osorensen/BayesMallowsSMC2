@@ -21,6 +21,11 @@ struct AlphaSummaries{
   arma::vec alpha_sd;
 };
 
+struct LogClusterContribution{
+  arma::vec log_contribution;
+  double log_sum;
+};
+
 struct Particle{
   Particle(
     const Prior& prior,
@@ -61,7 +66,7 @@ struct Particle{
     const SMCOptions& smc_options,
     const AlphaSummaries& alpha_summaries
   );
-  double compute_log_likelihood_contribution(
+  LogClusterContribution compute_log_likelihood_contribution(
       const arma::ivec& ranking,
       const std::unique_ptr<Distance>& distfun,
       const std::unique_ptr<PartitionFunction>& pfun
