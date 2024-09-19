@@ -33,8 +33,10 @@ Rcpp::List run_smc(
   int T = data->n_timepoints();
   auto particle_vector = create_particle_vector(prior, smc_options, data);
   vec log_marginal_likelihood(T);
+  ivec n_particle_filters(T);
 
   for(size_t t{}; t < T; t++) {
+    n_particle_filters(t) = particle_vector[0].particle_filters.size();
     for(auto& particle : particle_vector) {
       particle.run_particle_filter(
         t, data, distfun, pfun, resampler, latent_proposer, prior);
@@ -98,7 +100,8 @@ Rcpp::List run_smc(
     Rcpp::Named("rho") = extract_rho_values(particle_vector, prior),
     Rcpp::Named("tau") = extract_tau_values(particle_vector, prior),
     Rcpp::Named("weights") = softmax(extract_weights(particle_vector, T - 1)),
-    Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood
+    Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood,
+    Rcpp::Named("n_particle_filters") = n_particle_filters
   );
 }
 
