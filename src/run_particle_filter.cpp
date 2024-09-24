@@ -35,18 +35,13 @@ void Particle::run_particle_filter(
         ivec obs = data->get_user_data(t, nu);
         LatentRankProposal prop{};
         prop = latent_proposer->propose(obs);
-        
         pf.latent_rankings = join_vert(
           pf.latent_rankings, 
           join_horiz(ivec{nu}, prop.proposal.t())
         );
+        
         log_proposal_probability += prop.log_probability;
-        
-        auto llc = compute_log_likelihood_contribution(
-          prop.proposal, distfun, pfun
-        );
-        
-        new_and_updated_users += llc.log_sum;
+        new_and_updated_users += -pfun->logz(alpha) - alpha * distfun->d(prop.proposal, rho);
       }
       for(int uu : updated_users) {
         auto obs = data->get_user_data(t, uu);
@@ -57,33 +52,35 @@ void Particle::run_particle_filter(
           check_rank_consistency(current_latent_ranking, obs, observed_inds);
         
         if(!consistent) {
-          updated_users_previous += compute_log_likelihood_contribution(
-            current_latent_ranking, distfun, pfun
-          ).log_sum;
+          updated_users_previous += -pfun->logz(alpha) - alpha * distfun->d(current_latent_ranking, rho);
           LatentRankProposal prop{};
           prop = latent_proposer->propose(obs);
           
           pf.insert_latent_ranking(prop.proposal, uu);
           log_proposal_probability += prop.log_probability;
           
-          new_and_updated_users += compute_log_likelihood_contribution(
-            prop.proposal, distfun, pfun
-          ).log_sum;
+          new_and_updated_users += -pfun->logz(alpha) - alpha * distfun->d(prop.proposal, rho);
         }
       }
-      
-      log_likelihood_increment(t) = 
-        new_and_updated_users - log_proposal_probability - updated_users_previous;
-      log_weight(t) += log_likelihood_increment(t);
+      pf.log_weight(t) = new_and_updated_users - log_proposal_probability - updated_users_previous;
     }
+    
+    vec tmp(particle_filters.size());
+    std::transform(
+      particle_filters.cbegin(), particle_filters.cend(), tmp.begin(),
+      [t](const ParticleFilter& pf) { return pf.log_weight(t); }
+    );
+    double maxval = max(tmp);
+    
+    log_likelihood_increment(t) = maxval - log(particle_filters.size()) + sum(exp(tmp - maxval));
+    log_weight(t) += log_likelihood_increment(t);
+    
+    
   } else if(data->type() == "CompleteRankings") {
     uvec new_users = data->get_users_at_timepoint(t);
     
     for(int nu : new_users) {
-      auto llc = compute_log_likelihood_contribution(
-        data->get_user_data(t, nu), distfun, pfun);
-      
-      log_likelihood_increment(t) += llc.log_sum;
+      log_likelihood_increment(t) = -pfun->logz(alpha) - alpha * distfun->d(data->get_user_data(t, nu), rho);
     }
     log_weight(t) += log_likelihood_increment(t);
   }

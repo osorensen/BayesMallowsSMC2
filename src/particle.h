@@ -10,20 +10,9 @@
 #include "resampler.h"
 #include "smc_options.h"
 
-struct StaticParameters{
-  arma::vec alpha;
-  arma::imat rho;
-  arma::vec tau;
-};
-
 struct AlphaSummaries{
-  arma::vec alpha_mean;
-  arma::vec alpha_sd;
-};
-
-struct LogClusterContribution{
-  arma::vec log_contribution;
-  double log_sum;
+  double alpha_mean;
+  double alpha_sd;
 };
 
 struct Particle{
@@ -33,15 +22,10 @@ struct Particle{
     const ModelOptions& model_options,
     const std::unique_ptr<Data>& data
   );
-  Particle(
-    const SMCOptions& smc_options, 
-    const ModelOptions& model_options,
-    const std::unique_ptr<Data>& data,
-    const AlphaSummaries& alpha_summaries,
-    const StaticParameters& static_parameters
-  );
   ~Particle() = default;
-  StaticParameters parameters;
+  
+  double alpha;
+  arma::ivec rho;
   
   arma::vec log_weight{};
   arma::vec log_likelihood_increment{};
@@ -56,7 +40,7 @@ struct Particle{
       const std::unique_ptr<LatentProposer>& latent_proposer
   );
   bool rejuvenate(
-    int t,
+    int T,
     const std::unique_ptr<Data>& data,
     const std::unique_ptr<Distance>& distfun,
     const std::unique_ptr<PartitionFunction>& pfun,
@@ -66,11 +50,6 @@ struct Particle{
     const SMCOptions& smc_options,
     const ModelOptions& model_options,
     const AlphaSummaries& alpha_summaries
-  );
-  LogClusterContribution compute_log_likelihood_contribution(
-      const arma::ivec& ranking,
-      const std::unique_ptr<Distance>& distfun,
-      const std::unique_ptr<PartitionFunction>& pfun
   );
 };
 

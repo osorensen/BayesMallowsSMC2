@@ -7,6 +7,7 @@ MatrixData::MatrixData(const Rcpp::List& input_data, const std::string& key)
   : matrix(input_data[key]) {
   matrix.col(0) -= 1;
   matrix.col(1) -= 1;
+  matrix.transform([](int val) { return (val < 0) ? 0 : val; });
 }
 
 int MatrixData::n_timepoints() {

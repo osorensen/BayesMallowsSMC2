@@ -2,43 +2,30 @@
 
 using namespace arma;
 
-mat extract_alpha_values(
+vec extract_alpha_values(
     const std::vector<Particle>& particle_vector,
     const ModelOptions& model_options
 ) {
-  mat alpha_values(model_options.n_clusters, particle_vector.size());
+  vec alpha_values(particle_vector.size());
   
   for(size_t i{}; i < particle_vector.size(); i++) {
-    alpha_values.col(i) = particle_vector[i].parameters.alpha;
+    alpha_values(i) = particle_vector[i].alpha;
   }
   
   return alpha_values;
 }
 
-icube extract_rho_values(
+imat extract_rho_values(
     const std::vector<Particle>& particle_vector,
     const ModelOptions& model_options
 ) {
-  icube rho_values(model_options.n_items, model_options.n_clusters, particle_vector.size());
+  imat rho_values(model_options.n_items, particle_vector.size());
   
   for(size_t i{}; i < particle_vector.size(); i++) {
-    rho_values.slice(i) = particle_vector[i].parameters.rho;
+    rho_values.col(i) = particle_vector[i].rho;
   }
   
   return rho_values;
-}
-
-mat extract_tau_values(
-    const std::vector<Particle>& particle_vector,
-    const ModelOptions& model_options
-) {
-  mat tau_values(model_options.n_clusters, particle_vector.size());
-  
-  for(size_t i{}; i < particle_vector.size(); i++) {
-    tau_values.col(i) = particle_vector[i].parameters.tau;
-  }
-  
-  return tau_values;
 }
 
 double extract_marginal_likelihood(

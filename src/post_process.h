@@ -3,17 +3,12 @@
 
 #include "particle.h"
 
-arma::mat extract_alpha_values(
+arma::vec extract_alpha_values(
     const std::vector<Particle>& particle_vector,
     const ModelOptions& model_options
 );
 
-arma::icube extract_rho_values(
-  const std::vector<Particle>& particle_vector,
-  const ModelOptions& model_options
-);
-
-arma::mat extract_tau_values(
+arma::imat extract_rho_values(
   const std::vector<Particle>& particle_vector,
   const ModelOptions& model_options
 );

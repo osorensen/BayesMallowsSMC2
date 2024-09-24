@@ -34,12 +34,9 @@ Rcpp::List run_smc(
   auto latent_proposer = choose_latent_proposer(smc_options);
   int T = data->n_timepoints();
   auto particle_vector = create_particle_vector(prior, smc_options, model_options, data);
-  vec log_marginal_likelihood(T);
-  ivec n_particle_filters(T);
 
   for(size_t t{}; t < T; t++) {
     reporter.report_time(t);
-    n_particle_filters(t) = particle_vector[0].particle_filters.size();
     for(auto& particle : particle_vector) {
       particle.run_particle_filter(
         t, data, distfun, pfun, resampler, latent_proposer);
@@ -47,10 +44,7 @@ Rcpp::List run_smc(
 
     vec log_weights = extract_weights(particle_vector, t);
     vec normalized_weights = softmax(log_weights);
-    log_marginal_likelihood(t) = extract_marginal_likelihood(
-      particle_vector, normalized_weights, t
-    );
-
+    
     double ess = 1.0 / pow(norm(normalized_weights), 2.0);
     reporter.report_ess(ess);
     
@@ -67,7 +61,6 @@ Rcpp::List run_smc(
       int iter{};
       double acceptance_rate{};
       do{
-        reporter.report_resampling();
         for(auto& particle : particle_vector) {
           acceptance_rate += 
             particle.rejuvenate(
@@ -81,8 +74,9 @@ Rcpp::List run_smc(
         iter < smc_options.max_rejuvenation_steps);
       
       acceptance_rate /= (iter * particle_vector.size());
+      reporter.report_acceptance_rate(acceptance_rate);
       
-      if(acceptance_rate < .2) {
+      if(acceptance_rate < 0) {
         for(auto& particle : particle_vector) {
           double logZ_old = sum(particle.log_likelihood_increment);
           
@@ -96,7 +90,6 @@ Rcpp::List run_smc(
           
           particle.log_weight += particle.log_weight + logZ_new - logZ_old;
         }
-        reporter.report_expansion(n_particle_filters(t) * 2);
       }
     }
   }
@@ -104,10 +97,7 @@ Rcpp::List run_smc(
   return Rcpp::List::create(
     Rcpp::Named("alpha") = extract_alpha_values(particle_vector, model_options),
     Rcpp::Named("rho") = extract_rho_values(particle_vector, model_options),
-    Rcpp::Named("tau") = extract_tau_values(particle_vector, model_options),
-    Rcpp::Named("weights") = softmax(extract_weights(particle_vector, T - 1)),
-    Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood,
-    Rcpp::Named("n_particle_filters") = n_particle_filters
+    Rcpp::Named("weights") = softmax(extract_weights(particle_vector, T - 1))
   );
 }
 

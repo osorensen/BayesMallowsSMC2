@@ -12,20 +12,15 @@ test_that("compute_sequentially works with complete data", {
   expect_gt(wm, .28)
   expect_lt(wm, .36)
   
-  new_inds <- sample(
-    seq_len(ncol(m$alpha)),
-    ncol(m$alpha),
-    prob = m$weights,
-    replace = TRUE
-  )
-  expect_gt(mean(m$alpha[, new_inds]), .28)
-  expect_lt(mean(m$alpha[, new_inds]), .36)
+  new_inds <- sample(length(m$alpha), length(m$alpha), prob = m$weights, replace = TRUE)
+  expect_gt(mean(m$alpha[new_inds]), .28)
+  expect_lt(mean(m$alpha[new_inds]), .36)
   
   expect_lte(
-    max(abs(order(apply(m$rho[, , new_inds, drop = FALSE], c(1, 2), mean)) - 1:10)),
+    max(abs(order(apply(m$rho[, new_inds], 1, mean)) - 1:10)),
     1)
   
-  hist <- table(apply(m$rho[, , new_inds, drop = FALSE], 3, paste, collapse = ","))
+  hist <- table(apply(m$rho[, new_inds], 2, paste, collapse = ","))
   expect_gt(length(hist), 10)  
   expect_lt(length(hist), 2000)  
 })
