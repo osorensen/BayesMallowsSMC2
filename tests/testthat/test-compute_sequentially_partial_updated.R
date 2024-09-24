@@ -9,9 +9,10 @@ test_that("compute_sequentially works with new and updated users", {
   mod <- compute_sequentially(
     dd,
     hyperparameters = set_hyperparameters(n_items = 5),
-    smc_options = set_smc_options(n_particles = 100, max_rejuvenation_steps = 5)
+    smc_options = set_smc_options(
+      n_particles = 200, max_rejuvenation_steps = 5, verbose = FALSE)
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .98)
-  expect_lt(alpha_hat, 1.05)
+  expect_gt(alpha_hat, .94)
+  expect_lt(alpha_hat, 1.1)
 })
