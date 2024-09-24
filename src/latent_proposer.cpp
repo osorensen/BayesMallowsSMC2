@@ -2,15 +2,13 @@
 #include "setdiff.h"
 using namespace arma;
 
-LatentRankProposal Uniform::propose(
-    const arma::ivec& ranking,
-    const Prior& prior
-    ) {
+LatentRankProposal Uniform::propose(const arma::ivec& ranking) {
+  int n_items = ranking.size();
   ivec proposal = ranking;
   uvec observed_inds = find(ranking > 0);
   uvec missing_inds = find(ranking < 0);
   ivec available_rankings = setdiff<ivec>(
-    regspace<ivec>(1, 1, prior.n_items), 
+    regspace<ivec>(1, 1, n_items), 
     ranking(observed_inds)
     );
   

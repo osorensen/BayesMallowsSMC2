@@ -9,6 +9,7 @@
 #include "partition_functions.h"
 #include "post_process.h"
 #include "prior.h"
+#include "progress_reporter.h"
 #include "resampler.h"
 #include "smc_options.h"
 #include "softmax.h"
@@ -25,21 +26,23 @@ Rcpp::List run_smc(
   Prior prior{input_prior, input_data};
   auto data = setup_data(input_data);
   SMCOptions smc_options{data, input_smc_options};
-  ModelOptions model_options{input_model_options};
+  ModelOptions model_options{input_model_options, input_data};
   auto distfun = choose_distance_function(model_options);
   auto resampler = choose_resampler(smc_options);
-  auto pfun = choose_partition_function(prior, model_options);
+  auto pfun = choose_partition_function(model_options);
+  auto reporter = ProgressReporter(smc_options.verbose);
   auto latent_proposer = choose_latent_proposer(smc_options);
   int T = data->n_timepoints();
-  auto particle_vector = create_particle_vector(prior, smc_options, data);
+  auto particle_vector = create_particle_vector(prior, smc_options, model_options, data);
   vec log_marginal_likelihood(T);
   ivec n_particle_filters(T);
 
   for(size_t t{}; t < T; t++) {
+    reporter.report_time(t);
     n_particle_filters(t) = particle_vector[0].particle_filters.size();
     for(auto& particle : particle_vector) {
       particle.run_particle_filter(
-        t, data, distfun, pfun, resampler, latent_proposer, prior);
+        t, data, distfun, pfun, resampler, latent_proposer);
     }
 
     vec log_weights = extract_weights(particle_vector, t);
@@ -49,26 +52,29 @@ Rcpp::List run_smc(
     );
 
     double ess = 1.0 / pow(norm(normalized_weights), 2.0);
+    reporter.report_ess(ess);
     
     if(ess < smc_options.n_particles / 2) {
+      reporter.report_resampling();
       ivec new_inds =
         resampler->resample(smc_options.n_particles, normalized_weights);
       particle_vector = replace_elements(particle_vector, new_inds);
 
       AlphaSummaries alpha_summaries =
-        compute_alpha_summaries(particle_vector, prior);
+        compute_alpha_summaries(particle_vector, model_options);
       
       int unq{};
       int iter{};
       double acceptance_rate{};
       do{
+        reporter.report_resampling();
         for(auto& particle : particle_vector) {
           acceptance_rate += 
             particle.rejuvenate(
               t, data, distfun, pfun, resampler, latent_proposer, 
-              prior, smc_options, alpha_summaries);
+              prior, smc_options, model_options, alpha_summaries);
         }
-        mat alpha_values = extract_alpha_values(particle_vector, prior);
+        mat alpha_values = extract_alpha_values(particle_vector, model_options);
         unq = count_unique_cols(alpha_values);
         iter++;
       } while (unq < particle_vector.size() / 2.0 && 
@@ -84,21 +90,21 @@ Rcpp::List run_smc(
           vec normalized_weights = softmax(log_weights);
           ivec new_inds = resampler->resample(particle.particle_filters.size() * 2, normalized_weights);
           particle.particle_filters = replace_elements(particle.particle_filters, new_inds);
-          particle.run_particle_filter(
-            t, data, distfun, pfun, resampler, latent_proposer, prior);
+          particle.run_particle_filter(t, data, distfun, pfun, resampler, latent_proposer);
           
           double logZ_new = sum(particle.log_likelihood_increment);
           
           particle.log_weight += particle.log_weight + logZ_new - logZ_old;
         }
+        reporter.report_expansion(n_particle_filters(t) * 2);
       }
     }
   }
 
   return Rcpp::List::create(
-    Rcpp::Named("alpha") = extract_alpha_values(particle_vector, prior),
-    Rcpp::Named("rho") = extract_rho_values(particle_vector, prior),
-    Rcpp::Named("tau") = extract_tau_values(particle_vector, prior),
+    Rcpp::Named("alpha") = extract_alpha_values(particle_vector, model_options),
+    Rcpp::Named("rho") = extract_rho_values(particle_vector, model_options),
+    Rcpp::Named("tau") = extract_tau_values(particle_vector, model_options),
     Rcpp::Named("weights") = softmax(extract_weights(particle_vector, T - 1)),
     Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood,
     Rcpp::Named("n_particle_filters") = n_particle_filters

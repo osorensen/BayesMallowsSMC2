@@ -10,7 +10,6 @@
 #' @param alpha_rate Rate parameter of gamma prior for `alpha`.
 #' @param cluster_concentration Concentration parameter of Dirichlet prior for
 #' `tau`.
-#' @param n_clusters Integer specifying the number of clusters.
 #'
 #' @return An object to be provided to the `priors` argument of
 #' [compute_sequentially()].
@@ -19,8 +18,7 @@
 set_priors <- function(
     alpha_shape = 1,
     alpha_rate = .5,
-    cluster_concentration = 10,
-    n_clusters = 1
+    cluster_concentration = 10
 ) {
   as.list(environment())
 }

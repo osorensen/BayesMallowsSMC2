@@ -4,17 +4,17 @@
 using namespace arma;
 
 std::unique_ptr<PartitionFunction> choose_partition_function(
-    const Prior& prior, const ModelOptions& model_options) {
+    const ModelOptions& model_options) {
   if(model_options.metric == "cayley") {
-    return std::make_unique<Cayley>(prior.n_items);
+    return std::make_unique<Cayley>(model_options.n_items);
   } else if(model_options.metric == "hamming") {
-    return std::make_unique<Hamming>(prior.n_items);
+    return std::make_unique<Hamming>(model_options.n_items);
   } else if(model_options.metric == "kendall") {
-    return std::make_unique<Kendall>(prior.n_items);
+    return std::make_unique<Kendall>(model_options.n_items);
   } else if(model_options.metric == "footrule" || 
     model_options.metric == "spearman" || 
     model_options.metric == "ulam") {
-    return std::make_unique<Cardinalities>(prior.n_items, model_options.metric);
+    return std::make_unique<Cardinalities>(model_options.n_items, model_options.metric);
   } else {
     Rcpp::stop("Unknown metric.");
   }

@@ -10,6 +10,4 @@ struct Prior{
   double alpha_shape;
   double alpha_rate;
   int cluster_concentration;
-  int n_clusters;
-  int n_items;
 };

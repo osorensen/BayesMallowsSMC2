@@ -4,10 +4,11 @@ using namespace arma;
 
 ParticleFilter::ParticleFilter(
   const std::unique_ptr<Data>& data,
-  const Prior& prior
+  const ModelOptions& model_options
 ) : log_weight { zeros(data->n_timepoints()) }, 
 cluster_labels { zeros<ivec>(data->n_users()) },
-latent_rankings { zeros<imat>(0, prior.n_items + 1)} {}
+cluster_probs { zeros<mat>(data->n_users(), model_options.n_clusters) },
+latent_rankings { zeros<imat>(0, model_options.n_items + 1)} {}
 
 ivec ParticleFilter::extract_latent_ranking(int u) {
   uvec index = find(latent_rankings.col(0) == u);
@@ -24,12 +25,12 @@ void ParticleFilter::insert_latent_ranking(const ivec& r, int u) {
 
 std::vector<ParticleFilter> create_particle_filter_vectors(
     const SMCOptions& smc_options,
-    const std::unique_ptr<Data>& data,
-    const Prior& prior
+    const ModelOptions& model_options,
+    const std::unique_ptr<Data>& data
 ) {
   return std::vector<ParticleFilter>(
     smc_options.n_particle_filters, 
-    ParticleFilter(data, prior)
+    ParticleFilter(data, model_options)
     );
 }
 

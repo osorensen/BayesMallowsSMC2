@@ -11,6 +11,7 @@
 #' "stratified", or "systematic". 
 #' @param max_rejuvenation_steps Maximum number of MCMC steps in rejuvenation 
 #' algorithm.
+#' @param verbose Whether to report progress or not.
 #' 
 #' @return An object to be provided to the `smc_options` argument of 
 #' [compute_sequentially()].
@@ -20,7 +21,8 @@ set_smc_options <- function(
     n_particles,
     n_particle_filters,
     resampler = c("multinomial", "residual", "stratified", "systematic"),
-    max_rejuvenation_steps = 10
+    max_rejuvenation_steps = 10,
+    verbose = FALSE
     ) {
   if(missing(n_particles) || missing(n_particle_filters)) {
     stop("Both n_particles and n_particle_filters must be provided.")

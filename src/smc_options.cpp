@@ -9,4 +9,5 @@ SMCOptions::SMCOptions(
     data->type() == "CompleteRankings" ? 1 :
     input_smc_options["n_particle_filters"] },
     resampler (input_smc_options["resampler"]),
-    max_rejuvenation_steps {input_smc_options["max_rejuvenation_steps"]}{}
+    max_rejuvenation_steps {input_smc_options["max_rejuvenation_steps"]},
+    verbose { input_smc_options["verbose"]} {}

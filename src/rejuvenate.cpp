@@ -3,18 +3,6 @@
 
 using namespace arma;
 
-ivec cluster_count(const ivec& cluster_labels, int n_clusters) {
-  ivec histogram(n_clusters, fill::zeros);
-  
-  for (size_t i = 0; i < cluster_labels.n_elem; ++i) {
-    int value = cluster_labels(i);
-    if (value >= 1 && value <= n_clusters) {
-      histogram(value - 1)++;
-    }
-  }
-  return histogram;
-}
-
 bool Particle::rejuvenate(
     int t,
     const std::unique_ptr<Data>& data,
@@ -24,6 +12,7 @@ bool Particle::rejuvenate(
     const std::unique_ptr<LatentProposer>& latent_proposer,
     const Prior& prior,
     const SMCOptions& smc_options,
+    const ModelOptions& model_options,
     const AlphaSummaries& alpha_summaries
 ) {
   vec pf_log_weights = extract_weights(particle_filters, t);
@@ -33,13 +22,12 @@ bool Particle::rejuvenate(
     Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(normalized_pf_weights));
   int k = Rcpp::sample(probs.size(), 1, true, probs, false)[0];
   
-  Particle proposal_particle{prior, smc_options, data, alpha_summaries,
+  Particle proposal_particle{smc_options, model_options, data, alpha_summaries,
                              parameters};
   
   for(size_t t_index{}; t_index < t + 1; t_index++) {
     proposal_particle.run_particle_filter(
-      t_index, data, distfun, pfun, resampler, latent_proposer, prior
-    );
+      t_index, data, distfun, pfun, resampler, latent_proposer);
   }
   
   double log_Z_proposal = sum(proposal_particle.log_likelihood_increment);
@@ -67,24 +55,6 @@ bool Particle::rejuvenate(
     parameters.alpha = proposal_particle.parameters.alpha;
     parameters.rho = proposal_particle.parameters.rho;
     k = k_proposal;
-  }
-  
-  if(prior.n_clusters > 1) {
-    ivec cluster_frequencies(prior.n_clusters);
-    if(accept) {
-      cluster_frequencies =
-        cluster_count(proposal_particle.particle_filters[k].cluster_labels,
-                      prior.n_clusters);
-    } else {
-      cluster_frequencies =
-        cluster_count(particle_filters[k].cluster_labels, prior.n_clusters);
-    }
-    
-    for(size_t c{}; c < prior.n_clusters; c++) {
-      parameters.tau(c) = randg(
-        distr_param(cluster_frequencies(c) + prior.cluster_concentration, 1));
-    }
-    parameters.tau = normalise(parameters.tau, 1);
   }
   
   return accept;

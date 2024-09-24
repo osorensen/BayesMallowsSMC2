@@ -30,11 +30,12 @@ struct Particle{
   Particle(
     const Prior& prior,
     const SMCOptions& smc_options,
+    const ModelOptions& model_options,
     const std::unique_ptr<Data>& data
   );
   Particle(
-    const Prior& prior,
     const SMCOptions& smc_options, 
+    const ModelOptions& model_options,
     const std::unique_ptr<Data>& data,
     const AlphaSummaries& alpha_summaries,
     const StaticParameters& static_parameters
@@ -52,8 +53,7 @@ struct Particle{
       const std::unique_ptr<Distance>& distfun,
       const std::unique_ptr<PartitionFunction>& pfun,
       const std::unique_ptr<Resampler>& resampler,
-      const std::unique_ptr<LatentProposer>& latent_proposer,
-      const Prior& prior
+      const std::unique_ptr<LatentProposer>& latent_proposer
   );
   bool rejuvenate(
     int t,
@@ -64,6 +64,7 @@ struct Particle{
     const std::unique_ptr<LatentProposer>& latent_proposer,
     const Prior& prior,
     const SMCOptions& smc_options,
+    const ModelOptions& model_options,
     const AlphaSummaries& alpha_summaries
   );
   LogClusterContribution compute_log_likelihood_contribution(
@@ -76,6 +77,7 @@ struct Particle{
 std::vector<Particle> create_particle_vector(
     const Prior& prior,
     const SMCOptions& smc_options,
+    const ModelOptions& model_options,
     const std::unique_ptr<Data>& data
 );
 
@@ -83,5 +85,5 @@ int count_unique_cols(const arma::mat& matrix);
 
 AlphaSummaries compute_alpha_summaries(
   const std::vector<Particle>& particle_vector,
-  const Prior& prior
+  const ModelOptions& model_options
 );

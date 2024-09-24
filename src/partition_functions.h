@@ -4,7 +4,6 @@
 #include <RcppArmadillo.h>
 
 #include "model_options.h"
-#include "prior.h"
 
 struct PartitionFunction {
   PartitionFunction() {};
@@ -12,8 +11,7 @@ struct PartitionFunction {
   virtual double logz(double alpha) = 0;
 };
 
-std::unique_ptr<PartitionFunction> choose_partition_function(
-    const Prior& prior, const ModelOptions& model_options);
+std::unique_ptr<PartitionFunction> choose_partition_function(const ModelOptions& model_options);
 
 struct Cayley : PartitionFunction {
   Cayley(unsigned int n_items);

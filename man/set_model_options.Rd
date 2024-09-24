@@ -5,12 +5,15 @@
 \title{Set options for Bayesian Mallows model}
 \usage{
 set_model_options(
-  metric = c("footrule", "spearman", "kendall", "cayley", "ulam", "hamming")
+  metric = c("footrule", "spearman", "kendall", "cayley", "ulam", "hamming"),
+  n_clusters = 1
 )
 }
 \arguments{
 \item{metric}{The metric used. One of "footrule", "spearman", "kendall",
 "cayley", "ulam", and "hamming". Defaults to "footrule".}
+
+\item{n_clusters}{Integer specifying the number of clusters.}
 }
 \value{
 An object to be provided to \code{\link[=compute_sequentially]{compute_sequentially()}}.

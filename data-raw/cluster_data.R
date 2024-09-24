@@ -1,7 +1,7 @@
 set.seed(1)
-n_items <- 10
-alpha0 <- c(.2, .4)
-n_users <- c(50, 50)
+n_items <- 5
+alpha0 <- c(.1, .4)
+n_users <- c(250, 250)
 
 rankings1 <- BayesMallows::sample_mallows(
   rho0 = seq_len(n_items), 

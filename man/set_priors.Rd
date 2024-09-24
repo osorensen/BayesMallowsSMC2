@@ -4,12 +4,7 @@
 \alias{set_priors}
 \title{Set prior parameters for Bayesian Mallows model}
 \usage{
-set_priors(
-  alpha_shape = 1,
-  alpha_rate = 0.5,
-  cluster_concentration = 10,
-  n_clusters = 1
-)
+set_priors(alpha_shape = 1, alpha_rate = 0.5, cluster_concentration = 10)
 }
 \arguments{
 \item{alpha_shape}{Shape parameter of gamma prior for \code{alpha}.}
@@ -18,8 +13,6 @@ set_priors(
 
 \item{cluster_concentration}{Concentration parameter of Dirichlet prior for
 \code{tau}.}
-
-\item{n_clusters}{Integer specifying the number of clusters.}
 }
 \value{
 An object to be provided to the \code{priors} argument of

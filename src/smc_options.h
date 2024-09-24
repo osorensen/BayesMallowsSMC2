@@ -15,4 +15,5 @@ struct SMCOptions{
   std::string resampler{};
   int max_rejuvenation_steps{};
   std::string latent_rank_proposer{"uniform"};
+  bool verbose{};
 };

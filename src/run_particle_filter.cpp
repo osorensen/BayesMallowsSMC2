@@ -5,21 +5,13 @@
 
 using namespace arma;
 
-int sample_cluster_label(const LogClusterContribution& llc) {
-  return Rcpp::sample(
-    llc.log_contribution.size(), 1, true, 
-    Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(llc.log_contribution - llc.log_sum)))
-  )(0);
-}
-
 void Particle::run_particle_filter(
     int t,
     const std::unique_ptr<Data>& data,
     const std::unique_ptr<Distance>& distfun,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Resampler>& resampler,
-    const std::unique_ptr<LatentProposer>& latent_proposer,
-    const Prior& prior
+    const std::unique_ptr<LatentProposer>& latent_proposer
 ) {
   if(t > 1) {
     vec log_weights = extract_weights(particle_filters, t - 1);
@@ -42,8 +34,7 @@ void Particle::run_particle_filter(
       for(int nu : new_users) {
         ivec obs = data->get_user_data(t, nu);
         LatentRankProposal prop{};
-        
-        prop = latent_proposer->propose(obs, prior);
+        prop = latent_proposer->propose(obs);
         
         pf.latent_rankings = join_vert(
           pf.latent_rankings, 
@@ -55,7 +46,6 @@ void Particle::run_particle_filter(
           prop.proposal, distfun, pfun
         );
         
-        pf.cluster_labels(nu) = sample_cluster_label(llc);
         new_and_updated_users += llc.log_sum;
       }
       for(int uu : updated_users) {
@@ -71,7 +61,7 @@ void Particle::run_particle_filter(
             current_latent_ranking, distfun, pfun
           ).log_sum;
           LatentRankProposal prop{};
-          prop = latent_proposer->propose(obs, prior);
+          prop = latent_proposer->propose(obs);
           
           pf.insert_latent_ranking(prop.proposal, uu);
           log_proposal_probability += prop.log_probability;
@@ -92,11 +82,6 @@ void Particle::run_particle_filter(
     for(int nu : new_users) {
       auto llc = compute_log_likelihood_contribution(
         data->get_user_data(t, nu), distfun, pfun);
-      
-      for(auto& pf : particle_filters) {
-        pf.cluster_labels(nu) = sample_cluster_label(llc);
-      }
-      
       
       log_likelihood_increment(t) += llc.log_sum;
     }
