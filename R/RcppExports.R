@@ -10,9 +10,7 @@
 #' @param prefs An integer matrix (`arma::umat`) representing the preference relations.
 #' @param n_items An integer specifying the number of items to sort.
 #' @param output_directory A string specifying the directory where the output files will be saved.
-#' @param max_files_to_save An integer specifying an upper limit on the number of files to save. If
-#'  the number of topological sorts exceeds `max_files_to_save`, a random sample of size `max_files_to_save`
-#'  is taken at random, and the corresponding sorts saved.
+#' @param save_frac Number between 0 and 1 specifying which fraction of sorts to save.
 #'
 #' @details
 #' The function generates all possible topological sorts for the provided preference matrix
@@ -22,8 +20,8 @@
 #' @return This function returns the number of topological sorts.
 #'
 #' @export
-precompute_topological_sorts <- function(prefs, n_items, output_directory, max_files_to_save) {
-    .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, output_directory, max_files_to_save)
+precompute_topological_sorts <- function(prefs, n_items, output_directory, save_frac) {
+    .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, output_directory, save_frac)
 }
 
 run_smc <- function(input_timeseries, input_prior, input_options) {
