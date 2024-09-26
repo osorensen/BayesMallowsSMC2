@@ -104,7 +104,7 @@ topological_sorts_user all_topological_sorts(const arma::umat& prefs, int n_item
 //'
 //' @export
 // [[Rcpp::export]]
-int precompute_topological_sorts(
+long long int precompute_topological_sorts(
     arma::umat prefs, int n_items, std::string output_directory,
     int max_files_to_save) {
  if (!std::filesystem::exists(output_directory)) {
@@ -114,7 +114,7 @@ int precompute_topological_sorts(
  }
 
  auto sorts = all_topological_sorts(prefs, n_items);
- int n_sorts = sorts.size();
+ long long int n_sorts = sorts.size();
  topological_sorts_user temp_sorts;
 
  if(sorts.size() > max_files_to_save) {
