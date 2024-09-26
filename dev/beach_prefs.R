@@ -8,6 +8,18 @@ dat <- BayesMallows::beach_preferences %>%
   select(timepoint, user, top_item, bottom_item) %>%
   as.data.frame()
 
+rels <- as.matrix(subset(dat, timepoint == 1 & user == 1)[, c("top_item", "bottom_item")])
+ss <- ""
+for(i in seq_len(nrow(rels))) {
+  ss <- paste(paste0(ss, "[", rels[i, 1], ",", rels[i, 2], "]"), ",")
+}
+
+precompute_topological_sorts(
+  rels,
+  n_items = 15,
+  output_directory = "tmp/user1",
+  3)
+
 mod <- compute_sequentially(
   data = dat,
   hyperparameters = set_hyperparameters(n_items = 15),
