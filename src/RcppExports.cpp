@@ -12,7 +12,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // precompute_topological_sorts
-int precompute_topological_sorts(arma::umat prefs, int n_items, std::string output_directory, double save_frac);
+long long int precompute_topological_sorts(arma::umat prefs, int n_items, std::string output_directory, double save_frac);
 RcppExport SEXP _BayesMallowsSMC2_precompute_topological_sorts(SEXP prefsSEXP, SEXP n_itemsSEXP, SEXP output_directorySEXP, SEXP save_fracSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
