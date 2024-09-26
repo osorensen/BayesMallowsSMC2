@@ -16,12 +16,12 @@ class Graph {
   vector<int> indegree;
   void alltopologicalSortUtil(
       vector<int>& res, vector<bool>& visited, const std::string& output_directory,
-      int& sort_count, double save_frac);
+      long long int& sort_count, double save_frac);
 
 public:
   Graph(int n_items);
   void addEdge(int v, int w);
-  void alltopologicalSort(const std::string& output_directory, int& sort_count, double save_frac);
+  void alltopologicalSort(const std::string& output_directory, long long int& sort_count, double save_frac);
 };
 
 Graph::Graph(int n_items) : n_items { n_items }, adj(n_items),
@@ -33,7 +33,7 @@ void Graph::addEdge(int v, int w) {
 }
 
 void Graph::alltopologicalSortUtil(vector<int>& res, vector<bool>& visited,
-                                   const std::string& output_directory, int& sort_count,
+                                   const std::string& output_directory, long long int& sort_count,
                                    double save_frac) {
   bool flag = false;
 
@@ -73,7 +73,8 @@ void Graph::alltopologicalSortUtil(vector<int>& res, vector<bool>& visited,
   }
 }
 
-void Graph::alltopologicalSort(const std::string& output_directory, int& sort_count,
+void Graph::alltopologicalSort(const std::string& output_directory,
+                               long long int& sort_count,
                                double save_frac) {
   vector<bool> visited(n_items, false);
   vector<int> res;
@@ -100,7 +101,7 @@ void Graph::alltopologicalSort(const std::string& output_directory, int& sort_co
 //'
 //' @export
 // [[Rcpp::export]]
-int precompute_topological_sorts(
+long long int precompute_topological_sorts(
    arma::umat prefs, int n_items, std::string output_directory, double save_frac) {
  if (!std::filesystem::exists(output_directory)) {
    if (!std::filesystem::create_directory(output_directory)) {
@@ -113,7 +114,7 @@ int precompute_topological_sorts(
    g.addEdge(prefs.at(i, 0) - 1, prefs.at(i, 1) - 1);
  }
 
- int sort_count = 0;
+ long long int sort_count = 0;
  g.alltopologicalSort(output_directory, sort_count, save_frac);
 
  return sort_count;
