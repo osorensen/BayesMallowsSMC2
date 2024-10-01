@@ -33,3 +33,10 @@ void ProgressReporter::report_expansion(int n_particle_filters) {
     Rcpp::Rcout << n_particle_filters << " particle filters after doubling" << std::endl;
   }
 }
+
+void ProgressReporter::report_acceptance_rate(double acceptance_rate) {
+  if(verbose) {
+    Rcpp::Rcout << "Acceptance rate " << acceptance_rate
+                << " in rejuvenation step." << std::endl;
+  }
+}
