@@ -33,7 +33,6 @@ structure:
 \item \code{user}: a vector identifying the user.
 \item \code{top_item}: identifier for the preferred item.
 \item \code{bottom_item}: identifier for the dispreferred item.
-\item etc.
 }}
 
 \item{hyperparameters}{A list returned from \code{\link[=set_hyperparameters]{set_hyperparameters()}}.}

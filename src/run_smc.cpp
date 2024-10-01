@@ -104,6 +104,7 @@ Rcpp::List run_smc(
                     [](Particle& p) { p.log_importance_weight = 1; });
 
       double acceptance_rate = accepted / particle_vector.size() / iter;
+      reporter.report_acceptance_rate(acceptance_rate);
 
       if(acceptance_rate < 0.2 && options.n_particle_filters < options.max_particle_filters) {
         for(auto& p : particle_vector) {
