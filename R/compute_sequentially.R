@@ -21,7 +21,6 @@
 #' \item `user`: a vector identifying the user.
 #' \item `top_item`: identifier for the preferred item.
 #' \item `bottom_item`: identifier for the dispreferred item.
-#' \item etc.
 #' }
 #'
 #' @param hyperparameters A list returned from [set_hyperparameters()].

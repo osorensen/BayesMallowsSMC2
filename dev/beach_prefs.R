@@ -18,7 +18,7 @@ precompute_topological_sorts(
   rels,
   n_items = 15,
   output_directory = "tmp/user1",
-  3)
+  .01)
 
 mod <- compute_sequentially(
   data = dat,

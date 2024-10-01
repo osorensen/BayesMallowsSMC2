@@ -4,7 +4,7 @@
 \alias{precompute_topological_sorts}
 \title{Precompute All Topological Sorts}
 \usage{
-precompute_topological_sorts(prefs, n_items, output_directory)
+precompute_topological_sorts(prefs, n_items, output_directory, save_frac)
 }
 \arguments{
 \item{prefs}{An integer matrix (\code{arma::umat}) representing the preference relations.}
@@ -12,6 +12,8 @@ precompute_topological_sorts(prefs, n_items, output_directory)
 \item{n_items}{An integer specifying the number of items to sort.}
 
 \item{output_directory}{A string specifying the directory where the output files will be saved.}
+
+\item{save_frac}{Number between 0 and 1 specifying which fraction of sorts to save.}
 }
 \value{
 This function returns the number of topological sorts.

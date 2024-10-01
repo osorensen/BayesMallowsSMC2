@@ -8,6 +8,7 @@ struct ProgressReporter{
   void report_resampling();
   void report_rejuvenation(int unique_particles);
   void report_expansion(int n_particle_filters);
+  void report_acceptance_rate(double acceptance_rate);
 
 private:
   const bool verbose;
