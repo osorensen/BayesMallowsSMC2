@@ -39,14 +39,14 @@ LatentRankingProposal sample_latent_rankings(
     } else {
       int lr_index = std::distance(data->observed_users.begin(), it);
 
-      uvec new_observed_indices = find(new_data[i].second);
-      uvec v1 = new_data[i].second(new_observed_indices);
-      uvec v2 = current_latent_rankings.col(lr_index);
-      v2 = v2.rows(new_observed_indices);
-      if(all(v1 == v2)) {
+      uvec new_observed_indices = find(new_data[i].second); // indices of non-missing ranks
+      uvec v1 = new_data[i].second(new_observed_indices); // ranks of ranked items
+      uvec v2 = current_latent_rankings.col(lr_index); // current latent ranking
+      v2 = v2.rows(new_observed_indices); // latent rankings limited to new observed
+      if(all(v1 == v2)) { // observations agree with latent
         proposal.updated_consistent_users.push_back(new_data[i].first);
         continue;
-      } else {
+      } else { // observations don't agree with latent
         proposal.updated_inconsistent_users.push_back(new_data[i].first);
       }
     }
@@ -104,9 +104,7 @@ LatentRankingProposal sample_latent_rankings(
     } else {
       Rcpp::stop("Unknown latent rank proposal.");
     }
-
   }
-
   return proposal;
 }
 

@@ -14,8 +14,11 @@
 #' @param verbose Boolean
 #' @param trace Logical specifying whether to save static parameters at each
 #'   timestep.
+#' @param trace_latent Logical specifying whether to sample and save one
+#'   complete set of latent rankings for each particle and each timepoint.
 #' @param trace_directory Character specifying directory to create in which to
-#'   put parameter trace. Only used if `trace = TRUE`.
+#'   put parameter trace. Only used if `trace = TRUE`. If `trace_latent = TRUE`
+#'   also, then latent rankings are saved in the same directory.
 #'
 #' @return A list
 #' @export
@@ -25,6 +28,6 @@ set_smc_options <- function(
     resampling_threshold = n_particles / 2, max_rejuvenation_steps = 20,
     metric = "footrule", resampler = "multinomial",
     latent_rank_proposal = "uniform", verbose = FALSE,
-    trace = FALSE, trace_directory = "") {
+    trace = FALSE, trace_latent = FALSE, trace_directory = "") {
   as.list(environment())
 }

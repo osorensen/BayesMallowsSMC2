@@ -29,7 +29,8 @@ Rcpp::List run_smc(
   auto distfun = choose_distance_function(options.metric);
   auto resampler = choose_resampler(options.resampler);
   auto reporter = ProgressReporter(options.verbose);
-  auto tracer = ParameterTracer(options.trace, options.trace_directory);
+  auto tracer = ParameterTracer(options.trace, options.trace_latent,
+                                options.trace_directory);
   Rcpp::IntegerVector n_particle_filters(data->n_timepoints());
   double log_marginal_likelihood{0};
 
@@ -38,7 +39,8 @@ Rcpp::List run_smc(
     reporter.report_time(t);
 
     for(auto& p : particle_vector) {
-      p.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
+      p.run_particle_filter(t, prior, data, pfun, distfun, resampler,
+                            options.latent_rank_proposal);
       p.log_importance_weight += p.log_incremental_likelihood(t);
     }
 

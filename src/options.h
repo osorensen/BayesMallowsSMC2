@@ -16,5 +16,6 @@ struct Options{
   unsigned int max_rejuvenation_steps;
   const bool verbose;
   const bool trace;
+  const bool trace_latent;
   const std::string trace_directory;
 };
