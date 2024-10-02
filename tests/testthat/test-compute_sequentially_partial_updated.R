@@ -10,7 +10,8 @@ test_that("compute_sequentially works with new and updated users", {
     dd,
     hyperparameters = set_hyperparameters(n_items = 5),
     smc_options = set_smc_options(
-      n_particles = 200, max_rejuvenation_steps = 5, verbose = FALSE)
+      n_particles = 200, max_rejuvenation_steps = 5, verbose = FALSE,
+      max_particle_filters = 100)
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
   expect_gt(alpha_hat, .94)
