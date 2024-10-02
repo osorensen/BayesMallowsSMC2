@@ -53,13 +53,10 @@ void ParameterTracer::update_trace(const std::vector<Particle>& pvec, int t) {
   }
   if(trace_latent) {
     for(size_t i{}; i < pvec.size(); i++) {
-      Rcpp::NumericVector probs = Rcpp::exp(pvec[i].log_normalized_particle_filter_weights);
-      int sampled_index = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
-
       std::ostringstream filename_stream_latent_rankings;
       filename_stream_latent_rankings << trace_directory << "/latent_rankings" << t << "_" << i << ".txt";
       std::string filename_latent_rankings = filename_stream_latent_rankings.str();
-      pvec[i].particle_filters[sampled_index].latent_rankings.save(filename_latent_rankings, arma_ascii);
+      pvec[i].particle_filters[pvec[i].conditioned_particle_filter].latent_rankings.save(filename_latent_rankings, arma_ascii);
     }
   }
 }
