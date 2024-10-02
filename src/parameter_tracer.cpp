@@ -4,8 +4,8 @@
 #include "parameter_tracer.h"
 using namespace arma;
 
-ParameterTracer::ParameterTracer(bool trace, const std::string& trace_directory)
-  : trace { trace }, trace_directory { trace_directory } {
+ParameterTracer::ParameterTracer(bool trace, bool trace_latent, const std::string& trace_directory)
+  : trace { trace }, trace_latent { trace_latent }, trace_directory { trace_directory } {
   if(trace) {
     int status = mkdir(trace_directory.c_str(), 0777);
     if (status != 0) {
@@ -50,7 +50,16 @@ void ParameterTracer::update_trace(const std::vector<Particle>& pvec, int t) {
     std::string filename_tau = filename_stream_tau.str();
 
     tau.save(filename_tau, arma_ascii);
+  }
+  if(trace_latent) {
+    for(size_t i{}; i < pvec.size(); i++) {
+      Rcpp::NumericVector probs = Rcpp::exp(pvec[i].log_normalized_particle_filter_weights);
+      int sampled_index = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
 
-
+      std::ostringstream filename_stream_latent_rankings;
+      filename_stream_latent_rankings << trace_directory << "/latent_rankings" << t << "_" << i << ".txt";
+      std::string filename_latent_rankings = filename_stream_latent_rankings.str();
+      pvec[i].particle_filters[sampled_index].latent_rankings.save(filename_latent_rankings, arma_ascii);
+    }
   }
 }
