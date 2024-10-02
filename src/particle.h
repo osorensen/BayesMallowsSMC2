@@ -44,6 +44,8 @@ struct Particle{
     const std::unique_ptr<Resampler>& resampler,
     const arma::vec& alpha_sd
   );
+  int conditioned_particle_filter{};
+  void sample_particle_filter();
 };
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);

@@ -52,22 +52,16 @@ bool Particle::rejuvenate(
     const std::unique_ptr<Resampler>& resampler,
     const vec& alpha_sd
 ) {
-  int pf_index = randi(distr_param(0, particle_filters.size() - 1));
-  uvec cluster_assignments = particle_filters[pf_index].cluster_assignments;
-  uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
-
   vec alpha_proposal(prior.n_clusters);
-  vec tau_proposal(prior.n_clusters);
   umat rho_proposal(prior.n_items, prior.n_clusters);
+
   for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
     alpha_proposal(cluster) = R::rlnorm(log(parameters.alpha(cluster)), std::max(.001, alpha_sd(cluster)));
-    tau_proposal(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
     rho_proposal.col(cluster) = leap_and_shift(parameters.rho.col(cluster), cluster, prior);
   }
-  tau_proposal = normalise(tau_proposal, 1);
 
   Particle proposal_particle(options, prior);
-  proposal_particle.parameters = StaticParameters{alpha_proposal, rho_proposal, tau_proposal};
+  proposal_particle.parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
   vec current_log_likelihood(T + 1);
 
   data->observed_users.clear();
@@ -76,19 +70,34 @@ bool Particle::rejuvenate(
     proposal_particle.log_importance_weight += proposal_particle.log_incremental_likelihood(t);
   }
 
+  Rcpp::NumericVector probs = Rcpp::exp(proposal_particle.log_normalized_particle_filter_weights);
+  int proposed_particle_filter = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
+
   vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
-    prior.alpha_rate * (alpha_proposal - parameters.alpha) +
-    (prior.cluster_concentration + cluster_frequencies - 1) % (log(tau_proposal) - log(parameters.tau));
+    prior.alpha_rate * (alpha_proposal - parameters.alpha);
   double log_ratio = proposal_particle.log_importance_weight -
     sum(log_incremental_likelihood) + accu(additional_terms);
 
+  bool accepted{};
   if(log_ratio > log(randu())) {
-    parameters = StaticParameters{alpha_proposal, rho_proposal, tau_proposal};
+    parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
+    conditioned_particle_filter = proposed_particle_filter;
     log_importance_weight = proposal_particle.log_importance_weight;
     log_incremental_likelihood = proposal_particle.log_incremental_likelihood;
     log_normalized_particle_filter_weights = proposal_particle.log_normalized_particle_filter_weights;
-    return true;
+    accepted = true;
   } else {
-    return false;
+    accepted = false;
   }
+
+  uvec cluster_assignments = particle_filters[conditioned_particle_filter].cluster_assignments;
+  uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
+
+  for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
+    parameters.tau(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
+  }
+  parameters.tau = normalise(parameters.tau, 1);
+  sample_particle_filter();
+
+  return accepted;
 }

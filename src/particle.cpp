@@ -100,6 +100,11 @@ void Particle::run_particle_filter(
     tmp_pf_weights - (maxval + log(sum(exp(tmp_pf_weights - maxval))));
 }
 
+void Particle::sample_particle_filter() {
+  Rcpp::NumericVector probs = Rcpp::exp(log_normalized_particle_filter_weights);
+  conditioned_particle_filter = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
+}
+
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior) {
   std::vector<Particle> result;
   result.reserve(options.n_particles);

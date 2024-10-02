@@ -42,6 +42,7 @@ Rcpp::List run_smc(
       p.run_particle_filter(t, prior, data, pfun, distfun, resampler,
                             options.latent_rank_proposal);
       p.log_importance_weight += p.log_incremental_likelihood(t);
+      p.sample_particle_filter();
     }
 
     vec normalized_importance_weights = normalize_importance_weights(particle_vector);
