@@ -19,8 +19,10 @@ Rankings::Rankings(const Rcpp::List& input_timeseries) {
 }
 
 void Rankings::update_observed_users(unsigned int t) {
-  for(auto obs : timeseries[t]) {
-    observed_users.push_back(obs.first);
+  for(const auto& obs : timeseries[t]) {
+    if(std::find(observed_users.begin(), observed_users.end(), obs.first) == observed_users.end()) {
+      observed_users.push_back(obs.first);
+    }
   }
 }
 
