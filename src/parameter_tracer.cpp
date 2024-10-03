@@ -54,9 +54,24 @@ void ParameterTracer::update_trace(const std::vector<Particle>& pvec, int t) {
   if(trace_latent) {
     for(size_t i{}; i < pvec.size(); i++) {
       std::ostringstream filename_stream_latent_rankings;
-      filename_stream_latent_rankings << trace_directory << "/latent_rankings" << t << "_" << i << ".txt";
+      filename_stream_latent_rankings << trace_directory << "/latent_rankings" << t << "_" << i << ".bin";
       std::string filename_latent_rankings = filename_stream_latent_rankings.str();
-      pvec[i].particle_filters[pvec[i].conditioned_particle_filter].latent_rankings.save(filename_latent_rankings, arma_ascii);
+      pvec[i].particle_filters[pvec[i].conditioned_particle_filter].latent_rankings.save(filename_latent_rankings);
+    }
+    // Create the zip file
+    std::ostringstream zip_command;
+    zip_command << "zip -jq " << trace_directory << "/latent_rankings" << t << ".zip " << trace_directory << "/latent_rankings" << t << "_*.bin";
+    int zip_status = system(zip_command.str().c_str());
+    if (zip_status != 0) {
+      Rcpp::stop("Error creating zip file.");
+    }
+
+    // Delete the .bin files
+    std::ostringstream rm_command;
+    rm_command << "rm " << trace_directory << "/latent_rankings" << t << "_*.bin";
+    int rm_status = system(rm_command.str().c_str());
+    if (rm_status != 0) {
+      Rcpp::stop("Error deleting .bin files.");
     }
   }
 }
