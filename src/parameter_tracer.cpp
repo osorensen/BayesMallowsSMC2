@@ -50,6 +50,17 @@ void ParameterTracer::update_trace(const std::vector<Particle>& pvec, int t) {
     std::string filename_tau = filename_stream_tau.str();
 
     tau.save(filename_tau, arma_ascii);
+
+    vec log_importance_weights(pvec.size());
+    for(size_t i{}; i < pvec.size(); i++) {
+      log_importance_weights(i) = pvec[i].log_importance_weight;
+    }
+
+    std::ostringstream filename_stream_log_weights;
+    filename_stream_log_weights << trace_directory << "/log_weights_" << t << ".txt";
+    std::string filename_log_weights = filename_stream_log_weights.str();
+
+    log_importance_weights.save(filename_log_weights, arma_ascii);
   }
   if(trace_latent) {
     for(size_t i{}; i < pvec.size(); i++) {
