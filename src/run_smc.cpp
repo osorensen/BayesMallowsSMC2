@@ -32,7 +32,7 @@ Rcpp::List run_smc(
   auto tracer = ParameterTracer(options.trace, options.trace_latent,
                                 options.trace_directory);
   Rcpp::IntegerVector n_particle_filters(data->n_timepoints());
-  double log_marginal_likelihood{0};
+  double log_marginal_likelihood{};
 
   int T = data->n_timepoints();
   for(size_t t{}; t < T; t++) {
@@ -47,21 +47,15 @@ Rcpp::List run_smc(
 
     vec normalized_importance_weights = normalize_importance_weights(particle_vector);
 
-    double log_marginal_likelihood_contribution = -std::numeric_limits<double>::infinity();
-    vec log_incremental_likelihoods(normalized_importance_weights.size());
-
+    vec unconditional_log_incremental(normalized_importance_weights.size());
     for(size_t i{}; i < normalized_importance_weights.size(); i++) {
-      log_incremental_likelihoods(i) =
+      unconditional_log_incremental(i) =
         log(normalized_importance_weights(i)) + particle_vector[i].log_incremental_likelihood(t);
     }
 
-    double max_log_incremental_likelihood = log_incremental_likelihoods.max();
-    double sum_exp_term = 0.0;
-    for(size_t i{}; i < normalized_importance_weights.size(); i++) {
-      sum_exp_term += exp(log_incremental_likelihoods(i) - max_log_incremental_likelihood);
-    }
-    log_marginal_likelihood_contribution = max_log_incremental_likelihood + log(sum_exp_term);
-    log_marginal_likelihood += log_marginal_likelihood_contribution;
+    double max_log_incremental_likelihood = unconditional_log_incremental.max();
+    log_marginal_likelihood += max_log_incremental_likelihood +
+      log(sum(exp(unconditional_log_incremental - max_log_incremental_likelihood)));
 
     double ess = pow(norm(normalized_importance_weights, 2), -2);
     reporter.report_ess(ess);
@@ -70,6 +64,7 @@ Rcpp::List run_smc(
       reporter.report_resampling();
       ivec new_inds = resampler->resample(normalized_importance_weights.size(),
                                           normalized_importance_weights);
+
       uvec unique_particles = find_unique(new_inds);
       int n_unique_particles = unique_particles.size();
 

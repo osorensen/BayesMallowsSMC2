@@ -3,7 +3,8 @@
 #include "particle.h"
 
 struct LatentRankingProposal{
-  arma::umat proposal;
+  arma::umat proposal{};
+  arma::uvec cluster_assignment{};
   double log_probability{};
   std::vector<std::string> new_users{};
   std::vector<std::string> updated_consistent_users{};
@@ -14,13 +15,17 @@ LatentRankingProposal sample_latent_rankings(
   const std::unique_ptr<Data>& data, unsigned int t, const Prior& prior,
   std::string latent_rank_proposal,
   const StaticParameters& parameters,
-  const arma::umat& current_latent_rankings
+  const arma::umat& current_latent_rankings,
+  const std::unique_ptr<PartitionFunction>& pfun,
+  const std::unique_ptr<Distance>& distfun
 );
 LatentRankingProposal sample_latent_rankings(
     const Rankings* data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
     const StaticParameters& parameters,
-    const arma::umat& current_latent_rankings);
+    const arma::umat& current_latent_rankings,
+    const std::unique_ptr<PartitionFunction>& pfun,
+    const std::unique_ptr<Distance>& distfun);
 LatentRankingProposal sample_latent_rankings(
     const PairwisePreferences* data, unsigned int t, const Prior& prior);
 

@@ -11,10 +11,13 @@ LatentRankingProposal sample_latent_rankings(
     const std::unique_ptr<Data>& data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
     const StaticParameters& parameters,
-    const umat& current_latent_rankings
+    const umat& current_latent_rankings,
+    const std::unique_ptr<PartitionFunction>& pfun,
+    const std::unique_ptr<Distance>& distfun
 ) {
   if(Rankings* r = dynamic_cast<Rankings*>(data.get())) {
-    return sample_latent_rankings(r, t, prior, latent_rank_proposal, parameters, current_latent_rankings);
+    return sample_latent_rankings(r, t, prior, latent_rank_proposal,
+                                  parameters, current_latent_rankings, pfun, distfun);
   } else if (PairwisePreferences* pp = dynamic_cast<PairwisePreferences*>(data.get())) {
     return sample_latent_rankings(pp, t, prior);
   } else {
@@ -26,7 +29,9 @@ LatentRankingProposal sample_latent_rankings(
     const Rankings* data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
     const StaticParameters& parameters,
-    const umat& current_latent_rankings)  {
+    const umat& current_latent_rankings,
+    const std::unique_ptr<PartitionFunction>& pfun,
+    const std::unique_ptr<Distance>& distfun)  {
   LatentRankingProposal proposal;
   ranking_tp new_data = data->timeseries[t];
   uvec all_items = regspace<uvec>(0, prior.n_items - 1);
@@ -55,11 +60,34 @@ LatentRankingProposal sample_latent_rankings(
     uvec observed_items = find(observed_ranking);
     uvec available_items = setdiff(all_items, observed_items);
     uvec available_rankings = setdiff(all_rankings, observed_ranking);
+
     uvec tmp = observed_ranking;
 
     if(latent_rank_proposal == "uniform") {
       tmp(available_items) = shuffle(available_rankings);
       proposal.proposal = join_horiz(proposal.proposal, tmp);
+
+      if(it == data->observed_users.end()) {
+        vec log_cluster_probabilities(parameters.tau.size());
+
+        for(size_t cluster{}; cluster < parameters.tau.size(); cluster++) {
+          log_cluster_probabilities(cluster) = log(parameters.tau(cluster)) -
+            pfun->logz(parameters.alpha(cluster)) - parameters.alpha(cluster) *
+            distfun->d(proposal.proposal, parameters.rho.col(cluster));
+        }
+
+        double maxval = log_cluster_probabilities.max();
+        log_cluster_probabilities = log_cluster_probabilities -
+          (maxval + log(sum(exp(log_cluster_probabilities - maxval))));
+
+        unsigned int z = Rcpp::sample(
+          parameters.tau.size(), 1, false,
+          Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(log_cluster_probabilities))),
+          false
+        )(0);
+        proposal.cluster_assignment = join_vert(proposal.cluster_assignment, uvec{z});
+      }
+
       proposal.log_probability -= lgamma(available_rankings.size() + 1.0);
     } else if(latent_rank_proposal == "pseudo") {
       if(parameters.alpha.size() > 1) {

@@ -3,7 +3,6 @@
 #include "misc.h"
 #include "particle.h"
 #include "sample_latent_rankings.h"
-#include "sample_cluster_assignments.h"
 
 using namespace arma;
 
@@ -79,7 +78,7 @@ bool Particle::rejuvenate(
 
   vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
     prior.alpha_rate * (alpha_proposal - parameters.alpha);
-  double log_ratio = sum(proposal_particle.log_incremental_likelihood) -
+  double log_ratio = proposal_particle.log_importance_weight -
     sum(this->log_incremental_likelihood) + accu(additional_terms);
 
   bool accepted{};

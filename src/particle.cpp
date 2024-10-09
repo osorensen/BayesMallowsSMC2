@@ -3,7 +3,6 @@
 #include "misc.h"
 #include "particle.h"
 #include "sample_latent_rankings.h"
-#include "sample_cluster_assignments.h"
 
 using namespace arma;
 
@@ -20,7 +19,8 @@ Particle::Particle(const Options& options, const Prior& prior) :
   }
 
 void Particle::run_particle_filter(
-    unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
+    unsigned int t, const Prior& prior,
+    const std::unique_ptr<Data>& data,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
     const std::unique_ptr<Resampler>& resampler,
@@ -28,32 +28,31 @@ void Particle::run_particle_filter(
 
   if(t > 0) {
     ivec new_inds = resampler->resample(
-      log_normalized_particle_filter_weights.size(),
-      exp(log_normalized_particle_filter_weights));
+      particle_filters.size(), exp(log_normalized_particle_filter_weights));
     std::vector<ParticleFilter> tmp(particle_filters.size());
-    for(size_t i{}; i < new_inds.size(); i++) {
-      tmp[i] = particle_filters[new_inds[i]];
-    }
-    particle_filters = tmp;
+    std::transform(new_inds.begin(), new_inds.end(), tmp.begin(),
+                   [&](int index) { return particle_filters[index]; });
+    particle_filters = std::move(tmp);
     log_normalized_particle_filter_weights =
       Rcpp::NumericVector(particle_filters.size(), -log(particle_filters.size()));
   }
 
   for(auto& pf : particle_filters) {
     auto proposal = sample_latent_rankings(data, t, prior, latent_rank_proposal,
-                                           parameters, pf.latent_rankings);
+                                           parameters, pf.latent_rankings,
+                                           pfun, distfun);
 
-    uvec new_cluster_assignments =
-      sample_cluster_assignments(proposal.proposal, parameters, pfun, distfun);
     pf.cluster_assignments =
-      join_cols(pf.cluster_assignments, new_cluster_assignments);
+      join_cols(pf.cluster_assignments, proposal.cluster_assignment);
 
     double log_prob{};
+
     for(size_t i{}; i < proposal.proposal.n_cols; i++) {
       vec log_cluster_contribution(prior.n_clusters);
       for(size_t c{}; c < prior.n_clusters; c++) {
         log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
           parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
+
         if(i < proposal.updated_inconsistent_users.size()) {
           auto it = std::find(data->observed_users.begin(), data->observed_users.end(),
                               proposal.updated_inconsistent_users[i]);
@@ -94,7 +93,7 @@ void Particle::run_particle_filter(
 
   log_incremental_likelihood.resize(log_incremental_likelihood.size() + 1);
   log_incremental_likelihood(log_incremental_likelihood.size() - 1) =
-    maxval + log(mean(exp(tmp_pf_weights - maxval)));
+    maxval - std::log(tmp_pf_weights.size()) + log(sum(exp(tmp_pf_weights - maxval)));
 
   log_normalized_particle_filter_weights =
     tmp_pf_weights - (maxval + log(sum(exp(tmp_pf_weights - maxval))));
