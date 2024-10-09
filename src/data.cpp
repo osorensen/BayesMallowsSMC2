@@ -78,11 +78,11 @@ void PairwisePreferences::print() {
 }
 
 std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
-  if(strcmp(input_timeseries.attr("type"), "complete rankings") == 0) {
+  std::string type = Rcpp::as<std::string>(input_timeseries.attr("type"));
+
+  if (type == "complete rankings" || type == "partial rankings") {
     return std::make_unique<Rankings>(input_timeseries);
-  } else if(strcmp(input_timeseries.attr("type"), "partial rankings") == 0) {
-    return std::make_unique<Rankings>(input_timeseries);
-  } else if(strcmp(input_timeseries.attr("type"), "pairwise preferences") == 0) {
+  } else if (type == "pairwise preferences") {
     return std::make_unique<PairwisePreferences>(input_timeseries);
   } else {
     Rcpp::stop("Wrong data type.");
