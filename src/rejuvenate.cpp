@@ -62,7 +62,6 @@ bool Particle::rejuvenate(
 
   Particle proposal_particle(options, prior);
   proposal_particle.parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
-  vec current_log_likelihood(T + 1);
 
   auto observed_users_backup = data->observed_users;
   data->observed_users.clear();
@@ -80,16 +79,16 @@ bool Particle::rejuvenate(
 
   vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
     prior.alpha_rate * (alpha_proposal - parameters.alpha);
-  double log_ratio = proposal_particle.log_importance_weight -
-    sum(log_incremental_likelihood) + accu(additional_terms);
+  double log_ratio = sum(proposal_particle.log_incremental_likelihood) -
+    sum(this->log_incremental_likelihood) + accu(additional_terms);
 
   bool accepted{};
   if(log_ratio > log(randu())) {
     parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
-    conditioned_particle_filter = proposed_particle_filter;
-    log_importance_weight = proposal_particle.log_importance_weight;
-    log_incremental_likelihood = proposal_particle.log_incremental_likelihood;
-    log_normalized_particle_filter_weights = proposal_particle.log_normalized_particle_filter_weights;
+    this->conditioned_particle_filter = proposed_particle_filter;
+    this->log_importance_weight = proposal_particle.log_importance_weight;
+    this->log_incremental_likelihood = proposal_particle.log_incremental_likelihood;
+    this->log_normalized_particle_filter_weights = proposal_particle.log_normalized_particle_filter_weights;
     accepted = true;
   } else {
     accepted = false;
