@@ -16,7 +16,7 @@ LatentRankingProposal sample_latent_rankings(
     const std::unique_ptr<Distance>& distfun
 ) {
   if(Rankings* r = dynamic_cast<Rankings*>(data.get())) {
-    return sample_latent_rankings(r, t, prior, latent_rank_proposal,
+    return sample_latent_rankings(r, t, latent_rank_proposal,
                                   parameters, current_latent_rankings, pfun, distfun);
   } else if (PairwisePreferences* pp = dynamic_cast<PairwisePreferences*>(data.get())) {
     return sample_latent_rankings(pp, t, prior);
@@ -43,7 +43,7 @@ uvec find_available_items(const uvec& observed_ranking) {
 }
 
 LatentRankingProposal sample_latent_rankings(
-    const Rankings* data, unsigned int t, const Prior& prior,
+    const Rankings* data, unsigned int t,
     std::string latent_rank_proposal,
     const StaticParameters& parameters,
     const umat& current_latent_rankings,
