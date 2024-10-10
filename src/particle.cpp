@@ -140,3 +140,15 @@ vec compute_alpha_stddev(const std::vector<Particle>& particle_vector) {
   }
   return stddev(alpha_values, 0, 0);
 }
+
+double compute_log_Z(const std::vector<ParticleFilter>& pf, int max_time) {
+  double log_Z{};
+  for(size_t s{}; s < max_time + 1; s++) {
+    vec log_weights(pf.size());
+    std::transform(
+      pf.begin(), pf.end(), log_weights.begin(),
+      [s](const ParticleFilter& pf) { return pf.log_weight(s); });
+    log_Z += log_mean_exp(log_weights);
+  }
+  return log_Z;
+}

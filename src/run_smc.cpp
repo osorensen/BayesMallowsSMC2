@@ -85,22 +85,14 @@ Rcpp::List run_smc(
 
       if(acceptance_rate < 0.2 && options.n_particle_filters < options.max_particle_filters) {
         for(auto& p : particle_vector) {
-          auto tmp = p.particle_filters;
-          int S = tmp.size() * 2;
-          p.particle_filters.clear();
-          p.particle_filters.reserve(S);
+          double log_Z_old = compute_log_Z(p.particle_filters, t);
+
+          int S = p.particle_filters.size() * 2;
           ivec new_inds = resampler->resample(S, exp(p.log_normalized_particle_filter_weights));
-          for(auto ni : new_inds) {
-            p.particle_filters.push_back(tmp[ni]);
-          }
+          p.particle_filters = update_vector(new_inds, p.particle_filters);
           p.log_normalized_particle_filter_weights = Rcpp::NumericVector(S, -log(p.particle_filters.size()));
 
-          double Z_old{};
-          for(const auto& pf : tmp) {
-            double max = pf.log_weight.max();
-            Z_old += exp(max) * sum(exp(pf.log_weight - max));
-          }
-          Z_old /= tmp.size();
+
           double Z_new{};
           for(const auto& pf : p.particle_filters) {
             double max = pf.log_weight.max();
@@ -108,7 +100,7 @@ Rcpp::List run_smc(
           }
           Z_new /= p.particle_filters.size();
 
-          p.log_importance_weight += log(Z_new) - log(Z_old);
+          p.log_importance_weight += log(Z_new) - log_Z_old;
 
         }
         options.n_particle_filters *= 2;
