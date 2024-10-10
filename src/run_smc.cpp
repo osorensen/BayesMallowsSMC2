@@ -46,7 +46,6 @@ Rcpp::List run_smc(
       p.log_importance_weight += p.log_incremental_likelihood(t);
       p.sample_particle_filter();
     }
-
     vec normalized_importance_weights = normalize_importance_weights(particle_vector);
 
     vec unconditional_log_incremental(normalized_importance_weights.size());

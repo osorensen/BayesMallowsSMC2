@@ -120,9 +120,5 @@ vec normalize_importance_weights(const std::vector<Particle>& particle_vector) {
     log_importance_weights.begin(),
     [](const Particle& p) { return p.log_importance_weight; });
 
-  vec normalized_log_importance_weights =
-    log_importance_weights - (max(log_importance_weights) +
-    log(sum(exp(log_importance_weights - max(log_importance_weights)))));
-
-  return exp(normalized_log_importance_weights);
+  return exp(softmax(log_importance_weights));
 }
