@@ -103,6 +103,7 @@ Rcpp::List run_smc(
     data->update_observed_users(t);
     tracer.update_trace(particle_vector, t);
     n_particle_filters(t) = options.n_particle_filters;
+
   }
 
   mat alpha(prior.n_clusters, particle_vector.size());

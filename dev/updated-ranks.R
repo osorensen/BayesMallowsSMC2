@@ -1,25 +1,32 @@
 devtools::load_all()
+library(tidyverse)
 
-dd1 <- complete_rankings[1:10, ]
-dd1[, -(1:2)][dd1[, -(1:2)] > 1] <- NA
+n_items <- 10
+set.seed(1)
 
-dd2 <- complete_rankings[1:10, ]
-dd2[, -(1:2)][dd2[, -(1:2)] > 2] <- NA
+rankings <- BayesMallows::sample_mallows(1:n_items, 10, 100, thinning = 1000)
+colnames(rankings) <- paste0("item", 1:10)
 
-dd3 <- complete_rankings[1:10, ]
-dd3[, -(1:2)][dd3[, -(1:2)] > 3] <- NA
+complete_rankings <- tibble(timepoint = 1:100, user = 1:100) %>%
+  bind_cols(rankings) %>%
+  as.data.frame()
 
-dd <- rbind(dd1, dd2, dd3)
-#dd <- dd[order(dd$user), ]
+partial_rankings <- complete_rankings %>%
+  mutate(across(contains("item"), ~ if_else(. > 5, NA_real_, .))) %>%
+  as.data.frame()
+
+dd1 <- partial_rankings[1:50, ]
+dd2 <- partial_rankings[51:100, ]
+dd2$user <- dd1$user
+dd <- rbind(dd1, dd2)
 dd$timepoint <- seq_len(nrow(dd))
 
-m <- compute_sequentially(
-  data = dd[1:15, ],
-  hyperparameters = set_hyperparameters(n_items = 5),
-  smc_options = set_smc_options(n_particles = 2, n_particle_filters = 2,
-                                max_particle_filters = 2, max_rejuvenation_steps = 5,
-                                verbose = TRUE)
+set.seed(2)
+mod <- compute_sequentially(
+  dd1,
+  hyperparameters = set_hyperparameters(n_items = n_items),
+  smc_options = set_smc_options(n_particles = 1000, max_rejuvenation_steps = 5, verbose = TRUE,
+                                trace = TRUE, trace_directory = "dev/tmp")
 )
 
-length(unique(as.numeric(m$alpha)))
-hist(m$alpha)
+hist(mod$alpha)
