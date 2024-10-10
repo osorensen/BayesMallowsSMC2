@@ -56,16 +56,16 @@ Rcpp::List run_smc(
 
     if(ess < options.resampling_threshold) {
       reporter.report_resampling();
-      ivec new_inds = resampler->resample(normalized_log_importance_weights.size(),
-                                          exp(normalized_log_importance_weights));
+      ivec new_inds = resampler->resample(
+        normalized_log_importance_weights.size(),
+        exp(normalized_log_importance_weights));
+
+      particle_vector = update_vector(new_inds, particle_vector);
 
       uvec unique_particles = find_unique(new_inds);
       int n_unique_particles = unique_particles.size();
 
-      std::vector<Particle> tmp = particle_vector;
-      for(size_t i{}; i < new_inds.size(); i++) {
-        particle_vector[i] = tmp[new_inds[i]];
-      }
+
 
       mat alpha_values(particle_vector.size(), prior.n_clusters);
       for(size_t i{}; i < particle_vector.size(); i++) {

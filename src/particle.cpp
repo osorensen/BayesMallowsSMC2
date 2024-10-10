@@ -30,10 +30,7 @@ void Particle::run_particle_filter(
   if(t > 0) {
     ivec new_inds = resampler->resample(
       particle_filters.size(), exp(log_normalized_particle_filter_weights));
-    std::vector<ParticleFilter> tmp(particle_filters.size());
-    std::transform(new_inds.begin(), new_inds.end(), tmp.begin(),
-                   [&](int index) { return particle_filters[index]; });
-    particle_filters = std::move(tmp);
+    particle_filters = update_vector(new_inds, particle_filters);
     log_normalized_particle_filter_weights =
       Rcpp::NumericVector(particle_filters.size(), -log(particle_filters.size()));
   }

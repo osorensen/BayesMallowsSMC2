@@ -23,6 +23,7 @@ struct ParticleFilter{
 };
 
 struct Particle{
+  Particle() {}
   Particle(const Options& options, const Prior& prior);
   ~Particle() = default;
   StaticParameters parameters;

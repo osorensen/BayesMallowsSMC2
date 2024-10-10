@@ -1,5 +1,6 @@
 #pragma once
 #include <RcppArmadillo.h>
+#include <vector>
 
 struct Resampler {
   Resampler() {};
@@ -24,3 +25,12 @@ struct Systematic : Resampler {
 };
 
 std::unique_ptr<Resampler> choose_resampler(std::string resampler);
+
+template <typename T>
+std::vector<T> update_vector(
+    const arma::ivec& new_inds, const std::vector<T>& particle_vector)  {
+  std::vector<T> tmp(particle_vector.size());
+  std::transform(new_inds.begin(), new_inds.end(), tmp.begin(),
+                 [&](int index) { return particle_vector[index]; });
+  return tmp;
+}
