@@ -61,7 +61,6 @@ Rcpp::List run_smc(
         exp(normalized_log_importance_weights));
 
       particle_vector = update_vector(new_inds, particle_vector);
-
       vec alpha_sd = compute_alpha_stddev(particle_vector);
 
       size_t iter{};
@@ -78,11 +77,11 @@ Rcpp::List run_smc(
 
       } while((2.0 * n_unique_particles < particle_vector.size()) && iter < options.max_rejuvenation_steps);
 
-      double acceptance_rate = accepted / particle_vector.size() / iter;
-      reporter.report_acceptance_rate(acceptance_rate);
-
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p){ p.log_importance_weight = 0; });
+
+      double acceptance_rate = accepted / particle_vector.size() / iter;
+      reporter.report_acceptance_rate(acceptance_rate);
 
       if(acceptance_rate < 0.2 && options.n_particle_filters < options.max_particle_filters) {
         for(auto& p : particle_vector) {
