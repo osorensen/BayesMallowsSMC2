@@ -61,25 +61,22 @@ Rcpp::List run_smc(
         exp(normalized_log_importance_weights));
 
       particle_vector = update_vector(new_inds, particle_vector);
-
-      uvec unique_particles = find_unique(new_inds);
-      int n_unique_particles = unique_particles.size();
       vec alpha_sd = compute_alpha_stddev(particle_vector);
 
       size_t iter{};
       double accepted{};
+      int n_unique_particles{};
       vec alpha0_tmp = vec(particle_vector.size());
       do {
         iter++;
         for(auto& p : particle_vector) {
-          accepted += p.rejuvenate(
-            t, options, prior, data, pfun, distfun, resampler, alpha_sd);
+          accepted += p.rejuvenate(t, options, prior, data, pfun, distfun, resampler, alpha_sd);
         }
         std::transform(
           particle_vector.cbegin(), particle_vector.cend(), alpha0_tmp.begin(),
           [](const Particle& p) { return p.parameters.alpha(0); });
 
-        unique_particles = find_unique(alpha0_tmp);
+        uvec unique_particles = find_unique(alpha0_tmp);
         n_unique_particles = unique_particles.size();
         reporter.report_rejuvenation(n_unique_particles);
 

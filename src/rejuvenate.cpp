@@ -78,12 +78,12 @@ bool Particle::rejuvenate(
 
   vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
     prior.alpha_rate * (alpha_proposal - parameters.alpha);
-  double log_ratio = proposal_particle.log_importance_weight -
+  double log_ratio = sum(proposal_particle.log_incremental_likelihood) -
     sum(this->log_incremental_likelihood) + accu(additional_terms);
 
   bool accepted{};
   if(log_ratio > log(randu())) {
-    parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
+    this->parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
     this->conditioned_particle_filter = proposed_particle_filter;
     this->log_importance_weight = proposal_particle.log_importance_weight;
     this->log_incremental_likelihood = proposal_particle.log_incremental_likelihood;
@@ -100,6 +100,8 @@ bool Particle::rejuvenate(
     parameters.tau(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
   }
   parameters.tau = normalise(parameters.tau, 1);
+
+
   sample_particle_filter();
 
   return accepted;
