@@ -73,7 +73,7 @@ Rcpp::List run_smc(
         iter++;
         for(auto& p : particle_vector) {
           accepted += p.rejuvenate(
-            t, options, prior, data, pfun, distfun, resampler, alpha_sd.t());
+            t, options, prior, data, pfun, distfun, resampler, alpha_sd);
         }
         std::transform(
           particle_vector.cbegin(), particle_vector.cend(), alpha0_tmp.begin(),
