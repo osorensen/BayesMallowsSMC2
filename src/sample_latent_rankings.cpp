@@ -50,13 +50,11 @@ LatentRankingProposal sample_latent_rankings(
 
     if(it != data->observed_users.end()) {
       int lr_index = std::distance(data->observed_users.begin(), it);
-
       bool consistent = check_consistency(new_data[i].second, current_latent_rankings.col(lr_index));
 
-      if(consistent) { // observations agree with latent
-        proposal.updated_consistent_users.push_back(new_data[i].first);
+      if(consistent) {
         continue;
-      } else { // observations don't agree with latent
+      } else {
         proposal.updated_inconsistent_users.push_back(new_data[i].first);
       }
     }
