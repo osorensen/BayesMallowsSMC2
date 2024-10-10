@@ -15,6 +15,7 @@ struct Data{
   virtual unsigned int n_timepoints() = 0;
   virtual void update_observed_users(unsigned int t) = 0;
   std::vector<std::string> observed_users{};
+  std::vector<std::string>::const_iterator find_user(const std::string& user_id) const;
 };
 
 struct Rankings : Data {

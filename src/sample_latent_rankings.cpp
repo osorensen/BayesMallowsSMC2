@@ -39,7 +39,8 @@ LatentRankingProposal sample_latent_rankings(
   uvec all_rankings = regspace<uvec>(1, prior.n_items);
 
   for(size_t i{}; i < new_data.size(); i++) {
-    auto it = std::find(data->observed_users.begin(), data->observed_users.end(), new_data[i].first);
+    auto it = data->find_user(new_data[i].first);
+
     if(it != data->observed_users.end()) {
       int lr_index = std::distance(data->observed_users.begin(), it);
 
