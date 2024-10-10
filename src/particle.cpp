@@ -57,34 +57,24 @@ void Particle::run_particle_filter(
       log_prob += log_sum_exp(log_cluster_contribution);
     }
     // Subtract inconsistent users' old latent rankings
-    for(const auto& ind : proposal.updated_inconsistent_users) {
+    umat proposal_new_users = proposal.proposal;
+    for(const auto& updated_user : proposal.updated_inconsistent_users) {
       vec log_cluster_contribution(prior.n_clusters);
-      auto it = data->find_user(ind);
-      int uiu_index = std::distance(data->observed_users.begin(), it);
+      int index = std::distance(data->observed_users.begin(), data->find_user(updated_user.first));
 
       for(size_t c{}; c < prior.n_clusters; c++) {
         log_cluster_contribution(c) -= log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
-          parameters.alpha(c) * distfun->d(pf.latent_rankings.col(uiu_index), parameters.rho.col(c));
+          parameters.alpha(c) * distfun->d(pf.latent_rankings.col(index), parameters.rho.col(c));
       }
       log_prob += log_sum_exp(log_cluster_contribution);
+      pf.latent_rankings.col(updated_user.second) = proposal.proposal.col(updated_user.second);
+      proposal_new_users.shed_col(updated_user.second);
     }
 
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - proposal.log_probability;
 
-    for(const auto & uiu : proposal.updated_inconsistent_users) {
-      auto it = std::find(data->observed_users.begin(), data->observed_users.end(), uiu);
-      int uiu_index = std::distance(data->observed_users.begin(), it);
-
-      auto propit = std::find(proposal.updated_inconsistent_users.begin(),
-                              proposal.updated_inconsistent_users.end(), uiu);
-      int prop_index = std::distance(proposal.updated_inconsistent_users.begin(), propit);
-
-      pf.latent_rankings.col(uiu_index) = proposal.proposal.col(prop_index);
-      proposal.proposal.shed_col(prop_index);
-    }
-
-    pf.latent_rankings = join_horiz(pf.latent_rankings, proposal.proposal);
+    pf.latent_rankings = join_horiz(pf.latent_rankings, proposal_new_users);
   }
 
   Rcpp::NumericVector tmp_pf_weights(log_normalized_particle_filter_weights.size());

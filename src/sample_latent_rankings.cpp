@@ -53,6 +53,7 @@ LatentRankingProposal sample_latent_rankings(
   LatentRankingProposal proposal;
   ranking_tp new_data = data->timeseries[t];
 
+  size_t proposal_index{};
   for(size_t i{}; i < new_data.size(); i++) {
     auto it = data->find_user(new_data[i].first);
 
@@ -63,9 +64,10 @@ LatentRankingProposal sample_latent_rankings(
       if(consistent) {
         continue;
       } else {
-        proposal.updated_inconsistent_users.push_back(new_data[i].first);
+        proposal.updated_inconsistent_users.push_back(std::pair{new_data[i].first, proposal_index});
       }
     }
+    proposal_index++;
 
     uvec tmp = new_data[i].second;
     uvec available_items = find_available_items(tmp);

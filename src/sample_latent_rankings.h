@@ -6,7 +6,8 @@ struct LatentRankingProposal{
   arma::umat proposal{};
   arma::uvec cluster_assignment{};
   double log_probability{};
-  std::vector<std::string> updated_inconsistent_users{};
+  // string shows index in data, integer shows index in proposal matrix
+  std::vector<std::pair<std::string, int>> updated_inconsistent_users{};
 };
 
 LatentRankingProposal sample_latent_rankings(
