@@ -18,3 +18,8 @@ uvec setdiff(const uvec& x1, const uvec& x2) {
 
   return arma::uvec(difference);
 }
+
+vec log_sum_exp(const vec& x) {
+  double maxval = x.max();
+  return x - (maxval + log(sum(exp(x - maxval))));
+}
