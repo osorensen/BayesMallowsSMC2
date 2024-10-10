@@ -50,4 +50,4 @@ struct Particle{
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);
 std::vector<ParticleFilter> create_particle_filters(const Options& options);
-arma::vec normalize_importance_weights(const std::vector<Particle>& particle_vector);
+arma::vec normalize_log_importance_weights(const std::vector<Particle>& particle_vector);

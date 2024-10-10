@@ -46,23 +46,23 @@ Rcpp::List run_smc(
       p.log_importance_weight += p.log_incremental_likelihood(t);
       p.sample_particle_filter();
     }
-    vec normalized_importance_weights = normalize_importance_weights(particle_vector);
+    vec normalized_log_importance_weights = normalize_log_importance_weights(particle_vector);
 
-    vec unconditional_log_incremental(normalized_importance_weights.size());
-    for(size_t i{}; i < normalized_importance_weights.size(); i++) {
+    vec unconditional_log_incremental(normalized_log_importance_weights.size());
+    for(size_t i{}; i < normalized_log_importance_weights.size(); i++) {
       unconditional_log_incremental(i) =
-        log(normalized_importance_weights(i)) + particle_vector[i].log_incremental_likelihood(t);
+        normalized_log_importance_weights(i) + particle_vector[i].log_incremental_likelihood(t);
     }
 
     log_marginal_likelihood += log_sum_exp(unconditional_log_incremental);
 
-    double ess = pow(norm(normalized_importance_weights, 2), -2);
+    double ess = pow(norm(exp(normalized_log_importance_weights), 2), -2);
     reporter.report_ess(ess);
 
     if(ess < options.resampling_threshold) {
       reporter.report_resampling();
-      ivec new_inds = resampler->resample(normalized_importance_weights.size(),
-                                          normalized_importance_weights);
+      ivec new_inds = resampler->resample(normalized_log_importance_weights.size(),
+                                          exp(normalized_log_importance_weights));
 
       uvec unique_particles = find_unique(new_inds);
       int n_unique_particles = unique_particles.size();
@@ -155,7 +155,7 @@ Rcpp::List run_smc(
     Rcpp::Named("rho") = rho,
     Rcpp::Named("tau") = tau,
     Rcpp::Named("n_particle_filters") = n_particle_filters,
-    Rcpp::Named("importance_weights") = normalize_importance_weights(particle_vector),
+    Rcpp::Named("importance_weights") = exp(normalize_log_importance_weights(particle_vector)),
     Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood
   );
 }
