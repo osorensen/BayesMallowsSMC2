@@ -6,8 +6,6 @@ struct LatentRankingProposal{
   arma::umat proposal{};
   arma::uvec cluster_assignment{};
   double log_probability{};
-  std::vector<std::string> new_users{};
-  std::vector<std::string> updated_consistent_users{};
   std::vector<std::string> updated_inconsistent_users{};
 };
 
