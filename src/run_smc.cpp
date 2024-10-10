@@ -92,16 +92,8 @@ Rcpp::List run_smc(
           p.particle_filters = update_vector(new_inds, p.particle_filters);
           p.log_normalized_particle_filter_weights = Rcpp::NumericVector(S, -log(p.particle_filters.size()));
 
-
-          double Z_new{};
-          for(const auto& pf : p.particle_filters) {
-            double max = pf.log_weight.max();
-            Z_new += exp(max) * sum(exp(pf.log_weight - max));
-          }
-          Z_new /= p.particle_filters.size();
-
-          p.log_importance_weight += log(Z_new) - log_Z_old;
-
+          double log_Z_new = compute_log_Z(p.particle_filters, t);
+          p.log_importance_weight += log_Z_new - log_Z_old;
         }
         options.n_particle_filters *= 2;
         reporter.report_expansion(options.n_particle_filters);

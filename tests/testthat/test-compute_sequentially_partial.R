@@ -8,7 +8,7 @@ test_that("compute_sequentially works with partial data", {
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
   expect_gt(alpha_hat, .95)
   expect_lt(alpha_hat, 1.05)
-  expect_equal(round(mod$log_marginal_likelihood), -179)
+  expect_equal(round(mod$log_marginal_likelihood), -178)
 
   set.seed(2)
   mod <- compute_sequentially(
