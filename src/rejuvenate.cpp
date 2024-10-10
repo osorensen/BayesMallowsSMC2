@@ -42,6 +42,15 @@ uvec leap_and_shift(const uvec& current_rho, unsigned int cluster, const Prior& 
   return rho_proposal;
 }
 
+int find_unique_alphas(const std::vector<Particle>& particle_vector) {
+  vec alpha0_tmp = vec(particle_vector.size());
+  std::transform(
+    particle_vector.cbegin(), particle_vector.cend(), alpha0_tmp.begin(),
+    [](const Particle& p) { return p.parameters.alpha(0); });
+
+  uvec unique_particles = find_unique(alpha0_tmp);
+  return unique_particles.size();
+}
 
 bool Particle::rejuvenate(
     unsigned int T, const Options& options, const Prior& prior,

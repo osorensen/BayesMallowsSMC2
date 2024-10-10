@@ -61,32 +61,28 @@ Rcpp::List run_smc(
         exp(normalized_log_importance_weights));
 
       particle_vector = update_vector(new_inds, particle_vector);
+
       vec alpha_sd = compute_alpha_stddev(particle_vector);
 
       size_t iter{};
       double accepted{};
       int n_unique_particles{};
-      vec alpha0_tmp = vec(particle_vector.size());
+
       do {
         iter++;
         for(auto& p : particle_vector) {
           accepted += p.rejuvenate(t, options, prior, data, pfun, distfun, resampler, alpha_sd);
         }
-        std::transform(
-          particle_vector.cbegin(), particle_vector.cend(), alpha0_tmp.begin(),
-          [](const Particle& p) { return p.parameters.alpha(0); });
-
-        uvec unique_particles = find_unique(alpha0_tmp);
-        n_unique_particles = unique_particles.size();
+        n_unique_particles = find_unique_alphas(particle_vector);
         reporter.report_rejuvenation(n_unique_particles);
 
       } while((2.0 * n_unique_particles < particle_vector.size()) && iter < options.max_rejuvenation_steps);
 
-      std::for_each(particle_vector.begin(), particle_vector.end(),
-                    [](Particle& p) { p.log_importance_weight = 1; });
-
       double acceptance_rate = accepted / particle_vector.size() / iter;
       reporter.report_acceptance_rate(acceptance_rate);
+
+      std::for_each(particle_vector.begin(), particle_vector.end(),
+                    [](Particle& p){ p.log_importance_weight = 0; });
 
       if(acceptance_rate < 0.2 && options.n_particle_filters < options.max_particle_filters) {
         for(auto& p : particle_vector) {

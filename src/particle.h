@@ -58,3 +58,4 @@ double log_marginal_likelihood_increment(
     int t
 );
 arma::vec compute_alpha_stddev(const std::vector<Particle>& particle_vector);
+int find_unique_alphas(const std::vector<Particle>& particle_vector);
