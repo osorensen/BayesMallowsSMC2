@@ -66,28 +66,6 @@ LatentRankingProposal sample_latent_rankings(
     if(latent_rank_proposal == "uniform") {
       tmp(available_items) = shuffle(available_rankings);
       proposal.proposal = join_horiz(proposal.proposal, tmp);
-
-      if(it == data->observed_users.end()) {
-        vec log_cluster_probabilities(parameters.tau.size());
-
-        for(size_t cluster{}; cluster < parameters.tau.size(); cluster++) {
-          log_cluster_probabilities(cluster) = log(parameters.tau(cluster)) -
-            pfun->logz(parameters.alpha(cluster)) - parameters.alpha(cluster) *
-            distfun->d(proposal.proposal, parameters.rho.col(cluster));
-        }
-
-        double maxval = log_cluster_probabilities.max();
-        log_cluster_probabilities = log_cluster_probabilities -
-          (maxval + log(sum(exp(log_cluster_probabilities - maxval))));
-
-        unsigned int z = Rcpp::sample(
-          parameters.tau.size(), 1, false,
-          Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(log_cluster_probabilities))),
-          false
-        )(0);
-        proposal.cluster_assignment = join_vert(proposal.cluster_assignment, uvec{z});
-      }
-
       proposal.log_probability -= lgamma(available_rankings.size() + 1.0);
     } else if(latent_rank_proposal == "pseudo") {
       if(parameters.alpha.size() > 1) {
@@ -131,6 +109,27 @@ LatentRankingProposal sample_latent_rankings(
 
     } else {
       Rcpp::stop("Unknown latent rank proposal.");
+    }
+
+    if(it == data->observed_users.end()) {
+      vec log_cluster_probabilities(parameters.tau.size());
+
+      for(size_t cluster{}; cluster < parameters.tau.size(); cluster++) {
+        log_cluster_probabilities(cluster) = log(parameters.tau(cluster)) -
+          pfun->logz(parameters.alpha(cluster)) - parameters.alpha(cluster) *
+          distfun->d(proposal.proposal, parameters.rho.col(cluster));
+      }
+
+      double maxval = log_cluster_probabilities.max();
+      log_cluster_probabilities = log_cluster_probabilities -
+        (maxval + log(sum(exp(log_cluster_probabilities - maxval))));
+
+      unsigned int z = Rcpp::sample(
+        parameters.tau.size(), 1, false,
+        Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(log_cluster_probabilities))),
+        false
+      )(0);
+      proposal.cluster_assignment = join_vert(proposal.cluster_assignment, uvec{z});
     }
   }
   return proposal;
