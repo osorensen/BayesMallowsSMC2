@@ -32,6 +32,16 @@ bool check_consistency(const uvec& new_rankings, const uvec& current_latent) {
   return all(v1 == v2);
 }
 
+uvec find_available_rankings(const uvec& observed_ranking) {
+  uvec all_rankings = regspace<uvec>(1, observed_ranking.size());
+  return setdiff(all_rankings, observed_ranking);
+}
+
+uvec find_available_items(const uvec& observed_ranking) {
+  uvec available_items = regspace<uvec>(0, observed_ranking.size() - 1);
+  return setdiff(available_items, find(observed_ranking));
+}
+
 LatentRankingProposal sample_latent_rankings(
     const Rankings* data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
@@ -42,8 +52,6 @@ LatentRankingProposal sample_latent_rankings(
 
   LatentRankingProposal proposal;
   ranking_tp new_data = data->timeseries[t];
-  uvec all_items = regspace<uvec>(0, prior.n_items - 1);
-  uvec all_rankings = regspace<uvec>(1, prior.n_items);
 
   for(size_t i{}; i < new_data.size(); i++) {
     auto it = data->find_user(new_data[i].first);
@@ -59,12 +67,9 @@ LatentRankingProposal sample_latent_rankings(
       }
     }
 
-    uvec observed_ranking = new_data[i].second;
-    uvec observed_items = find(observed_ranking);
-    uvec available_items = setdiff(all_items, observed_items);
-    uvec available_rankings = setdiff(all_rankings, observed_ranking);
-
-    uvec tmp = observed_ranking;
+    uvec tmp = new_data[i].second;
+    uvec available_items = find_available_items(tmp);
+    uvec available_rankings = find_available_rankings(tmp);
 
     if(latent_rank_proposal == "uniform") {
       tmp(available_items) = shuffle(available_rankings);
