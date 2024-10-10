@@ -76,7 +76,6 @@ bool Particle::rejuvenate(
 
   for(size_t t{}; t < T + 1; t++) {
     proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
-    proposal_particle.log_importance_weight += proposal_particle.log_incremental_likelihood(t);
     data->update_observed_users(t);
   }
 
@@ -94,7 +93,6 @@ bool Particle::rejuvenate(
   if(log_ratio > log(randu())) {
     this->parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
     this->conditioned_particle_filter = proposed_particle_filter;
-    this->log_importance_weight = proposal_particle.log_importance_weight;
     this->log_incremental_likelihood = proposal_particle.log_incremental_likelihood;
     this->log_normalized_particle_filter_weights = proposal_particle.log_normalized_particle_filter_weights;
     accepted = true;
