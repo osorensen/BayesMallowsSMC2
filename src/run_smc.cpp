@@ -4,13 +4,15 @@
 #include <limits>
 #include "prior.h"
 #include "data.h"
-#include "particle.h"
-#include "options.h"
-#include "partition_functions.h"
 #include "distances.h"
-#include "resampler.h"
-#include "progress_reporter.h"
+#include "misc.h"
+#include "options.h"
 #include "parameter_tracer.h"
+#include "particle.h"
+#include "partition_functions.h"
+#include "progress_reporter.h"
+#include "resampler.h"
+
 using namespace arma;
 
 // [[Rcpp::export]]
@@ -53,9 +55,7 @@ Rcpp::List run_smc(
         log(normalized_importance_weights(i)) + particle_vector[i].log_incremental_likelihood(t);
     }
 
-    double max_log_incremental_likelihood = unconditional_log_incremental.max();
-    log_marginal_likelihood += max_log_incremental_likelihood +
-      log(sum(exp(unconditional_log_incremental - max_log_incremental_likelihood)));
+    log_marginal_likelihood += log_sum_exp(unconditional_log_incremental);
 
     double ess = pow(norm(normalized_importance_weights, 2), -2);
     reporter.report_ess(ess);

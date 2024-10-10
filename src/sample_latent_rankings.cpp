@@ -120,7 +120,7 @@ LatentRankingProposal sample_latent_rankings(
           distfun->d(proposal.proposal, parameters.rho.col(cluster));
       }
 
-      log_cluster_probabilities = log_sum_exp(log_cluster_probabilities);
+      log_cluster_probabilities = softmax(log_cluster_probabilities);
 
       unsigned int z = Rcpp::sample(
         parameters.tau.size(), 1, false,
