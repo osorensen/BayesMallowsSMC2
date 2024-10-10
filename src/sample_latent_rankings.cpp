@@ -40,9 +40,7 @@ LatentRankingProposal sample_latent_rankings(
 
   for(size_t i{}; i < new_data.size(); i++) {
     auto it = std::find(data->observed_users.begin(), data->observed_users.end(), new_data[i].first);
-    if(it == data->observed_users.end()) {
-      proposal.new_users.push_back(new_data[i].first);
-    } else {
+    if(it != data->observed_users.end()) {
       int lr_index = std::distance(data->observed_users.begin(), it);
 
       uvec new_observed_indices = find(new_data[i].second); // indices of non-missing ranks

@@ -38,9 +38,9 @@ void Particle::run_particle_filter(
   }
 
   for(auto& pf : particle_filters) {
-    auto proposal = sample_latent_rankings(data, t, prior, latent_rank_proposal,
-                                           parameters, pf.latent_rankings,
-                                           pfun, distfun);
+    auto proposal = sample_latent_rankings(
+      data, t, prior, latent_rank_proposal, parameters, pf.latent_rankings,
+      pfun, distfun);
 
     pf.cluster_assignments =
       join_cols(pf.cluster_assignments, proposal.cluster_assignment);
