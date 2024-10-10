@@ -51,3 +51,8 @@ struct Particle{
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);
 std::vector<ParticleFilter> create_particle_filters(const Options& options);
 arma::vec normalize_log_importance_weights(const std::vector<Particle>& particle_vector);
+double log_marginal_likelihood_increment(
+    const std::vector<Particle>& particle_vector,
+    const arma::vec& normalized_log_importance_weights,
+    int t
+);

@@ -122,3 +122,16 @@ vec normalize_log_importance_weights(const std::vector<Particle>& particle_vecto
 
   return softmax(log_importance_weights);
 }
+
+  double log_marginal_likelihood_increment(
+      const std::vector<Particle>& particle_vector,
+      const vec& normalized_log_importance_weights,
+      int t
+  ) {
+  vec unconditional_log_incremental(particle_vector.size());
+  for(size_t i{}; i < particle_vector.size(); i++) {
+    unconditional_log_incremental(i) =
+      normalized_log_importance_weights(i) + particle_vector[i].log_incremental_likelihood(t);
+  }
+  return log_sum_exp(unconditional_log_incremental);
+}

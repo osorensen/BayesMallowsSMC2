@@ -48,13 +48,8 @@ Rcpp::List run_smc(
     }
     vec normalized_log_importance_weights = normalize_log_importance_weights(particle_vector);
 
-    vec unconditional_log_incremental(normalized_log_importance_weights.size());
-    for(size_t i{}; i < normalized_log_importance_weights.size(); i++) {
-      unconditional_log_incremental(i) =
-        normalized_log_importance_weights(i) + particle_vector[i].log_incremental_likelihood(t);
-    }
-
-    log_marginal_likelihood += log_sum_exp(unconditional_log_incremental);
+    log_marginal_likelihood += log_marginal_likelihood_increment(
+      particle_vector, normalized_log_importance_weights, t);
 
     double ess = pow(norm(exp(normalized_log_importance_weights), 2), -2);
     reporter.report_ess(ess);
