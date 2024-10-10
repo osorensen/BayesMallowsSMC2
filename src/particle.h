@@ -57,3 +57,4 @@ double log_marginal_likelihood_increment(
     const arma::vec& normalized_log_importance_weights,
     int t
 );
+arma::vec compute_alpha_stddev(const std::vector<Particle>& particle_vector);

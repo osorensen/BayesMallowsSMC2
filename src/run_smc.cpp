@@ -65,13 +65,7 @@ Rcpp::List run_smc(
       uvec unique_particles = find_unique(new_inds);
       int n_unique_particles = unique_particles.size();
 
-
-
-      mat alpha_values(particle_vector.size(), prior.n_clusters);
-      for(size_t i{}; i < particle_vector.size(); i++) {
-        alpha_values.row(i) = particle_vector[i].parameters.alpha.t();
-      }
-      auto alpha_sd = stddev(alpha_values, 0, 0);
+      vec alpha_sd = compute_alpha_stddev(particle_vector);
 
       size_t iter{};
       double accepted{};

@@ -132,3 +132,11 @@ vec normalize_log_importance_weights(const std::vector<Particle>& particle_vecto
   }
   return log_sum_exp(unconditional_log_incremental);
 }
+
+vec compute_alpha_stddev(const std::vector<Particle>& particle_vector) {
+  mat alpha_values(particle_vector.size(), particle_vector[0].parameters.alpha.size());
+  for(size_t i{}; i < particle_vector.size(); i++) {
+    alpha_values.row(i) = particle_vector[i].parameters.alpha.t();
+  }
+  return stddev(alpha_values, 0, 0);
+}
