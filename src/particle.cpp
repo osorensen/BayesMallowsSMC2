@@ -77,18 +77,14 @@ void Particle::run_particle_filter(
     pf.latent_rankings = join_horiz(pf.latent_rankings, proposal_new_users);
   }
 
-  Rcpp::NumericVector tmp_pf_weights(log_normalized_particle_filter_weights.size());
+  vec log_pf_weights(log_normalized_particle_filter_weights.size());
   std::transform(
-    particle_filters.cbegin(), particle_filters.cend(), tmp_pf_weights.begin(),
+    particle_filters.cbegin(), particle_filters.cend(), log_pf_weights.begin(),
     [t](const ParticleFilter& pf){ return pf.log_weight(t); });
-  double maxval = Rcpp::max(tmp_pf_weights);
 
   log_incremental_likelihood.resize(log_incremental_likelihood.size() + 1);
-  log_incremental_likelihood(log_incremental_likelihood.size() - 1) =
-    maxval - std::log(tmp_pf_weights.size()) + log(sum(exp(tmp_pf_weights - maxval)));
-
-  log_normalized_particle_filter_weights =
-    tmp_pf_weights - (maxval + log(sum(exp(tmp_pf_weights - maxval))));
+  log_incremental_likelihood(log_incremental_likelihood.size() - 1) = log_mean_exp(log_pf_weights);
+  log_normalized_particle_filter_weights = softmax(log_pf_weights);
 }
 
 void Particle::sample_particle_filter() {

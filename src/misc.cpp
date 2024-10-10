@@ -24,6 +24,11 @@ double log_sum_exp(const vec& x) {
   return maxval + log(sum(exp(x - maxval)));
 }
 
+double log_mean_exp(const vec& x) {
+  double maxval = x.max();
+  return maxval + log(mean(exp(x - maxval)));
+}
+
 vec softmax(const vec& x) {
   return x - log_sum_exp(x);
 }
