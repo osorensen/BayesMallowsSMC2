@@ -25,6 +25,13 @@ LatentRankingProposal sample_latent_rankings(
   }
 }
 
+bool check_consistency(const uvec& new_rankings, const uvec& current_latent) {
+  uvec new_observed_indices = find(new_rankings);
+  uvec v1 = new_rankings(new_observed_indices);
+  uvec v2 = current_latent.rows(new_observed_indices);
+  return all(v1 == v2);
+}
+
 LatentRankingProposal sample_latent_rankings(
     const Rankings* data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
@@ -44,11 +51,9 @@ LatentRankingProposal sample_latent_rankings(
     if(it != data->observed_users.end()) {
       int lr_index = std::distance(data->observed_users.begin(), it);
 
-      uvec new_observed_indices = find(new_data[i].second); // indices of non-missing ranks
-      uvec v1 = new_data[i].second(new_observed_indices); // ranks of ranked items
-      uvec v2 = current_latent_rankings.col(lr_index); // current latent ranking
-      v2 = v2.rows(new_observed_indices); // latent rankings limited to new observed
-      if(all(v1 == v2)) { // observations agree with latent
+      bool consistent = check_consistency(new_data[i].second, current_latent_rankings.col(lr_index));
+
+      if(consistent) { // observations agree with latent
         proposal.updated_consistent_users.push_back(new_data[i].first);
         continue;
       } else { // observations don't agree with latent
