@@ -8,6 +8,10 @@ std::vector<std::string>::const_iterator Data::find_user(const std::string& user
   return std::find(observed_users.cbegin(), observed_users.cend(), user_id);
 }
 
+std::vector<std::string>::iterator Data::find_user(const std::string& user_id) {
+  return std::find(observed_users.begin(), observed_users.end(), user_id);
+}
+
 Rankings::Rankings(const Rcpp::List& input_timeseries) {
   timeseries.reserve(input_timeseries.size());
   for(Rcpp::List a : input_timeseries) {

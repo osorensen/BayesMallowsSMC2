@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <vector>
 #include <Rmath.h>
 #include "misc.h"
 #include "particle.h"
@@ -52,17 +53,19 @@ void Particle::run_particle_filter(
       for(size_t c{}; c < prior.n_clusters; c++) {
         log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
           parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
-
-        if(i < proposal.updated_inconsistent_users.size()) {
-          auto it = std::find(data->observed_users.begin(), data->observed_users.end(),
-                              proposal.updated_inconsistent_users[i]);
-          int uiu_index = std::distance(data->observed_users.begin(), it);
-
-          log_cluster_contribution(c) -= log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
-            parameters.alpha(c) * distfun->d(pf.latent_rankings.col(uiu_index), parameters.rho.col(c));
-        }
       }
+      log_prob += log_sum_exp(log_cluster_contribution);
+    }
+    // Subtract inconsistent users' old latent rankings
+    for(const auto& ind : proposal.updated_inconsistent_users) {
+      vec log_cluster_contribution(prior.n_clusters);
+      auto it = data->find_user(ind);
+      int uiu_index = std::distance(data->observed_users.begin(), it);
 
+      for(size_t c{}; c < prior.n_clusters; c++) {
+        log_cluster_contribution(c) -= log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
+          parameters.alpha(c) * distfun->d(pf.latent_rankings.col(uiu_index), parameters.rho.col(c));
+      }
       log_prob += log_sum_exp(log_cluster_contribution);
     }
 
