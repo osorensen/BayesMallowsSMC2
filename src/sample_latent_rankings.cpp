@@ -32,6 +32,7 @@ LatentRankingProposal sample_latent_rankings(
     const umat& current_latent_rankings,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun)  {
+
   LatentRankingProposal proposal;
   ranking_tp new_data = data->timeseries[t];
   uvec all_items = regspace<uvec>(0, prior.n_items - 1);

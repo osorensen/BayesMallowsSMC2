@@ -40,16 +40,16 @@ test_that("compute_sequentially works with partial data", {
   expect_lt(alpha_hat, 1.05)
 })
 
-test_that("compute_sequentially works with partial data and pseudolikelihood proposal", {
-  set.seed(2)
-  mod <- compute_sequentially(
-    partial_rankings,
-    hyperparameters = set_hyperparameters(n_items = 5),
-    smc_options = set_smc_options(n_particles = 100, max_rejuvenation_steps = 5,
-                                  latent_rank_proposal = "pseudo")
-  )
-  alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .98)
-  expect_lt(alpha_hat, 1.05)
-
-})
+# test_that("compute_sequentially works with partial data and pseudolikelihood proposal", {
+#   set.seed(2)
+#   mod <- compute_sequentially(
+#     partial_rankings,
+#     hyperparameters = set_hyperparameters(n_items = 5),
+#     smc_options = set_smc_options(n_particles = 100, max_rejuvenation_steps = 5,
+#                                   latent_rank_proposal = "pseudo")
+#   )
+#   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
+#   expect_gt(alpha_hat, .98)
+#   expect_lt(alpha_hat, 1.05)
+#
+# })

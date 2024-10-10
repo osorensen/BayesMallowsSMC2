@@ -63,8 +63,7 @@ void Particle::run_particle_filter(
         }
       }
 
-      double maxval = log_cluster_contribution.max();
-      log_prob += maxval + log(accu(exp(log_cluster_contribution - maxval)));
+      log_prob += log_sum_exp(log_cluster_contribution);
     }
 
     pf.log_weight.resize(t + 1);
