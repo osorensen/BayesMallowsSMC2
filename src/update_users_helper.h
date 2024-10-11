@@ -7,7 +7,7 @@
 template<typename TimeSeriesType>
 void updateObservedUsersHelper(
     std::map<std::string, unsigned int>& observed_users, const TimeSeriesType& timeseries, unsigned int t) {
-  int current_max = 0;
+  int current_max = -1;
   if (!observed_users.empty()) {
     auto max_iter = std::max_element(
       observed_users.begin(), observed_users.end(),
@@ -21,8 +21,6 @@ void updateObservedUsersHelper(
   for (auto it = timeseries[t].begin(); it != timeseries[t].end(); ++it) {
     if (observed_users.find(it->first) == observed_users.end()) {
       observed_users[it->first] = new_value++;
-    } else {
-      Rcpp::Rcout << "User " << it->first << " already exists." << std::endl;
     }
   }
 }

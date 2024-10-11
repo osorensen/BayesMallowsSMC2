@@ -58,7 +58,9 @@ LatentRankingProposal sample_latent_rankings(
     auto it = data->observed_users.find(ndit->first);
 
     if(it != data->observed_users.end()) {
-      bool consistent = check_consistency(ndit->second, current_latent_rankings.col(it->second));
+      bool consistent = check_consistency(
+        ndit->second,
+        current_latent_rankings.col(it->second));
 
       if(consistent) {
         continue;
@@ -139,6 +141,7 @@ LatentRankingProposal sample_latent_rankings(
       proposal.cluster_assignment = join_vert(proposal.cluster_assignment, uvec{z});
     }
   }
+
   return proposal;
 }
 
