@@ -70,12 +70,15 @@ bool Particle::rejuvenate(
 
   Particle proposal_particle(options, prior);
   proposal_particle.parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
+  Particle current_particle(options, prior);
+  current_particle.parameters = StaticParameters{this->parameters};
 
   auto observed_users_backup = data->observed_users;
   data->observed_users.clear();
 
   for(size_t t{}; t < T + 1; t++) {
     proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
+    current_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
     data->update_observed_users(t);
   }
 
@@ -87,7 +90,7 @@ bool Particle::rejuvenate(
   vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
     prior.alpha_rate * (alpha_proposal - parameters.alpha);
   double log_ratio = sum(proposal_particle.log_incremental_likelihood) -
-    sum(this->log_incremental_likelihood) + accu(additional_terms);
+    sum(current_particle.log_incremental_likelihood) + accu(additional_terms);
 
   bool accepted{};
   if(log_ratio > log(randu())) {

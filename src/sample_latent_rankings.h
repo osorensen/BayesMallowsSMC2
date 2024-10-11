@@ -8,6 +8,7 @@ struct LatentRankingProposal{
   double log_probability{};
   // string shows index in data, integer shows index in proposal matrix
   std::map<std::string, unsigned int> updated_inconsistent_users{};
+  std::map<unsigned int, std::string> users{};
 };
 
 LatentRankingProposal sample_latent_rankings(

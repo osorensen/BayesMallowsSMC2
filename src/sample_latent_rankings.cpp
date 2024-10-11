@@ -68,7 +68,9 @@ LatentRankingProposal sample_latent_rankings(
         proposal.updated_inconsistent_users[ndit->first] = proposal_index;
       }
     }
+    proposal.users[proposal_index] = ndit->first;
     proposal_index++;
+
 
     uvec tmp = ndit->second;
     uvec available_items = find_available_items(tmp);
