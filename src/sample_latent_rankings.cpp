@@ -54,22 +54,21 @@ LatentRankingProposal sample_latent_rankings(
   ranking_tp new_data = data->timeseries[t];
 
   size_t proposal_index{};
-  for(size_t i{}; i < new_data.size(); i++) {
-    auto it = data->find_user(new_data[i].first);
+  for(auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
+    auto it = data->observed_users.find(ndit->first);
 
     if(it != data->observed_users.end()) {
-      int lr_index = std::distance(data->observed_users.begin(), it);
-      bool consistent = check_consistency(new_data[i].second, current_latent_rankings.col(lr_index));
+      bool consistent = check_consistency(ndit->second, current_latent_rankings.col(it->second));
 
       if(consistent) {
         continue;
       } else {
-        proposal.updated_inconsistent_users.push_back(std::pair{new_data[i].first, proposal_index});
+        proposal.updated_inconsistent_users[ndit->first] = proposal_index;
       }
     }
     proposal_index++;
 
-    uvec tmp = new_data[i].second;
+    uvec tmp = ndit->second;
     uvec available_items = find_available_items(tmp);
     uvec available_rankings = find_available_rankings(tmp);
 
@@ -147,10 +146,11 @@ LatentRankingProposal sample_latent_rankings(
     const PairwisePreferences* data, unsigned int t, const Prior& prior) {
   LatentRankingProposal proposal;
   proposal.proposal = umat(prior.n_items, data->timeseries[t].size());
+  pairwise_tp new_data = data->timeseries[t];
+  size_t proposal_index{};
 
-  for(size_t i{}; i < data->timeseries[t].size(); i++) {
-    std::string user = data->timeseries[t][i].first;
-    std::string directory_path = data->topological_sorts_directory + std::string("/user") + user;
+  for(auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
+    std::string directory_path = data->topological_sorts_directory + std::string("/user") + ndit->first;
     std::vector<fs::path> file_paths;
 
     for(const auto& entry : fs::directory_iterator(directory_path)) {
@@ -173,8 +173,8 @@ LatentRankingProposal sample_latent_rankings(
     }
 
     Rcpp::CharacterVector nn = data->num_topological_sorts.names();
-    Rcpp::IntegerVector matching_index = Rcpp::match(Rcpp::CharacterVector::create(user), nn) - 1;
-    proposal.proposal.col(i) = conv_to<uvec>::from(tmp);
+    Rcpp::IntegerVector matching_index = Rcpp::match(Rcpp::CharacterVector::create(ndit->first), nn) - 1;
+    proposal.proposal.col(proposal_index++) = conv_to<uvec>::from(tmp);
     proposal.log_probability = -log(data->num_topological_sorts[matching_index[0]]);
   }
 

@@ -1,32 +1,33 @@
 devtools::load_all()
 library(tidyverse)
 
-n_items <- 10
+n_items <- 5
 set.seed(1)
 
-rankings <- BayesMallows::sample_mallows(1:n_items, 10, 100, thinning = 1000)
-colnames(rankings) <- paste0("item", 1:10)
+rankings <- BayesMallows::sample_mallows(1:n_items, .5 * n_items, n_samples = 2, thinning = 1000)
+colnames(rankings) <- paste0("item", 1:n_items)
 
-complete_rankings <- tibble(timepoint = 1:100, user = 1:100) %>%
-  bind_cols(rankings) %>%
-  as.data.frame()
+dd1 <- rankings
+dd1[dd1 > 2] <- NA
+dd2 <- rankings
+dd2[dd2 > 3] <- NA
 
-partial_rankings <- complete_rankings %>%
-  mutate(across(contains("item"), ~ if_else(. > 5, NA_real_, .))) %>%
-  as.data.frame()
-
-dd1 <- partial_rankings[1:50, ]
-dd2 <- partial_rankings[51:100, ]
-dd2$user <- dd1$user
-dd <- rbind(dd1, dd2)
+dd <- as.data.frame(rbind(dd1, dd2))
 dd$timepoint <- seq_len(nrow(dd))
+dd$user <- c(1:2, 1:2)
 
 set.seed(2)
 mod <- compute_sequentially(
-  dd1,
+  dd,
   hyperparameters = set_hyperparameters(n_items = n_items),
-  smc_options = set_smc_options(n_particles = 1000, max_rejuvenation_steps = 5, verbose = TRUE,
-                                trace = TRUE, trace_directory = "dev/tmp")
+  smc_options = set_smc_options(n_particles = 1, max_rejuvenation_steps = 5, verbose = TRUE,
+                                n_particle_filters = 1, max_particle_filters = 1,
+                                resampling_threshold = 0)
 )
 
-hist(mod$alpha)
+ hist(mod$alpha)
+
+weighted.mean(mod$alpha[1, ], w = mod$importance_weights)
+
+
+

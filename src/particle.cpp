@@ -19,6 +19,12 @@ Particle::Particle(const Options& options, const Prior& prior) :
     parameters.rho.each_col([&prior](uvec& a){ a = shuffle(regspace<uvec>(1, prior.n_items)); });
   }
 
+std::vector<std::pair<std::string, int>>::const_iterator findIntInPairs(const std::vector<std::pair<std::string, int>>& vec, int a) {
+  return std::find_if(vec.begin(), vec.end(), [a](const std::pair<std::string, int>& element) {
+    return element.second == a;
+  });
+}
+
 void Particle::run_particle_filter(
     unsigned int t, const Prior& prior,
     const std::unique_ptr<Data>& data,
@@ -55,23 +61,26 @@ void Particle::run_particle_filter(
     }
     // Subtract inconsistent users' old latent rankings
     umat proposal_new_users = proposal.proposal;
-    for(const auto& updated_user : proposal.updated_inconsistent_users) {
+    uvec cols_to_drop{};
+    for(auto uu = proposal.updated_inconsistent_users.begin();
+        uu != proposal.updated_inconsistent_users.end(); ++uu) {
+      unsigned int index_in_proposal = uu->second;
+      unsigned int index_in_latent = data->observed_users[uu->first];
       vec log_cluster_contribution(prior.n_clusters);
-      int index = std::distance(data->observed_users.begin(), data->find_user(updated_user.first));
 
       for(size_t c{}; c < prior.n_clusters; c++) {
         log_cluster_contribution(c) -= log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
-          parameters.alpha(c) * distfun->d(pf.latent_rankings.col(index), parameters.rho.col(c));
+          parameters.alpha(c) * distfun->d(pf.latent_rankings.col(index_in_latent), parameters.rho.col(c));
       }
       log_prob += log_sum_exp(log_cluster_contribution);
-      pf.latent_rankings.col(updated_user.second) = proposal.proposal.col(updated_user.second);
-      proposal_new_users.shed_col(updated_user.second);
+      pf.latent_rankings.col(index_in_latent) = proposal.proposal.col(index_in_proposal);
+      cols_to_drop = join_vert(cols_to_drop, uvec{index_in_proposal});
     }
 
+    proposal_new_users.shed_cols(cols_to_drop);
+    pf.latent_rankings = join_horiz(pf.latent_rankings, proposal_new_users);
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - proposal.log_probability;
-
-    pf.latent_rankings = join_horiz(pf.latent_rankings, proposal_new_users);
   }
 
   vec log_pf_weights(log_normalized_particle_filter_weights.size());

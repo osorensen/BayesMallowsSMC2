@@ -2,45 +2,27 @@
 #include "data.h"
 #include "misc.h"
 #include "sample_latent_rankings.h"
+#include "update_users_helper.h"
 using namespace arma;
-
-std::vector<std::string>::const_iterator Data::find_user(const std::string& user_id) const {
-  return std::find(observed_users.cbegin(), observed_users.cend(), user_id);
-}
-
-std::vector<std::string>::iterator Data::find_user(const std::string& user_id) {
-  return std::find(observed_users.begin(), observed_users.end(), user_id);
-}
 
 Rankings::Rankings(const Rcpp::List& input_timeseries) {
   timeseries.reserve(input_timeseries.size());
   for(Rcpp::List a : input_timeseries) {
     ranking_tp new_data;
-    new_data.reserve(a.size());
     Rcpp::CharacterVector nm = a.names();
     for(size_t i{}; i < nm.size(); i++) {
-      uvec rankings = a[i];
-      new_data.push_back(ranking_obs(nm[i], rankings));
+      new_data[std::string(nm[i])] = uvec(a[i]);
     }
     timeseries.push_back(new_data);
   }
 }
 
 void Rankings::update_observed_users(unsigned int t) {
-  for(const auto& obs : timeseries[t]) {
-    if(std::find(observed_users.begin(), observed_users.end(), obs.first) == observed_users.end()) {
-      observed_users.push_back(obs.first);
-    }
-  }
+  updateObservedUsersHelper(observed_users, timeseries, t);
 }
 
-void Rankings::print() {
-  for(auto timepoint : timeseries) {
-    for(auto observation : timepoint) {
-      Rcpp::Rcout << "user " << observation.first << std::endl
-                  << "rankings " << observation.second.t() << std::endl;
-    }
-  }
+void PairwisePreferences::update_observed_users(unsigned int t) {
+  updateObservedUsersHelper(observed_users, timeseries, t);
 }
 
 PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
@@ -49,7 +31,6 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
   timeseries.reserve(input_timeseries.size());
   for(Rcpp::List a : input_timeseries) {
     pairwise_tp new_data;
-    new_data.reserve(a.size());
     Rcpp::CharacterVector nm = a.names();
     for(size_t i{}; i < nm.size(); i++) {
       umat preferences = a[i];
@@ -57,33 +38,13 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
       for(size_t j{}; j < preferences.n_rows; j++) {
         user_data.insert(single_comparison(preferences(j, 0), preferences(j, 1)));
       }
-      new_data.push_back(pairwise_obs(nm[i], user_data));
+      new_data[std::string(nm[i])] = user_data;
     }
     timeseries.push_back(new_data);
   }
 }
 
-void PairwisePreferences::update_observed_users(unsigned int t) {
-  for(auto obs : timeseries[t]) {
-    observed_users.push_back(obs.first);
-  }
-}
 
-void PairwisePreferences::print() {
-  for(auto timepoint : timeseries) {
-    for(auto observation : timepoint) {
-      Rcpp::Rcout << "user " << observation.first << std::endl
-                  << "preferences ";
-      auto comparisons{observation.second};
-      std::for_each(comparisons.begin(), comparisons.end(),
-                    [](const single_comparison& s ){
-                      Rcpp::Rcout << s.first << "<" << s.second << ", ";
-                    });
-      Rcpp::Rcout << std::endl;
-    }
-    Rcpp::Rcout << std::endl;
-  }
-}
 
 std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
   std::string type = Rcpp::as<std::string>(input_timeseries.attr("type"));
