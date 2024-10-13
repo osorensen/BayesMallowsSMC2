@@ -57,7 +57,10 @@ void Particle::run_particle_filter(
         log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
           parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
       }
-      pf.user_delta[proposal.users[i]] = log_sum_exp(log_cluster_contribution);
+      if(data->updated_users) {
+        pf.user_delta[proposal.users[i]] = log_sum_exp(log_cluster_contribution);
+      }
+
       log_prob += log_sum_exp(log_cluster_contribution);
     }
     // Subtract inconsistent users' old latent rankings

@@ -14,6 +14,7 @@ struct Data{
   virtual unsigned int n_timepoints() = 0;
   virtual void update_observed_users(unsigned int t) = 0;
   std::map<std::string, unsigned int> observed_users{}; // user ID and index in latent ranking and cluster
+  bool updated_users{};
 };
 
 struct Rankings : Data {

@@ -15,6 +15,7 @@ Rankings::Rankings(const Rcpp::List& input_timeseries) {
     }
     timeseries.push_back(new_data);
   }
+  updated_users = input_timeseries.attr("updated_users");
 }
 
 void Rankings::update_observed_users(unsigned int t) {
@@ -42,9 +43,8 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
     }
     timeseries.push_back(new_data);
   }
+  updated_users = input_timeseries.attr("updated_users");
 }
-
-
 
 std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
   std::string type = Rcpp::as<std::string>(input_timeseries.attr("type"));

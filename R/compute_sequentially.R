@@ -46,6 +46,7 @@ compute_sequentially <- function(
     ){
   rank_columns <- grepl("item[0-9]+", colnames(data))
   preference_columns <- grepl("top\\_item|bottom\\_item", colnames(data))
+
   if(any(rank_columns)) {
     input_timeseries <- split(data, f = ~ timepoint) |>
       lapply(split, f = ~ user) |>
@@ -73,6 +74,10 @@ compute_sequentially <- function(
   } else {
     stop("Something wrong with data")
   }
+
+  attr(input_timeseries, "updated_users") <-
+    if(length(unique(data$timepoint)) < length(unique(data$user))) {
+      TRUE } else { FALSE }
 
   ret <- run_smc(input_timeseries, hyperparameters, smc_options)
 }
