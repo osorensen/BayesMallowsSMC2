@@ -82,7 +82,8 @@ LatentRankingProposal sample_latent_rankings(
     if(latent_rank_proposal == "uniform") {
       tmp(available_items) = shuffle(available_rankings);
       proposal.proposal = join_horiz(proposal.proposal, tmp);
-      proposal.log_probability -= lgamma(available_rankings.size() + 1.0);
+      proposal.log_probability = join_vert(
+        proposal.log_probability, vec{-lgamma(available_rankings.size() + 1.0)});
     } else if(latent_rank_proposal == "pseudo") {
       if(parameters.alpha.size() > 1) {
         Rcpp::stop("Pseudolikelihood proposal does not work with clusters.");
@@ -121,7 +122,7 @@ LatentRankingProposal sample_latent_rankings(
       }
 
       proposal.proposal = join_horiz(proposal.proposal, tmp);
-      proposal.log_probability += logprob;
+      proposal.log_probability = join_vert(proposal.log_probability, vec{logprob});
 
     } else {
       Rcpp::stop("Unknown latent rank proposal.");
@@ -183,7 +184,10 @@ LatentRankingProposal sample_latent_rankings(
     Rcpp::CharacterVector nn = data->num_topological_sorts.names();
     Rcpp::IntegerVector matching_index = Rcpp::match(Rcpp::CharacterVector::create(ndit->first), nn) - 1;
     proposal.proposal.col(proposal_index++) = conv_to<uvec>::from(tmp);
-    proposal.log_probability = -log(data->num_topological_sorts[matching_index[0]]);
+    proposal.log_probability = join_vert(
+      proposal.log_probability,
+      vec{-log(data->num_topological_sorts[matching_index[0]])}
+    );
   }
 
   return proposal;

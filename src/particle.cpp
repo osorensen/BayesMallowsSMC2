@@ -58,7 +58,8 @@ void Particle::run_particle_filter(
           parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
       }
       if(data->updated_users) {
-        pf.user_delta[proposal.users[i]] = log_sum_exp(log_cluster_contribution);
+        pf.user_delta[proposal.users[i]] =
+          log_sum_exp(log_cluster_contribution) - proposal.log_probability(i);
       }
 
       log_prob += log_sum_exp(log_cluster_contribution);
@@ -79,7 +80,7 @@ void Particle::run_particle_filter(
     proposal_new_users.shed_cols(cols_to_drop);
     pf.latent_rankings = join_horiz(pf.latent_rankings, proposal_new_users);
     pf.log_weight.resize(t + 1);
-    pf.log_weight(t) = log_prob - proposal.log_probability;
+    pf.log_weight(t) = log_prob - sum(proposal.log_probability);
   }
 
   vec log_pf_weights(log_normalized_particle_filter_weights.size());
