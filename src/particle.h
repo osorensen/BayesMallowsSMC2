@@ -9,6 +9,9 @@
 #include "resampler.h"
 
 struct StaticParameters{
+  StaticParameters() {}
+  StaticParameters(const arma::vec& alpha, const arma::umat& rho, const arma::vec& tau);
+  StaticParameters(const Prior& prior);
   arma::vec alpha;
   arma::umat rho;
   arma::vec tau;
@@ -25,7 +28,7 @@ struct ParticleFilter{
 
 struct Particle{
   Particle() {}
-  Particle(const Options& options, const Prior& prior);
+  Particle(const Options& options, const StaticParameters& parameters);
   ~Particle() = default;
   StaticParameters parameters;
   std::vector<ParticleFilter> particle_filters;

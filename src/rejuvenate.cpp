@@ -68,8 +68,7 @@ bool Particle::rejuvenate(
     rho_proposal.col(cluster) = leap_and_shift(parameters.rho.col(cluster), cluster, prior);
   }
 
-  Particle proposal_particle(options, prior);
-  proposal_particle.parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
+  Particle proposal_particle(options, StaticParameters{alpha_proposal, rho_proposal, parameters.tau});
 
   auto observed_users_backup = data->observed_users;
   data->observed_users.clear();

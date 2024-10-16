@@ -7,17 +7,23 @@
 
 using namespace arma;
 
-Particle::Particle(const Options& options, const Prior& prior) :
-  parameters { randg(prior.n_clusters, distr_param(prior.alpha_shape, 1 / prior.alpha_rate)),
-               umat(prior.n_items, prior.n_clusters),
-               normalise(randg(prior.n_clusters, distr_param(prior.cluster_concentration, 1)), 1) },
+StaticParameters::StaticParameters(const vec& alpha, const umat& rho, const vec& tau) :
+  alpha { alpha }, rho { rho }, tau { tau } {}
+
+StaticParameters::StaticParameters(const Prior& prior) :
+  alpha { randg(prior.n_clusters, distr_param(prior.alpha_shape, 1 / prior.alpha_rate)) },
+  rho { umat(prior.n_items, prior.n_clusters) },
+  tau { normalise(randg(prior.n_clusters, distr_param(prior.cluster_concentration, 1)), 1) }
+  {
+    rho.each_col([&prior](uvec& a){ a = shuffle(regspace<uvec>(1, prior.n_items)); });
+  }
+
+Particle::Particle(const Options& options, const StaticParameters& parameters) :
+  parameters { parameters },
   particle_filters(create_particle_filters(options)),
   log_normalized_particle_filter_weights (
       Rcpp::NumericVector(options.n_particle_filters, -log(options.n_particle_filters))
-  )
-  {
-    parameters.rho.each_col([&prior](uvec& a){ a = shuffle(regspace<uvec>(1, prior.n_items)); });
-  }
+  ){}
 
 std::vector<std::pair<std::string, int>>::const_iterator findIntInPairs(const std::vector<std::pair<std::string, int>>& vec, int a) {
   return std::find_if(vec.begin(), vec.end(), [a](const std::pair<std::string, int>& element) {
@@ -105,7 +111,7 @@ std::vector<Particle> create_particle_vector(const Options& options, const Prior
   result.reserve(options.n_particles);
 
   for(size_t i{}; i < options.n_particles; i++) {
-    result.push_back(Particle{options, prior});
+    result.push_back(Particle{options, StaticParameters(prior)});
   }
 
   return result;
