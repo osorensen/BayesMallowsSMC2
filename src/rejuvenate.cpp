@@ -95,6 +95,7 @@ bool Particle::rejuvenate(
     this->log_incremental_likelihood = proposal_particle.log_incremental_likelihood;
     this->log_normalized_particle_filter_weights = proposal_particle.log_normalized_particle_filter_weights;
     this->particle_filters = proposal_particle.particle_filters;
+    this->logz = proposal_particle.logz;
     accepted = true;
   } else {
     accepted = false;

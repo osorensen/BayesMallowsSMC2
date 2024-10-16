@@ -24,7 +24,12 @@ Particle::Particle(const Options& options, const StaticParameters& parameters,
   particle_filters(create_particle_filters(options)),
   log_normalized_particle_filter_weights (
       Rcpp::NumericVector(options.n_particle_filters, -log(options.n_particle_filters))
-  ){}
+  ){
+    logz = zeros(parameters.tau.size());
+    for(size_t i{}; i < logz.size(); i++) {
+      logz(i) = pfun->logz(parameters.alpha(i));
+    }
+  }
 
 std::vector<std::pair<std::string, int>>::const_iterator findIntInPairs(const std::vector<std::pair<std::string, int>>& vec, int a) {
   return std::find_if(vec.begin(), vec.end(), [a](const std::pair<std::string, int>& element) {
