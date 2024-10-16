@@ -18,7 +18,8 @@ StaticParameters::StaticParameters(const Prior& prior) :
     rho.each_col([&prior](uvec& a){ a = shuffle(regspace<uvec>(1, prior.n_items)); });
   }
 
-Particle::Particle(const Options& options, const StaticParameters& parameters) :
+Particle::Particle(const Options& options, const StaticParameters& parameters,
+                   const std::unique_ptr<PartitionFunction>& pfun) :
   parameters { parameters },
   particle_filters(create_particle_filters(options)),
   log_normalized_particle_filter_weights (
@@ -106,12 +107,13 @@ void Particle::sample_particle_filter() {
   conditioned_particle_filter = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
 }
 
-std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior) {
+std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior,
+                                             const std::unique_ptr<PartitionFunction>& pfun) {
   std::vector<Particle> result;
   result.reserve(options.n_particles);
 
   for(size_t i{}; i < options.n_particles; i++) {
-    result.push_back(Particle{options, StaticParameters(prior)});
+    result.push_back(Particle{options, StaticParameters(prior), pfun});
   }
 
   return result;

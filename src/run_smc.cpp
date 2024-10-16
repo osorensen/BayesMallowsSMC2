@@ -26,8 +26,8 @@ Rcpp::List run_smc(
   Options options{input_options};
 
   auto data = setup_data(input_timeseries);
-  auto particle_vector = create_particle_vector(options, prior);
   auto pfun = choose_partition_function(prior.n_items, options.metric);
+  auto particle_vector = create_particle_vector(options, prior, pfun);
   auto distfun = choose_distance_function(options.metric);
   auto resampler = choose_resampler(options.resampler);
   auto reporter = ProgressReporter(options.verbose);

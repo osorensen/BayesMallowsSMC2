@@ -28,7 +28,8 @@ struct ParticleFilter{
 
 struct Particle{
   Particle() {}
-  Particle(const Options& options, const StaticParameters& parameters);
+  Particle(const Options& options, const StaticParameters& parameters,
+           const std::unique_ptr<PartitionFunction>& pfun);
   ~Particle() = default;
   StaticParameters parameters;
   std::vector<ParticleFilter> particle_filters;
@@ -51,9 +52,11 @@ struct Particle{
   );
   int conditioned_particle_filter{};
   void sample_particle_filter();
+  arma::vec logz{};
 };
 
-std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior);
+std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior,
+                                             const std::unique_ptr<PartitionFunction>& pfun);
 std::vector<ParticleFilter> create_particle_filters(const Options& options);
 arma::vec normalize_log_importance_weights(const std::vector<Particle>& particle_vector);
 double log_marginal_likelihood_increment(
