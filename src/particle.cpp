@@ -68,7 +68,7 @@ void Particle::run_particle_filter(
     for(size_t i{}; i < proposal.proposal.n_cols; i++) {
       vec log_cluster_contribution(prior.n_clusters);
       for(size_t c{}; c < prior.n_clusters; c++) {
-        log_cluster_contribution(c) = log(parameters.tau(c)) - pfun->logz(parameters.alpha(c)) -
+        log_cluster_contribution(c) = log(parameters.tau(c)) - this->logz(c) -
           parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
       }
       if(data->updated_users) {
