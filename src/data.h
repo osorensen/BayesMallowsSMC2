@@ -18,10 +18,11 @@ struct Data{
 };
 
 struct Rankings : Data {
-  Rankings(const Rcpp::List& input_timeseries);
+  Rankings(const Rcpp::List& input_timeseries, bool partial_rankings);
   ranking_ts timeseries;
   unsigned int n_timepoints() override { return timeseries.size(); }
   void update_observed_users(unsigned int t) override;
+  bool partial_rankings{};
 };
 
 struct PairwisePreferences : Data{

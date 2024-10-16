@@ -5,7 +5,8 @@
 #include "update_users_helper.h"
 using namespace arma;
 
-Rankings::Rankings(const Rcpp::List& input_timeseries) {
+Rankings::Rankings(const Rcpp::List& input_timeseries, bool partial_rankings) :
+  partial_rankings { partial_rankings } {
   timeseries.reserve(input_timeseries.size());
   for(Rcpp::List a : input_timeseries) {
     ranking_tp new_data;
@@ -50,7 +51,7 @@ std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
   std::string type = Rcpp::as<std::string>(input_timeseries.attr("type"));
 
   if (type == "complete rankings" || type == "partial rankings") {
-    return std::make_unique<Rankings>(input_timeseries);
+    return std::make_unique<Rankings>(input_timeseries, type == "partial rankings");
   } else if (type == "pairwise preferences") {
     return std::make_unique<PairwisePreferences>(input_timeseries);
   } else {
