@@ -101,13 +101,16 @@ bool Particle::rejuvenate(
     accepted = false;
   }
 
-  uvec cluster_assignments = particle_filters[conditioned_particle_filter].cluster_assignments;
-  uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
+  if(prior.n_clusters > 1) {
+    uvec cluster_assignments = particle_filters[conditioned_particle_filter].cluster_assignments;
+    uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
 
-  for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
-    parameters.tau(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
+    for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
+      parameters.tau(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
+    }
+    parameters.tau = normalise(parameters.tau, 1);
   }
-  parameters.tau = normalise(parameters.tau, 1);
+
   sample_particle_filter();
 
   return accepted;

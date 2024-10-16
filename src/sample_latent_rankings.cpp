@@ -145,8 +145,6 @@ LatentRankingProposal sample_latent_rankings(
         false
       )(0);
       proposal.cluster_assignment = join_vert(proposal.cluster_assignment, uvec{z});
-    } else {
-      proposal.cluster_assignment = join_vert(proposal.cluster_assignment, uvec{0});
     }
   }
 
