@@ -11,14 +11,15 @@ assignInNamespace('compiler_flags', new_compiler_flags, 'pkgbuild')
 devtools::load_all()
 
 n_items <- 10
-alpha <- .1
-n_users <- 200
+alpha <- .3
+n_users <- 50
 n_timepoints <- n_users
 set.seed(1)
 rankings <- BayesMallows::sample_mallows(
   rho0 = seq_len(n_items), alpha0 = alpha * n_items, n_samples = n_users,
   thinning = 1000)
 colnames(rankings) <- paste0("item", seq_len(n_items))
+rankings[rankings > 3] <- NA
 
 complete_rankings <- tibble(
   timepoint = rep(seq_len(n_timepoints), each = 1),
@@ -28,8 +29,10 @@ complete_rankings <- tibble(
 
 data <- complete_rankings
 hyperparameters <- set_hyperparameters(n_items = n_items)
-smc_options <- set_smc_options(n_particles = 200, n_particle_filters = 1,
-                              max_particle_filters = 1)
+smc_options <- set_smc_options(n_particles = 300, n_particle_filters = 1,
+                               max_rejuvenation_steps = 5,
+                               max_particle_filters = 1000,
+                               resampler = "residual")
 topological_sorts_directory = NULL
 num_topological_sorts = NULL
 

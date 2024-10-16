@@ -5,6 +5,16 @@
 #include "update_users_helper.h"
 using namespace arma;
 
+uvec find_available_rankings(const uvec& observed_ranking) {
+  uvec all_rankings = regspace<uvec>(1, observed_ranking.size());
+  return setdiff(all_rankings, observed_ranking);
+}
+
+uvec find_available_items(const uvec& observed_ranking) {
+  uvec available_items = regspace<uvec>(0, observed_ranking.size() - 1);
+  return setdiff(available_items, find(observed_ranking));
+}
+
 Rankings::Rankings(const Rcpp::List& input_timeseries, bool partial_rankings) :
   partial_rankings { partial_rankings } {
   timeseries.reserve(input_timeseries.size());
@@ -12,7 +22,7 @@ Rankings::Rankings(const Rcpp::List& input_timeseries, bool partial_rankings) :
     ranking_tp new_data;
     Rcpp::CharacterVector nm = a.names();
     for(size_t i{}; i < nm.size(); i++) {
-      new_data[std::string(nm[i])] = uvec(a[i]);
+      new_data[std::string(nm[i])] = RankingObs{uvec(a[i]), find_available_items(uvec(a[i])), find_available_rankings(uvec(a[i]))};
     }
     timeseries.push_back(new_data);
   }

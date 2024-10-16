@@ -32,16 +32,6 @@ bool check_consistency(const uvec& new_rankings, const uvec& current_latent) {
   return all(v1 == v2);
 }
 
-uvec find_available_rankings(const uvec& observed_ranking) {
-  uvec all_rankings = regspace<uvec>(1, observed_ranking.size());
-  return setdiff(all_rankings, observed_ranking);
-}
-
-uvec find_available_items(const uvec& observed_ranking) {
-  uvec available_items = regspace<uvec>(0, observed_ranking.size() - 1);
-  return setdiff(available_items, find(observed_ranking));
-}
-
 LatentRankingProposal sample_latent_rankings(
     const Rankings* data, unsigned int t,
     std::string latent_rank_proposal,
@@ -61,7 +51,7 @@ LatentRankingProposal sample_latent_rankings(
       it = data->observed_users.find(ndit->first);
       if(it != data->observed_users.end()) {
         bool consistent = check_consistency(
-          ndit->second,
+          ndit->second.observation,
           current_latent_rankings.col(it->second));
 
         if(consistent) {
@@ -76,22 +66,22 @@ LatentRankingProposal sample_latent_rankings(
     proposal_index++;
 
     if(data->partial_rankings) {
-      uvec tmp = ndit->second;
-      uvec available_items = find_available_items(tmp);
-      uvec available_rankings = find_available_rankings(tmp);
+      uvec tmp = ndit->second.observation;
 
       if(latent_rank_proposal == "uniform") {
-        tmp(available_items) = shuffle(available_rankings);
+        tmp(ndit->second.available_items) = shuffle(ndit->second.available_rankings);
         proposal.proposal = join_horiz(proposal.proposal, tmp);
         proposal.log_probability = join_vert(
-          proposal.log_probability, vec{-lgamma(available_rankings.size() + 1.0)});
+          proposal.log_probability, vec{-lgamma(ndit->second.available_rankings.size() + 1.0)});
       } else if(latent_rank_proposal == "pseudo") {
         if(parameters.alpha.size() > 1) {
           Rcpp::stop("Pseudolikelihood proposal does not work with clusters.");
         }
         double logprob{0};
 
+        uvec available_items = ndit->second.available_items;
         uvec available_items_shuffled = shuffle(available_items);
+        uvec available_rankings = ndit->second.available_rankings;
 
         while(available_items_shuffled.size() > 1) {
           uvec rho0(available_items_shuffled.size());
@@ -129,7 +119,7 @@ LatentRankingProposal sample_latent_rankings(
         Rcpp::stop("Unknown latent rank proposal.");
       }
     } else {
-      proposal.proposal = ndit->second;
+      proposal.proposal = ndit->second.observation;
       proposal.log_probability = join_vert(proposal.log_probability, vec{0});
     }
 

@@ -4,7 +4,13 @@
 #include <string>
 #include <utility>
 
-using ranking_tp = std::map<std::string, arma::uvec>;
+struct RankingObs {
+  arma::uvec observation{};
+  arma::uvec available_items{};
+  arma::uvec available_rankings{};
+};
+
+using ranking_tp = std::map<std::string, RankingObs>;
 using ranking_ts = std::vector<ranking_tp>;
 using single_comparison = std::pair<unsigned int, unsigned int>;
 using comparisons = std::set<single_comparison>;
