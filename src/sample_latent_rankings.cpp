@@ -128,7 +128,7 @@ LatentRankingProposal sample_latent_rankings(
       Rcpp::stop("Unknown latent rank proposal.");
     }
 
-    if(it == data->observed_users.end()) {
+    if(parameters.tau.size() > 1 && it == data->observed_users.end()) {
       vec log_cluster_probabilities(parameters.tau.size());
 
       for(size_t cluster{}; cluster < parameters.tau.size(); cluster++) {
@@ -145,6 +145,8 @@ LatentRankingProposal sample_latent_rankings(
         false
       )(0);
       proposal.cluster_assignment = join_vert(proposal.cluster_assignment, uvec{z});
+    } else {
+      proposal.cluster_assignment = join_vert(proposal.cluster_assignment, uvec{0});
     }
   }
 
