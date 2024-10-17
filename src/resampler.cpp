@@ -3,8 +3,8 @@
 
 using namespace arma;
 
-ivec count_to_index(const vec& counts) {
-  ivec indices(sum(counts));
+ivec count_to_index(const vec& counts, double R) {
+  ivec indices(R);
 
   int idx = 0;
   for (uword i = 0; i < counts.n_elem; ++i) {
@@ -53,7 +53,7 @@ ivec Residual::resample(int n_samples, vec probs) {
       new_probs.size(), n_samples - R, true,
       Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(new_probs)), false);
   }
-  ivec part1 = count_to_index(counts);
+  ivec part1 = count_to_index(counts, R);
   return join_cols(part1, part2);
 }
 
