@@ -27,10 +27,19 @@ struct Systematic : Resampler {
 std::unique_ptr<Resampler> choose_resampler(std::string resampler);
 
 template <typename T>
-std::vector<T> update_vector(
-    const arma::ivec& new_inds, const std::vector<T>& particle_vector)  {
-  std::vector<T> tmp(new_inds.size());
-  std::transform(new_inds.begin(), new_inds.end(), tmp.begin(),
-                 [&](int index) { return particle_vector[index]; });
-  return tmp;
+std::vector<T> update_vector(const arma::ivec& counts, const std::vector<T>& particle_vector) {
+  size_t total_size = sum(counts);
+  std::vector<T> result(total_size);
+
+  T* result_ptr = result.data();
+
+  for (size_t i = 0; i < counts.size(); ++i) {
+    int count = counts[i];
+    if (count > 0) {
+      std::fill_n(result_ptr, count, particle_vector[i]);
+      result_ptr += count;
+    }
+  }
+
+  return result;
 }
