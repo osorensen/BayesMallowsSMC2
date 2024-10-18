@@ -56,11 +56,11 @@ Rcpp::List run_smc(
 
     if(ess < options.resampling_threshold) {
       reporter.report_resampling();
-      ivec new_inds = resampler->resample(
+      ivec new_counts = resampler->resample(
         normalized_log_importance_weights.size(),
         exp(normalized_log_importance_weights));
 
-      particle_vector = update_vector(new_inds, particle_vector);
+      particle_vector = update_vector(new_counts, particle_vector);
       vec alpha_sd = compute_alpha_stddev(particle_vector);
 
       size_t iter{};
@@ -88,8 +88,8 @@ Rcpp::List run_smc(
           double log_Z_old = compute_log_Z(p.particle_filters, t);
 
           int S = p.particle_filters.size() * 2;
-          ivec new_inds = resampler->resample(S, exp(p.log_normalized_particle_filter_weights));
-          p.particle_filters = update_vector(new_inds, p.particle_filters);
+          ivec new_counts = resampler->resample(S, exp(p.log_normalized_particle_filter_weights));
+          p.particle_filters = update_vector(new_counts, p.particle_filters);
           p.log_normalized_particle_filter_weights = Rcpp::NumericVector(S, -log(p.particle_filters.size()));
 
           double log_Z_new = compute_log_Z(p.particle_filters, t);

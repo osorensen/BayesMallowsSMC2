@@ -46,9 +46,9 @@ void Particle::run_particle_filter(
     std::string latent_rank_proposal) {
 
   if(t > 0) {
-    ivec new_inds = resampler->resample(
+    ivec new_counts = resampler->resample(
       particle_filters.size(), exp(log_normalized_particle_filter_weights));
-    particle_filters = update_vector(new_inds, particle_filters);
+    particle_filters = update_vector(new_counts, particle_filters);
     log_normalized_particle_filter_weights =
       Rcpp::NumericVector(particle_filters.size(), -log(particle_filters.size()));
   }
