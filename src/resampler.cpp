@@ -3,58 +3,55 @@
 
 using namespace arma;
 
-ivec count_to_index(const vec& counts, double R) {
-  ivec indices(R);
+ivec count_between_intervals(const vec& cumprob, const vec& u) {
+  ivec counts(cumprob.size());
+  size_t last_index{};
 
-  int idx = 0;
-  for (uword i = 0; i < counts.n_elem; ++i) {
-    for (int j = 0; j < counts(i); ++j) {
-      indices(idx++) = i;
+  for (size_t i{}; i < cumprob.size(); ++i) {
+    uvec indices = find(u < cumprob(i), 1, "last");
+    size_t current_index{};
+    if(!indices.is_empty()) {
+      current_index = indices(0) + 1;
+    } else {
+      current_index = last_index;
     }
+
+    counts(i) = current_index - last_index;
+    last_index = current_index;
   }
-  return indices;
+
+  return counts;
 }
 
-ivec digitize(const vec& bins, const vec& values) {
-  ivec indices(values.n_elem);
-
-  for (uword i = 0; i < values.n_elem; ++i) {
-    double val = values(i);
-    uword index = 0;
-    while (index < bins.n_elem && val >= bins(index)) {
-      ++index;
-    }
-    indices(i) = index;
-  }
-  return indices;
-}
 
 ivec stratsys(int n_samples, vec probs, bool stratified) {
   vec u(n_samples);
   vec rn = stratified ? randu(n_samples) : vec(n_samples, fill::value(randu()));
 
   for(size_t i{}; i < n_samples; i++) u(i) = (i + rn(i)) / n_samples;
-  return digitize(cumsum(probs), u);
+  return count_between_intervals(cumsum(probs), u);
+}
+
+ivec resample_counts(unsigned int size, vec& probs) {
+  unsigned int N = probs.size();
+  ivec outcome = zeros<ivec>(N);
+  R::rmultinom(size, probs.begin(), N, outcome.begin());
+  return outcome;
 }
 
 ivec Multinomial::resample(int n_samples, vec probs) {
-  return Rcpp::sample(
-    probs.size(), n_samples, true,
-    Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(probs)), false);
+  return resample_counts(n_samples, probs);
 }
 
 ivec Residual::resample(int n_samples, vec probs) {
-  vec counts = floor(n_samples * probs);
+  ivec counts = conv_to<ivec>::from(floor(n_samples * probs));
   double R = sum(counts);
-  ivec part2;
   if(n_samples > R) {
     vec new_probs = (n_samples * probs - counts) / (n_samples - R);
-    part2 = Rcpp::sample(
-      new_probs.size(), n_samples - R, true,
-      Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(new_probs)), false);
+    ivec part2 = resample_counts(n_samples - R, new_probs);
+    counts += part2;
   }
-  ivec part1 = count_to_index(counts, R);
-  return join_cols(part1, part2);
+  return counts;
 }
 
 ivec Stratified::resample(int n_samples, vec probs) {

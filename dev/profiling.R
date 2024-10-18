@@ -29,10 +29,10 @@ complete_rankings <- tibble(
 
 data <- complete_rankings
 hyperparameters <- set_hyperparameters(n_items = n_items)
-smc_options <- set_smc_options(n_particles = 300, n_particle_filters = 1,
+smc_options <- set_smc_options(n_particles = 300, n_particle_filters = 100,
                                max_rejuvenation_steps = 5,
                                max_particle_filters = 1000,
-                               resampler = "residual")
+                               resampler = "multinomial")
 topological_sorts_directory = NULL
 num_topological_sorts = NULL
 
