@@ -37,6 +37,7 @@ Rcpp::List run_smc(
   double log_marginal_likelihood{};
 
   int T = data->n_timepoints();
+  vec ESS(T);
   for(size_t t{}; t < T; t++) {
     reporter.report_time(t);
 
@@ -51,10 +52,10 @@ Rcpp::List run_smc(
     log_marginal_likelihood += log_marginal_likelihood_increment(
       particle_vector, normalized_log_importance_weights, t);
 
-    double ess = pow(norm(exp(normalized_log_importance_weights), 2), -2);
-    reporter.report_ess(ess);
+    ESS(t) = pow(norm(exp(normalized_log_importance_weights), 2), -2);
+    reporter.report_ess(ESS(t));
 
-    if(ess < options.resampling_threshold) {
+    if(ESS(t) < options.resampling_threshold) {
       reporter.report_resampling();
       ivec new_counts = resampler->resample(
         normalized_log_importance_weights.size(),
@@ -119,6 +120,7 @@ Rcpp::List run_smc(
     Rcpp::Named("alpha") = alpha,
     Rcpp::Named("rho") = rho,
     Rcpp::Named("tau") = tau,
+    Rcpp::Named("ESS") = ESS,
     Rcpp::Named("n_particle_filters") = n_particle_filters,
     Rcpp::Named("importance_weights") = exp(normalize_log_importance_weights(particle_vector)),
     Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood
