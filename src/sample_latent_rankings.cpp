@@ -87,12 +87,10 @@ LatentRankingProposal sample_latent_rankings(
           uvec rhocol = parameters.rho.col(0);
           uvec rho0 = rhocol.rows(available_items_shuffled);
 
-          vec probs = exp(-parameters.alpha(0) * abs(conv_to<vec>::from(rho0) - conv_to<vec>::from(available_rankings)));
-          probs = normalise(probs, 1);
+          vec probs = exp(softmax(-parameters.alpha(0) * abs(conv_to<vec>::from(rho0) - conv_to<vec>::from(available_rankings))));
+
           Rcpp::IntegerVector sampled_index = Rcpp::sample(
-            probs.size(), 1, true, Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(probs)),
-            false
-          );
+            probs.size(), 1, true, Rcpp::as<Rcpp::NumericMatrix>(Rcpp::wrap(probs)), false);
           tmp(available_items_shuffled(0)) = available_rankings(sampled_index(0));
           logprob += log(probs(sampled_index(0)));
           available_items_shuffled = available_items_shuffled(span(1, available_items_shuffled.size() - 1));
