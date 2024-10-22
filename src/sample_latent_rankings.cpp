@@ -83,13 +83,11 @@ LatentRankingProposal sample_latent_rankings(
         uvec available_rankings = ndit->second.available_rankings;
 
         while(available_items_shuffled.size() > 1) {
-          uvec rho0(available_items_shuffled.size());
-          for(size_t i{}; i < rho0.size(); i++) {
-            unsigned int item = available_items_shuffled(i);
-            rho0(i) = parameters.rho(item, 0);
-          }
-          double alpha0 = parameters.alpha(0);
-          vec probs = exp(-alpha0 * abs(conv_to<vec>::from(rho0) - conv_to<vec>::from(available_rankings)));
+
+          uvec rhocol = parameters.rho.col(0);
+          uvec rho0 = rhocol.rows(available_items_shuffled);
+
+          vec probs = exp(-parameters.alpha(0) * abs(conv_to<vec>::from(rho0) - conv_to<vec>::from(available_rankings)));
           probs = normalise(probs, 1);
           Rcpp::IntegerVector sampled_index = Rcpp::sample(
             probs.size(), 1, true, Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(probs)),
