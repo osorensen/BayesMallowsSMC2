@@ -79,8 +79,7 @@ LatentRankingProposal sample_latent_rankings(
         }
         double logprob{0};
 
-        uvec available_items = ndit->second.available_items;
-        uvec available_items_shuffled = shuffle(available_items);
+        uvec available_items_shuffled = shuffle(ndit->second.available_items);
         uvec available_rankings = ndit->second.available_rankings;
 
         while(available_items_shuffled.size() > 1) {
@@ -104,8 +103,6 @@ LatentRankingProposal sample_latent_rankings(
 
         if(available_items_shuffled.size() == 1) {
           tmp(available_items_shuffled(0)) = available_rankings(0);
-          available_items.reset();
-          available_rankings.reset();
         }
 
         if(!approx_equal(sort(tmp), regspace<uvec>(1, tmp.size()), "absdiff", 0)) {

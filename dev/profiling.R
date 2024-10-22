@@ -10,7 +10,7 @@ assignInNamespace('compiler_flags', new_compiler_flags, 'pkgbuild')
 # Load your library
 devtools::load_all()
 
-n_items <- 10
+n_items <- 6
 alpha <- .3
 n_users <- 50
 n_timepoints <- n_users
@@ -32,7 +32,8 @@ hyperparameters <- set_hyperparameters(n_items = n_items)
 smc_options <- set_smc_options(n_particles = 300, n_particle_filters = 100,
                                max_rejuvenation_steps = 5,
                                max_particle_filters = 1000,
-                               resampler = "multinomial")
+                               resampler = "multinomial",
+                               latent_rank_proposal = "pseudo")
 topological_sorts_directory = NULL
 num_topological_sorts = NULL
 
@@ -76,3 +77,6 @@ start_profiler("/tmp/profile.out")
 set.seed(2)
 ret <- run_smc(input_timeseries, hyperparameters, smc_options)
 stop_profiler()
+
+
+hist(ret$alpha)
