@@ -38,6 +38,7 @@ Rcpp::List run_smc(
 
   int T = data->n_timepoints();
   vec ESS(T);
+  ivec resampling = zeros<ivec>(T);
   for(size_t t{}; t < T; t++) {
     reporter.report_time(t);
 
@@ -56,6 +57,7 @@ Rcpp::List run_smc(
     reporter.report_ess(ESS(t));
 
     if(ESS(t) < options.resampling_threshold) {
+      resampling(t) = 1;
       reporter.report_resampling();
       ivec new_counts = resampler->resample(
         normalized_log_importance_weights.size(),
@@ -121,6 +123,7 @@ Rcpp::List run_smc(
     Rcpp::Named("rho") = rho,
     Rcpp::Named("tau") = tau,
     Rcpp::Named("ESS") = ESS,
+    Rcpp::Named("resampling") = resampling,
     Rcpp::Named("n_particle_filters") = n_particle_filters,
     Rcpp::Named("importance_weights") = exp(normalize_log_importance_weights(particle_vector)),
     Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood
