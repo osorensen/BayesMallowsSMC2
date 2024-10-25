@@ -76,7 +76,7 @@ compute_sequentially <- function(
   }
 
   attr(input_timeseries, "updated_users") <-
-    if(length(unique(data$timepoint)) < length(unique(data$user))) {
+    if(length(unique(data$timepoint)) > length(unique(data$user))) {
       TRUE } else { FALSE }
 
   ret <- run_smc(input_timeseries, hyperparameters, smc_options)
