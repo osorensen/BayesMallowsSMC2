@@ -72,11 +72,11 @@ std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
 }
 
 void Rankings::prune(unsigned int t) {
-
+  timeseries = prune_worker(timeseries, t);
 }
 
 void PairwisePreferences::prune(unsigned int t) {
-
+  timeseries = prune_worker(timeseries, t);
 }
 
 void Rankings::unprune() {

@@ -46,7 +46,7 @@ std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries);
 
 template<typename T>
 T prune_worker(const T& timeseries, unsigned int t) {
-  if(t >= timeseries.size()) return;
+  if(t >= timeseries.size()) return timeseries;
   auto& target_tp = timeseries[t];
 
   std::set<std::string> keys_to_prune;
@@ -72,5 +72,5 @@ T prune_worker(const T& timeseries, unsigned int t) {
     new_timeseries.push_back(std::move(timeseries[s]));
   }
 
-  timeseries = std::move(new_timeseries);
+  return new_timeseries;
 }
