@@ -27,6 +27,7 @@ Rankings::Rankings(const Rcpp::List& input_timeseries, bool partial_rankings) :
     timeseries.push_back(new_data);
   }
   updated_users = input_timeseries.attr("updated_users");
+  original_timeseries = timeseries;
 }
 
 void Rankings::update_observed_users(unsigned int t) {
@@ -55,6 +56,7 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
     timeseries.push_back(new_data);
   }
   updated_users = input_timeseries.attr("updated_users");
+  original_timeseries = timeseries;
 }
 
 std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
@@ -68,3 +70,26 @@ std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
     Rcpp::stop("Wrong data type.");
   }
 }
+
+void Rankings::prune(unsigned int t) {
+
+}
+
+void PairwisePreferences::prune(unsigned int t) {
+
+}
+
+void Rankings::unprune() {
+  timeseries = original_timeseries;
+}
+
+void PairwisePreferences::unprune() {
+  timeseries = original_timeseries;
+}
+
+
+
+
+
+
+
