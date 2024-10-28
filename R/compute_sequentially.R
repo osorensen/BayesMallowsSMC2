@@ -75,9 +75,7 @@ compute_sequentially <- function(
     stop("Something wrong with data")
   }
 
-  attr(input_timeseries, "updated_users") <-
-    if(length(unique(data$timepoint)) > length(unique(data$user))) {
-      TRUE } else { FALSE }
+  attr(input_timeseries, "updated_users") <- max(table(data$user)) > 1
 
   ret <- run_smc(input_timeseries, hyperparameters, smc_options)
 }

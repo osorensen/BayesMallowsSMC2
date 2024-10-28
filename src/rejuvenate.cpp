@@ -73,6 +73,7 @@ bool Particle::rejuvenate(
   auto observed_users_backup = data->observed_users;
   data->observed_users.clear();
 
+
   for(size_t t{}; t < T + 1; t++) {
     proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
     data->update_observed_users(t);
