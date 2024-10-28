@@ -43,3 +43,34 @@ struct PairwisePreferences : Data{
 };
 
 std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries);
+
+template<typename T>
+T prune_worker(const T& timeseries, unsigned int t) {
+  if(t >= timeseries.size()) return;
+  auto& target_tp = timeseries[t];
+
+  std::set<std::string> keys_to_prune;
+  for(const auto& [key, _] : target_tp) {
+    keys_to_prune.insert(key);
+  }
+
+  T new_timeseries;
+  for(size_t s{}; s < t; s++) {
+    bool should_prune{};
+    for(const auto& [key, _] : timeseries[s]) {
+      if(keys_to_prune.find(key) != keys_to_prune.end()) {
+        should_prune = true;
+        break;
+      }
+    }
+    if(!should_prune) {
+      new_timeseries.push_back(std::move(timeseries[s]));
+    }
+  }
+
+  for(size_t s{}; s < timeseries.size(); s++) {
+    new_timeseries.push_back(std::move(timeseries[s]));
+  }
+
+  timeseries = std::move(new_timeseries);
+}
