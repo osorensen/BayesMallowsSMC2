@@ -82,6 +82,13 @@ void Particle::run_particle_filter(
       unsigned int index_in_proposal = uu->second;
       unsigned int index_in_latent = data->observed_users[uu->first];
 
+      vec old_log_cluster_contribution(prior.n_clusters);
+      for(size_t c{}; c < prior.n_clusters; c++) {
+        old_log_cluster_contribution(c) = log(parameters.tau(c)) - this->logz(c) -
+          parameters.alpha(c) * distfun->d(pf.latent_rankings.col(index_in_latent), parameters.rho.col(c));
+      }
+
+      log_prob -= log_sum_exp(old_log_cluster_contribution);
       pf.latent_rankings.col(index_in_latent) = proposal.proposal.col(index_in_proposal);
       cols_to_drop = join_vert(cols_to_drop, uvec{index_in_proposal});
     }
