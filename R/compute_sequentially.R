@@ -75,7 +75,8 @@ compute_sequentially <- function(
     stop("Something wrong with data")
   }
 
-  attr(input_timeseries, "updated_users") <- max(table(data$user)) > 1
+  attr(input_timeseries, "updated_users") <- max(table(data$user)) > 1 &&
+    attr(input_timeseries, "type") != "pairwise preferences"
 
   ret <- run_smc(input_timeseries, hyperparameters, smc_options)
 }
