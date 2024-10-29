@@ -23,7 +23,6 @@ struct ParticleFilter{
   arma::umat latent_rankings{};
   arma::uvec cluster_assignments{};
   arma::vec log_weight{};
-  std::map<std::string, double> user_delta{};
 };
 
 struct Particle{

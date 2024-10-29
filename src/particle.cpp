@@ -71,10 +71,6 @@ void Particle::run_particle_filter(
         log_cluster_contribution(c) = log(parameters.tau(c)) - this->logz(c) -
           parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
       }
-      if(data->updated_users) {
-        pf.user_delta[proposal.users[i]] =
-          log_sum_exp(log_cluster_contribution) - proposal.log_probability(i);
-      }
 
       log_prob += log_sum_exp(log_cluster_contribution);
     }
@@ -86,7 +82,6 @@ void Particle::run_particle_filter(
       unsigned int index_in_proposal = uu->second;
       unsigned int index_in_latent = data->observed_users[uu->first];
 
-      log_prob -= pf.user_delta[uu->first];
       pf.latent_rankings.col(index_in_latent) = proposal.proposal.col(index_in_proposal);
       cols_to_drop = join_vert(cols_to_drop, uvec{index_in_proposal});
     }

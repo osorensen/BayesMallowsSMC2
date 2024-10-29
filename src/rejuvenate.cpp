@@ -80,7 +80,8 @@ bool Particle::rejuvenate(
     Particle current_particle(options, StaticParameters{parameters}, pfun);
 
     data->prune(T);
-    for(size_t t{}; t < T + 1; t++) {
+    unsigned int new_T = data->n_timepoints();
+    for(size_t t{}; t < new_T; t++) {
       proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
       current_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
       data->update_observed_users(t);
