@@ -38,6 +38,7 @@ struct PairwisePreferences : Data{
   void update_observed_users(unsigned int t) override;
   std::string topological_sorts_directory;
   Rcpp::IntegerVector num_topological_sorts;
+  Rcpp::IntegerVector file_count;
   void prune(unsigned int t) override;
   void unprune() override;
 };

@@ -1,6 +1,7 @@
 #include <RcppArmadillo.h>
 #include <filesystem>
 #include <vector>
+#include <iterator>
 #include "sample_latent_rankings.h"
 #include "data.h"
 #include "misc.h"
@@ -148,21 +149,29 @@ LatentRankingProposal sample_latent_rankings(
   size_t proposal_index{};
 
   for(auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
-    std::string directory_path = data->topological_sorts_directory + std::string("/user") + ndit->first;
-    std::vector<fs::path> file_paths;
+    Rcpp::CharacterVector nn = data->num_topological_sorts.names();
+    Rcpp::IntegerVector matching_index = Rcpp::match(Rcpp::CharacterVector::create(ndit->first), nn) - 1;
 
-    for(const auto& entry : fs::directory_iterator(directory_path)) {
-      if(entry.is_regular_file()) {
-        file_paths.push_back(entry.path());
+    std::string directory_path = data->topological_sorts_directory + std::string("/user") + ndit->first;
+    size_t file_count = data->file_count[matching_index[0]];
+
+    if (file_count == 0) {
+      Rcpp::stop("No files.");
+    }
+
+    int random_index = randi(distr_param(0, file_count - 1));
+
+    fs::path random_file_path;
+    size_t current_index = 0;
+    for (const auto& entry : fs::directory_iterator(directory_path)) {
+      if (entry.is_regular_file()) {
+        if (current_index == random_index) {
+          random_file_path = entry.path();
+          break;
+        }
+        ++current_index;
       }
     }
-
-    if(file_paths.empty()) {
-      Rcpp::stop("Found no files.");
-    }
-
-    int file_index = randi(distr_param(0, file_paths.size() - 1));
-    fs::path random_file_path = file_paths[file_index];
 
     ivec tmp;
     bool ok = tmp.load(random_file_path.string(), arma_binary);
@@ -170,8 +179,6 @@ LatentRankingProposal sample_latent_rankings(
       Rcpp::stop("Could not find file.");
     }
 
-    Rcpp::CharacterVector nn = data->num_topological_sorts.names();
-    Rcpp::IntegerVector matching_index = Rcpp::match(Rcpp::CharacterVector::create(ndit->first), nn) - 1;
     proposal.proposal.col(proposal_index++) = conv_to<uvec>::from(tmp);
     proposal.log_probability = join_vert(
       proposal.log_probability,

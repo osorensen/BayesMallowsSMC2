@@ -33,6 +33,8 @@
 #'
 #' @param num_topological_sorts Integer vector containing the number of
 #'   topological sorts for each user.
+#' @param file_count Integer vector containing the number of files with
+#'   topological sorts for each user.
 #'
 #' @return An object
 #' @export
@@ -42,7 +44,8 @@ compute_sequentially <- function(
     hyperparameters = set_hyperparameters(),
     smc_options = set_smc_options(),
     topological_sorts_directory = NULL,
-    num_topological_sorts = NULL
+    num_topological_sorts = NULL,
+    file_count = NULL
     ){
   rank_columns <- grepl("item[0-9]+", colnames(data))
   preference_columns <- grepl("top\\_item|bottom\\_item", colnames(data))
@@ -64,13 +67,17 @@ compute_sequentially <- function(
     if(is.null(num_topological_sorts)) {
       stop("num_topological_sorts must be provided with preference data.")
     }
+    if(is.null(file_count)) {
+      stop("file_count must be provided with preference data.")
+    }
     input_timeseries <- split(data, f = ~ timepoint) |>
       lapply(split, f = ~ user) |>
       lapply(function(x) lapply(x, function(y) as.matrix(y[preference_columns])))
     attr(input_timeseries, "type") <- "pairwise preferences"
     attr(input_timeseries, "topological_sorts_directory") <- topological_sorts_directory
-    names(num_topological_sorts) <- as.character(lapply(input_timeseries, names))
+    names(num_topological_sorts) <- names(file_count) <- as.character(lapply(input_timeseries, names))
     attr(input_timeseries, "num_topological_sorts") <- num_topological_sorts
+    attr(input_timeseries, "file_count") <- file_count
   } else {
     stop("Something wrong with data")
   }

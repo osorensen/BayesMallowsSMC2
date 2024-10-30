@@ -40,7 +40,8 @@ void PairwisePreferences::update_observed_users(unsigned int t) {
 
 PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
   topological_sorts_directory (input_timeseries.attr("topological_sorts_directory")),
-  num_topological_sorts (input_timeseries.attr("num_topological_sorts")) {
+  num_topological_sorts (input_timeseries.attr("num_topological_sorts")),
+  file_count (input_timeseries.attr("file_count")) {
   timeseries.reserve(input_timeseries.size());
   for(Rcpp::List a : input_timeseries) {
     pairwise_tp new_data;

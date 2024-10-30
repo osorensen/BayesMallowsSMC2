@@ -2,6 +2,7 @@
 #include <RcppArmadillo.h>
 #include <numeric>
 #include <limits>
+#include <chrono>
 #include "prior.h"
 #include "data.h"
 #include "distances.h"
@@ -75,10 +76,13 @@ Rcpp::List run_smc(
         for(auto& p : particle_vector) {
           accepted += p.rejuvenate(t, options, prior, data, pfun, distfun, resampler, alpha_sd);
         }
+
         n_unique_particles = find_unique_alphas(particle_vector);
         reporter.report_rejuvenation(n_unique_particles);
 
       } while((2.0 * n_unique_particles < particle_vector.size()) && iter < options.max_rejuvenation_steps);
+
+
 
       std::for_each(particle_vector.begin(), particle_vector.end(),
                     [](Particle& p){ p.log_importance_weight = 0; });
