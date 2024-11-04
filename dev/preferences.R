@@ -7,11 +7,10 @@ Rcpp::sourceCpp("dev/read_arma_files.cpp")
 
 set.seed(1)
 n_items <- 5
-n <- 20
-alpha <- 1
+n <- 50
+alpha <- .4
 rankings <- BayesMallows::sample_mallows(1:n_items, alpha * n_items, n_samples = n, thinning = 1000)
 colnames(rankings) <- paste0("item", 1:n_items)
-
 
 dat <- tibble(
   timepoint = seq_len(n),
@@ -33,11 +32,11 @@ dat <- tibble(
     across(c("top_item", "bottom_item"), ~ as.integer(str_extract(., "[:digit:]+$")))
   )
 
-
 tmp <- dat %>%
   select(user, bottom_item, top_item) %>%
   rename(assessor = user) %>%
   as.data.frame()
+
 mm <- BayesMallows::compute_mallows(
   data = BayesMallows::setup_rank_data(preferences = tmp),
   compute_options = BayesMallows::set_compute_options(nmc = 5000, burnin = 1000)
@@ -68,15 +67,14 @@ file_count <- map_dfr(list.files("dev/tmp", full.names = TRUE), function(f) {
 mod <- compute_sequentially(
   data = dat,
   hyperparameters = set_hyperparameters(n_items = n_items),
-  smc_options = set_smc_options(n_particles = 100, n_particle_filters = 20,
-                                max_particle_filters = 200,
+  smc_options = set_smc_options(n_particles = 1000, n_particle_filters = 20,
+                                max_particle_filters = 2000,
                                 max_rejuvenation_steps = 5, verbose = TRUE,
                                 trace = TRUE, trace_directory = "dev/trace"),
   topological_sorts_directory = "dev/tmp",
   num_topological_sorts = num_topological_sorts,
   file_count = file_count
 )
-
 
 weighted.mean(as.numeric(mod$alpha), mod$importance_weights)
 

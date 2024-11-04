@@ -9,7 +9,8 @@ compute_sequentially(
   hyperparameters = set_hyperparameters(),
   smc_options = set_smc_options(),
   topological_sorts_directory = NULL,
-  num_topological_sorts = NULL
+  num_topological_sorts = NULL,
+  file_count = NULL
 )
 }
 \arguments{
@@ -46,6 +47,9 @@ topological sorts can be found. Must contain subdirectories with names
 provided when data contain pairwise preferences.}
 
 \item{num_topological_sorts}{Integer vector containing the number of
+topological sorts for each user.}
+
+\item{file_count}{Integer vector containing the number of files with
 topological sorts for each user.}
 }
 \value{

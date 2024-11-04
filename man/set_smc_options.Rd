@@ -15,6 +15,7 @@ set_smc_options(
   latent_rank_proposal = "uniform",
   verbose = FALSE,
   trace = FALSE,
+  trace_latent = FALSE,
   trace_directory = ""
 )
 }
@@ -43,8 +44,12 @@ after this many steps, the rejuvenation is still stopped.}
 \item{trace}{Logical specifying whether to save static parameters at each
 timestep.}
 
+\item{trace_latent}{Logical specifying whether to sample and save one
+complete set of latent rankings for each particle and each timepoint.}
+
 \item{trace_directory}{Character specifying directory to create in which to
-put parameter trace. Only used if \code{trace = TRUE}.}
+put parameter trace. Only used if \code{trace = TRUE}. If \code{trace_latent = TRUE}
+also, then latent rankings are saved in the same directory.}
 }
 \value{
 A list
