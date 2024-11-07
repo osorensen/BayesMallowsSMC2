@@ -2,7 +2,7 @@
 #include "data.h"
 #include "misc.h"
 #include "sample_latent_rankings.h"
-#include "update_users_helper.h"
+
 using namespace arma;
 
 uvec find_available_rankings(const uvec& observed_ranking) {
@@ -27,14 +27,6 @@ Rankings::Rankings(const Rcpp::List& input_timeseries, bool partial_rankings) :
     timeseries.push_back(new_data);
   }
   original_timeseries = timeseries;
-}
-
-void Rankings::update_observed_users(unsigned int t) {
-  updateObservedUsersHelper(observed_users, timeseries, t);
-}
-
-void PairwisePreferences::update_observed_users(unsigned int t) {
-  updateObservedUsersHelper(observed_users, timeseries, t);
 }
 
 PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
@@ -69,26 +61,4 @@ std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
     Rcpp::stop("Wrong data type.");
   }
 }
-
-void Rankings::prune(unsigned int t) {
-  timeseries = prune_worker(timeseries, t);
-}
-
-void PairwisePreferences::prune(unsigned int t) {
-  timeseries = prune_worker(timeseries, t);
-}
-
-void Rankings::unprune() {
-  timeseries = original_timeseries;
-}
-
-void PairwisePreferences::unprune() {
-  timeseries = original_timeseries;
-}
-
-
-
-
-
-
 

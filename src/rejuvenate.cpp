@@ -70,20 +70,15 @@ bool Particle::rejuvenate(
 
   Particle proposal_particle(options, StaticParameters{alpha_proposal, rho_proposal, parameters.tau}, pfun);
 
-  auto observed_users_backup = data->observed_users;
-  data->observed_users.clear();
   double log_ratio{};
   vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
     prior.alpha_rate * (alpha_proposal - parameters.alpha);
 
   for(size_t t{}; t < T + 1; t++) {
     proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
-    data->update_observed_users(t);
   }
   log_ratio = sum(proposal_particle.log_incremental_likelihood) -
     sum(this->log_incremental_likelihood) + accu(additional_terms);
-
-  data->observed_users = std::move(observed_users_backup);
 
   Rcpp::NumericVector probs = Rcpp::exp(proposal_particle.log_normalized_particle_filter_weights);
   int proposed_particle_filter = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
