@@ -49,8 +49,6 @@ void Particle::run_particle_filter(
     ivec new_counts = resampler->resample(
       particle_filters.size(), exp(log_normalized_particle_filter_weights));
     particle_filters = update_vector(new_counts, particle_filters);
-    log_normalized_particle_filter_weights =
-      Rcpp::NumericVector(particle_filters.size(), -log(particle_filters.size()));
   }
 
   for(auto& pf : particle_filters) {
