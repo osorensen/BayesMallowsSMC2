@@ -48,21 +48,6 @@ LatentRankingProposal sample_latent_rankings(
   for(auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
 
     auto it = data->observed_users.end();
-    if(data->updated_users) {
-      it = data->observed_users.find(ndit->first);
-      if(it != data->observed_users.end()) {
-        bool consistent = check_consistency(
-          ndit->second.observation,
-          current_latent_rankings.col(it->second));
-
-        if(consistent) {
-          continue;
-        } else {
-          proposal.updated_inconsistent_users[ndit->first] = proposal_index;
-        }
-      }
-    }
-
     proposal.users[proposal_index] = ndit->first;
     proposal_index++;
 

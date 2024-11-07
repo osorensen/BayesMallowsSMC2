@@ -16,7 +16,6 @@ struct Data{
   virtual void prune(unsigned int t) = 0;
   virtual void unprune() = 0;
   std::map<std::string, unsigned int> observed_users{}; // user ID and index in latent ranking and cluster
-  bool updated_users{};
 };
 
 struct Rankings : Data {

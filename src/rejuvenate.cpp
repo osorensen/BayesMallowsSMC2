@@ -76,28 +76,12 @@ bool Particle::rejuvenate(
   vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
     prior.alpha_rate * (alpha_proposal - parameters.alpha);
 
-  if(data->updated_users) {
-    Particle current_particle(options, StaticParameters{parameters}, pfun);
-
-    data->prune(T);
-    unsigned int new_T = data->n_timepoints();
-    for(size_t t{}; t < new_T; t++) {
-      proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
-      current_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
-      data->update_observed_users(t);
-    }
-    data->unprune();
-    log_ratio = sum(proposal_particle.log_incremental_likelihood) -
-      sum(current_particle.log_incremental_likelihood) + accu(additional_terms);
-
-  } else {
-    for(size_t t{}; t < T + 1; t++) {
-      proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
-      data->update_observed_users(t);
-    }
-    log_ratio = sum(proposal_particle.log_incremental_likelihood) -
-      sum(this->log_incremental_likelihood) + accu(additional_terms);
+  for(size_t t{}; t < T + 1; t++) {
+    proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
+    data->update_observed_users(t);
   }
+  log_ratio = sum(proposal_particle.log_incremental_likelihood) -
+    sum(this->log_incremental_likelihood) + accu(additional_terms);
 
   data->observed_users = std::move(observed_users_backup);
 

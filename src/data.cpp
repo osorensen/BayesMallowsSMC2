@@ -26,7 +26,6 @@ Rankings::Rankings(const Rcpp::List& input_timeseries, bool partial_rankings) :
     }
     timeseries.push_back(new_data);
   }
-  updated_users = input_timeseries.attr("updated_users");
   original_timeseries = timeseries;
 }
 
@@ -56,7 +55,6 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
     }
     timeseries.push_back(new_data);
   }
-  updated_users = input_timeseries.attr("updated_users");
   original_timeseries = timeseries;
 }
 
