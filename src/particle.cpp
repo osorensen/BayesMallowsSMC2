@@ -55,8 +55,7 @@ void Particle::run_particle_filter(
 
   for(auto& pf : particle_filters) {
     auto proposal = sample_latent_rankings(
-      data, t, prior, latent_rank_proposal, parameters, pf.latent_rankings,
-      pfun, distfun);
+      data, t, prior, latent_rank_proposal, parameters, pfun, distfun);
 
     if(prior.n_clusters > 1) {
       pf.cluster_assignments =

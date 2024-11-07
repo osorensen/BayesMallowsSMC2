@@ -12,13 +12,12 @@ LatentRankingProposal sample_latent_rankings(
     const std::unique_ptr<Data>& data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
     const StaticParameters& parameters,
-    const umat& current_latent_rankings,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun
 ) {
   if(Rankings* r = dynamic_cast<Rankings*>(data.get())) {
     return sample_latent_rankings(r, t, latent_rank_proposal,
-                                  parameters, current_latent_rankings, pfun, distfun);
+                                  parameters, pfun, distfun);
   } else if (PairwisePreferences* pp = dynamic_cast<PairwisePreferences*>(data.get())) {
     return sample_latent_rankings(pp, t, prior);
   } else {
@@ -26,18 +25,10 @@ LatentRankingProposal sample_latent_rankings(
   }
 }
 
-bool check_consistency(const uvec& new_rankings, const uvec& current_latent) {
-  uvec new_observed_indices = find(new_rankings);
-  uvec v1 = new_rankings(new_observed_indices);
-  uvec v2 = current_latent.rows(new_observed_indices);
-  return all(v1 == v2);
-}
-
 LatentRankingProposal sample_latent_rankings(
     const Rankings* data, unsigned int t,
     std::string latent_rank_proposal,
     const StaticParameters& parameters,
-    const umat& current_latent_rankings,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun)  {
 
@@ -47,7 +38,6 @@ LatentRankingProposal sample_latent_rankings(
   size_t proposal_index{};
   for(auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
 
-    auto it = data->observed_users.end();
     proposal.users[proposal_index] = ndit->first;
     proposal_index++;
 
@@ -103,7 +93,7 @@ LatentRankingProposal sample_latent_rankings(
     }
 
 
-    if(parameters.tau.size() > 1 && it == data->observed_users.end()) {
+    if(parameters.tau.size() > 1) {
       vec log_cluster_probabilities(parameters.tau.size());
 
       for(size_t cluster{}; cluster < parameters.tau.size(); cluster++) {
