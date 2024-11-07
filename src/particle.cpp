@@ -164,7 +164,7 @@ vec compute_alpha_stddev(const std::vector<Particle>& particle_vector) {
   for(size_t i{}; i < particle_vector.size(); i++) {
     alpha_values.row(i) = particle_vector[i].parameters.alpha.t();
   }
-  return stddev(alpha_values, 0, 0);
+  return stddev(alpha_values, 0, 0).t();
 }
 
 double compute_log_Z(const std::vector<ParticleFilter>& pf, int max_time) {
