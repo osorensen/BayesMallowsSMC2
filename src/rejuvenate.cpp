@@ -104,9 +104,11 @@ bool Particle::rejuvenate(
       parameters.tau(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
     }
     parameters.tau = normalise(parameters.tau, 1);
+
+
+    sample_particle_filter();
   }
 
-  sample_particle_filter();
 
   return accepted;
 }

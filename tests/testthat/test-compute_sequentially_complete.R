@@ -13,7 +13,7 @@ test_that("compute_sequentially works with complete data", {
   mod <- compute_sequentially(
     complete_rankings,
     hyperparameters = set_hyperparameters(n_items = 5),
-    smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1,
+    smc_options = set_smc_options(n_particles = 200, n_particle_filters = 1,
                                   resampler = "residual")
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
