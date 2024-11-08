@@ -103,6 +103,7 @@ LatentRankingProposal sample_latent_rankings(
       }
 
       log_cluster_probabilities = softmax(log_cluster_probabilities);
+      proposal.cluster_probabilities = join_rows(proposal.cluster_probabilities, exp(log_cluster_probabilities));
 
       unsigned int z = Rcpp::sample(
         parameters.tau.size(), 1, false,

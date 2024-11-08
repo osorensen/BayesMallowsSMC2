@@ -4,6 +4,7 @@
 
 struct LatentRankingProposal{
   arma::umat proposal{};
+  arma::mat cluster_probabilities{};
   arma::uvec cluster_assignment{};
   arma::vec log_probability{};
   std::map<unsigned int, std::string> users{};

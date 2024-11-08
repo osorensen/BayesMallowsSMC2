@@ -24,6 +24,7 @@ struct ParticleFilter{
   arma::uvec cluster_assignments{};
   arma::vec log_weight{};
   arma::uvec index{};
+  arma::mat cluster_probabilities{};
 };
 
 struct Particle{

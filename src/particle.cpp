@@ -75,10 +75,14 @@ void Particle::run_particle_filter(
     }
 
     if(!(conditional && pf_index == 0)) {
-      pf.index = join_cols(pf.index, uvec{pf_index});
-      pf.cluster_assignments =
-        join_cols(pf.cluster_assignments, proposal.cluster_assignment);
+      if(prior.n_clusters > 1) {
+        pf.index = join_cols(pf.index, uvec{pf_index});
+        pf.cluster_assignments =
+          join_cols(pf.cluster_assignments, proposal.cluster_assignment);
+      }
+
       pf.latent_rankings = join_horiz(pf.latent_rankings, proposal.proposal);
+
     }
 
     pf.log_weight.resize(t + 1);

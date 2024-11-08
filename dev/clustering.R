@@ -1,5 +1,6 @@
 devtools::load_all()
 library(tidyverse)
+library(label.switching)
 Rcpp::sourceCpp("dev/read_arma_files.cpp")
 
 n_items <- 5
@@ -32,8 +33,8 @@ mod <- compute_sequentially(
   data = dat,
   hyperparameters = set_hyperparameters(n_items = n_items, n_clusters = 2),
   smc_options = set_smc_options(
-    n_particles = 300, n_particle_filters = 10, max_particle_filters = 10, verbose = TRUE,
-    trace = TRUE, trace_directory = "dev/trace")
+    n_particles = 1000, n_particle_filters = 100, max_particle_filters = 100, verbose = TRUE,
+    trace = FALSE)
 )
 
 hist(mod$alpha[1, ])
