@@ -1,7 +1,7 @@
 devtools::load_all()
 library(tidyverse)
 library(label.switching)
-Rcpp::sourceCpp("dev/read_arma_files.cpp")
+#Rcpp::sourceCpp("dev/read_arma_files.cpp")
 
 n_items <- 5
 rho1 <- seq_len(n_items)
@@ -33,12 +33,23 @@ mod <- compute_sequentially(
   data = dat,
   hyperparameters = set_hyperparameters(n_items = n_items, n_clusters = 2),
   smc_options = set_smc_options(
-    n_particles = 1000, n_particle_filters = 100, max_particle_filters = 100, verbose = TRUE,
+    n_particles = 1000, n_particle_filters = 300, max_particle_filters = 300, verbose = TRUE,
     trace = FALSE)
 )
 
+perm <- stephens(mod$cluster_probabilities)
+
 hist(mod$alpha[1, ])
 hist(mod$alpha[2, ])
+
+alpha <- mod$alpha
+
+for(i in seq_len(ncol(alpha))) {
+  alpha[, i] <- alpha[perm$permutations[i, ], i]
+}
+
+hist(alpha[1, ])
+hist(alpha[2, ])
 
 apply(mod$tau, 1, mean)
 

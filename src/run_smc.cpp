@@ -114,16 +114,27 @@ Rcpp::List run_smc(
   mat alpha(prior.n_clusters, particle_vector.size());
   ucube rho(prior.n_items, prior.n_clusters, particle_vector.size());
   mat tau(prior.n_clusters, particle_vector.size());
+  cube cluster_probabilities;
+  if(prior.n_clusters > 1) {
+    cluster_probabilities = cube(particle_vector.size(), particle_vector[0].particle_filters[0].cluster_probabilities.n_cols, prior.n_clusters);
+  }
+
   for(size_t i{}; i < particle_vector.size(); i++) {
     alpha.col(i) = particle_vector[i].parameters.alpha;
     rho.slice(i) = particle_vector[i].parameters.rho;
     tau.col(i) = particle_vector[i].parameters.tau;
+
+    if(prior.n_clusters > 1) {
+      Rcpp::Rcout << particle_vector[i].particle_filters[particle_vector[i].conditioned_particle_filter].cluster_probabilities.t() << std::endl;
+      cluster_probabilities.row(i) = particle_vector[i].particle_filters[particle_vector[i].conditioned_particle_filter].cluster_probabilities.t();
+    }
   }
 
   return Rcpp::List::create(
     Rcpp::Named("alpha") = alpha,
     Rcpp::Named("rho") = rho,
     Rcpp::Named("tau") = tau,
+    Rcpp::Named("cluster_probabilities") = cluster_probabilities,
     Rcpp::Named("ESS") = ESS,
     Rcpp::Named("resampling") = resampling,
     Rcpp::Named("n_particle_filters") = n_particle_filters,

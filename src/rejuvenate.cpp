@@ -108,6 +108,7 @@ bool Particle::rejuvenate(
     Particle gibbs_particle(options, this->parameters, pfun);
     gibbs_particle.conditioned_particle_filter = 0;
     gibbs_particle.particle_filters[0] = this->particle_filters[this->conditioned_particle_filter];
+    gibbs_particle.particle_filters[0].cluster_probabilities = mat{};
 
     for(size_t t{}; t < T + 1; t++) {
       gibbs_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal, true);
