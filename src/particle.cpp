@@ -48,7 +48,8 @@ void Particle::run_particle_filter(
 
   if(t > 0) {
     ivec new_counts = resampler->resample(
-      particle_filters.size(), exp(log_normalized_particle_filter_weights));
+      conditional ? particle_filters.size() - 1 : particle_filters.size(),
+      exp(log_normalized_particle_filter_weights));
     particle_filters = update_vector(new_counts, particle_filters);
   }
 
