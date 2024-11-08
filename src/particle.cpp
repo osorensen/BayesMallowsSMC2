@@ -52,7 +52,11 @@ void Particle::run_particle_filter(
     particle_filters = update_vector(new_counts, particle_filters);
   }
 
+  unsigned int pf_index{};
   for(auto& pf : particle_filters) {
+    if(prior.n_clusters > 1) {
+      pf.index = join_rows(pf.index, uvec{pf_index});
+    }
     auto proposal = sample_latent_rankings(
       data, t, prior, latent_rank_proposal, parameters, pfun, distfun);
 
@@ -76,6 +80,7 @@ void Particle::run_particle_filter(
     pf.latent_rankings = join_horiz(pf.latent_rankings, proposal.proposal);
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - sum(proposal.log_probability);
+    pf_index++;
   }
 
   vec log_pf_weights(log_normalized_particle_filter_weights.size());
