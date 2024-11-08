@@ -109,6 +109,8 @@ bool Particle::rejuvenate(
     gibbs_particle.particle_filters[this->conditioned_particle_filter] =
       this->particle_filters[this->conditioned_particle_filter];
 
+
+
     sample_particle_filter();
   }
 

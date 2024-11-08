@@ -43,7 +43,8 @@ void Particle::run_particle_filter(
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
     const std::unique_ptr<Resampler>& resampler,
-    std::string latent_rank_proposal) {
+    std::string latent_rank_proposal,
+    bool conditional) {
 
   if(t > 0) {
     ivec new_counts = resampler->resample(
