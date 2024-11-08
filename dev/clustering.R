@@ -27,11 +27,13 @@ dat <- rankings1 %>%
   ) %>%
   select(timepoint, user, everything())
 
+set.seed(2)
 mod <- compute_sequentially(
-  data = dat,
+  data = dat[1:10, ],
   hyperparameters = set_hyperparameters(n_items = n_items, n_clusters = 2),
   smc_options = set_smc_options(
-    n_particles = 1000, n_particle_filters = 50, verbose = TRUE)
+    n_particles = 5, n_particle_filters = 2, max_particle_filters = 5, verbose = TRUE,
+    resampling_threshold = 3)
 )
 
 dim(mod$alpha)

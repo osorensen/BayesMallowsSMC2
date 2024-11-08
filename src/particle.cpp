@@ -54,16 +54,13 @@ void Particle::run_particle_filter(
 
   unsigned int pf_index{};
   for(auto& pf : particle_filters) {
-    if(prior.n_clusters > 1) {
-      pf.index = join_rows(pf.index, uvec{pf_index});
-    }
+    pf.index = join_cols(pf.index, uvec{pf_index});
+
     auto proposal = sample_latent_rankings(
       data, t, prior, latent_rank_proposal, parameters, pfun, distfun);
 
-    if(prior.n_clusters > 1) {
-      pf.cluster_assignments =
-        join_cols(pf.cluster_assignments, proposal.cluster_assignment);
-    }
+    pf.cluster_assignments =
+      join_cols(pf.cluster_assignments, proposal.cluster_assignment);
 
     double log_prob{};
 
@@ -73,7 +70,6 @@ void Particle::run_particle_filter(
         log_cluster_contribution(c) = log(parameters.tau(c)) - this->logz(c) -
           parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
       }
-
       log_prob += log_sum_exp(log_cluster_contribution);
     }
 

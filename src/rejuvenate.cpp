@@ -77,6 +77,7 @@ bool Particle::rejuvenate(
   for(size_t t{}; t < T + 1; t++) {
     proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
   }
+
   log_ratio = sum(proposal_particle.log_incremental_likelihood) -
     sum(this->log_incremental_likelihood) + accu(additional_terms);
 
@@ -109,7 +110,10 @@ bool Particle::rejuvenate(
     gibbs_particle.particle_filters[this->conditioned_particle_filter] =
       this->particle_filters[this->conditioned_particle_filter];
 
-
+    for(size_t t{}; t < T + 1; t++) {
+      Rcpp::Rcout << "t = " << t << std::endl;
+      gibbs_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal, true);
+    }
 
     sample_particle_filter();
   }
