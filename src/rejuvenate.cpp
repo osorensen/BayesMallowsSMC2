@@ -106,14 +106,17 @@ bool Particle::rejuvenate(
     }
     parameters.tau = normalise(parameters.tau, 1);
     Particle gibbs_particle(options, this->parameters, pfun);
-    gibbs_particle.conditioned_particle_filter = this->conditioned_particle_filter;
-    gibbs_particle.particle_filters[this->conditioned_particle_filter] =
-      this->particle_filters[this->conditioned_particle_filter];
+    gibbs_particle.conditioned_particle_filter = 0;
+    gibbs_particle.particle_filters[0] = this->particle_filters[this->conditioned_particle_filter];
 
     for(size_t t{}; t < T + 1; t++) {
-      Rcpp::Rcout << "t = " << t << std::endl;
       gibbs_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal, true);
     }
+
+    this->log_incremental_likelihood = gibbs_particle.log_incremental_likelihood;
+    this->log_normalized_particle_filter_weights = gibbs_particle.log_normalized_particle_filter_weights;
+    this->particle_filters = gibbs_particle.particle_filters;
+    this->logz = gibbs_particle.logz;
 
     sample_particle_filter();
   }

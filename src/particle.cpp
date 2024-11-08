@@ -50,18 +50,18 @@ void Particle::run_particle_filter(
     ivec new_counts = resampler->resample(
       conditional ? particle_filters.size() - 1 : particle_filters.size(),
       exp(log_normalized_particle_filter_weights));
+    if(conditional) new_counts(0) += 1;
     particle_filters = update_vector(new_counts, particle_filters);
   }
 
   unsigned int pf_index{};
   for(auto& pf : particle_filters) {
-    pf.index = join_cols(pf.index, uvec{pf_index});
-
     auto proposal = sample_latent_rankings(
       data, t, prior, latent_rank_proposal, parameters, pfun, distfun);
 
-    pf.cluster_assignments =
-      join_cols(pf.cluster_assignments, proposal.cluster_assignment);
+    if(conditional && pf_index == 0) {
+      proposal.proposal = particle_filters[0].latent_rankings.col(t);
+    }
 
     double log_prob{};
 
@@ -74,7 +74,13 @@ void Particle::run_particle_filter(
       log_prob += log_sum_exp(log_cluster_contribution);
     }
 
-    pf.latent_rankings = join_horiz(pf.latent_rankings, proposal.proposal);
+    if(!(conditional && pf_index == 0)) {
+      pf.index = join_cols(pf.index, uvec{pf_index});
+      pf.cluster_assignments =
+        join_cols(pf.cluster_assignments, proposal.cluster_assignment);
+      pf.latent_rankings = join_horiz(pf.latent_rankings, proposal.proposal);
+    }
+
     pf.log_weight.resize(t + 1);
     pf.log_weight(t) = log_prob - sum(proposal.log_probability);
     pf_index++;

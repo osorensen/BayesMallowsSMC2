@@ -29,12 +29,19 @@ dat <- rankings1 %>%
 
 set.seed(2)
 mod <- compute_sequentially(
-  data = dat[1:10, ],
+  data = dat,
   hyperparameters = set_hyperparameters(n_items = n_items, n_clusters = 2),
   smc_options = set_smc_options(
-    n_particles = 5, n_particle_filters = 2, max_particle_filters = 5, verbose = TRUE,
-    resampling_threshold = 3)
+    n_particles = 300, n_particle_filters = 10, max_particle_filters = 10, verbose = TRUE,
+    trace = TRUE, trace_directory = "dev/trace")
 )
+
+hist(mod$alpha[1, ])
+hist(mod$alpha[2, ])
+
+apply(mod$tau, 1, mean)
+
+apply(mod$rho, c(1, 2), mean)
 
 dim(mod$alpha)
 mod$importance_weights
