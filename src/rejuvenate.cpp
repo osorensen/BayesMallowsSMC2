@@ -104,7 +104,10 @@ bool Particle::rejuvenate(
       parameters.tau(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
     }
     parameters.tau = normalise(parameters.tau, 1);
-
+    Particle gibbs_particle(options, this->parameters, pfun);
+    gibbs_particle.conditioned_particle_filter = this->conditioned_particle_filter;
+    gibbs_particle.particle_filters[this->conditioned_particle_filter] =
+      this->particle_filters[this->conditioned_particle_filter];
 
     sample_particle_filter();
   }
