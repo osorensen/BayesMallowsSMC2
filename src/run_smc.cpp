@@ -125,7 +125,6 @@ Rcpp::List run_smc(
     tau.col(i) = particle_vector[i].parameters.tau;
 
     if(prior.n_clusters > 1) {
-      Rcpp::Rcout << particle_vector[i].particle_filters[particle_vector[i].conditioned_particle_filter].cluster_probabilities.t() << std::endl;
       cluster_probabilities.row(i) = particle_vector[i].particle_filters[particle_vector[i].conditioned_particle_filter].cluster_probabilities.t();
     }
   }
