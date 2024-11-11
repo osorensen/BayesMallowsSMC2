@@ -1,9 +1,9 @@
-devtools::load_all()
+library(BayesMallowsSMC2)
 library(tidyverse)
 library(label.switching)
 #Rcpp::sourceCpp("dev/read_arma_files.cpp")
 
-n_items <- 5
+n_items <- 10
 rho1 <- seq_len(n_items)
 rho2 <- rev(seq_len(n_items))
 alpha1 <- .3
@@ -39,24 +39,22 @@ mod <- compute_sequentially(
 
 perm <- stephens(mod$cluster_probabilities)
 
-hist(mod$alpha[1, ])
-hist(mod$alpha[2, ])
-
 alpha <- mod$alpha
+rho <- mod$rho
+tau <- mod$tau
 
 for(i in seq_len(ncol(alpha))) {
   alpha[, i] <- alpha[perm$permutations[i, ], i]
+  rho[, , i] <- rho[, perm$permutations[i, ], i, drop = FALSE]
+  tau[, i] <- tau[perm$permutations[i, ], i]
 }
 
 hist(alpha[1, ])
 hist(alpha[2, ])
 
-apply(mod$tau, 1, mean)
 
-apply(mod$rho, c(1, 2), mean)
-
-dim(mod$alpha)
-mod$importance_weights
+apply(tau, 1, mean)
+apply(rho, c(1, 2), mean)
 
 weighted.mean(mod$alpha[1, ], mod$importance_weights)
 weighted.mean(mod$alpha[2, ], mod$importance_weights)
