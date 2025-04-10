@@ -135,7 +135,7 @@ LatentRankingProposal sample_latent_rankings(
       Rcpp::stop("No files.");
     }
 
-    int random_index = randi(distr_param(0, file_count - 1));
+    int random_index = Rcpp::sample(file_count, 1, false)[0] - 1;
 
     fs::path random_file_path;
     size_t current_index = 0;

@@ -7,7 +7,7 @@
 using namespace arma;
 
 uvec leap_and_shift(const uvec& current_rho, unsigned int cluster, const Prior& prior) {
-  unsigned int u = randi(distr_param(0, prior.n_items - 1));
+  unsigned int u = Rcpp::sample(prior.n_items, 1, false)[0] - 1;
   uvec intermediate_rho = current_rho;
   uvec rho_proposal = intermediate_rho;
   int rho_u = intermediate_rho(u);
@@ -16,7 +16,7 @@ uvec leap_and_shift(const uvec& current_rho, unsigned int cluster, const Prior& 
     uvec(rho_u)
   );
 
-  unsigned int index = randi(distr_param(0, support.size() - 1));
+  unsigned int index = Rcpp::sample(support.size(), 1, false)[0] - 1;
   intermediate_rho(u) = support(index);
   for(size_t i{}; i < intermediate_rho.size(); i++) {
     if(current_rho(i) == current_rho(u)) {
