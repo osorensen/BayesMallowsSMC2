@@ -1,5 +1,8 @@
 ---
-output: github_document
+output:
+  github_document
+bibliography: ./inst/REFERENCES.bib
+link-citations: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -19,11 +22,11 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-BayesMallowsSMC2 provides functions for performing sequential inference in the Bayesian Mallows model using the SMC$^{2}$ algorithm.
+BayesMallowsSMC2 provides functions for performing sequential inference in the Bayesian Mallows model using the SMC$^{2}$ algorithm originally developed by @Chopin2012 and @Fulop2013. The methodology implemented is described in @Sorensen2024. The package supports analysis of time series containing complete rankings, partial rankings, and pairwise preference data, and all of these data types can be combined with mixture modeling.
 
 ## Installation
 
-You can install the development version of BayesMallowsSMC2 from [GitHub](https://github.com/) with:
+You can install the development version of BayesMallowsSMC2 from GitHub with:
 
 ``` r
 # install.packages("devtools")
@@ -32,6 +35,33 @@ devtools::install_github("osorensen/BayesMallowsSMC2")
 
 ## Usage
 
-This package is under development, and is not yet well documented. For examples on how to use it, see the code in the OSF repository https://osf.io/pquk4/.
+```{r}
+library(BayesMallowsSMC2)
+```
 
 
+The example dataset `complete_rankings` contains a simulated dataset in which 100 users have provided a complete ranking of five items at 100 separate timepoints. The first six rows are shown below.
+
+```{r}
+head(complete_rankings)
+```
+
+We can analyze these data sequentially using the `compute_sequentially()` function. Since the rankings are complete, we only need a single particle filter in this case. Otherwise we use the default options.
+
+```{r}
+model <- compute_sequentially(
+  data = complete_rankings,
+  hyperparameters = set_hyperparameters(n_items = 5),
+  smc_options = set_smc_options(n_particle_filters = 1, 
+                                max_particle_filters = 1)
+)
+```
+
+No plotting function is implemented yet, but the posterior can be inspected by plotting the elements of the returned `model` object.
+
+```{r}
+plot(density(model$alpha), main = expression("Posterior of " ~ alpha))
+```
+
+
+## References 
