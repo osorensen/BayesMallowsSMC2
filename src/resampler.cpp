@@ -26,7 +26,7 @@ ivec count_between_intervals(const vec& cumprob, const vec& u) {
 
 ivec stratsys(int n_samples, vec probs, bool stratified) {
   vec u(n_samples);
-  vec rn = stratified ? randu(n_samples) : vec(n_samples, fill::value(randu()));
+  vec rn = stratified ? Rcpp::runif(n_samples) : vec(n_samples, fill::value(R::runif(0, 1)));
 
   for(size_t i{}; i < n_samples; i++) u(i) = (i + rn(i)) / n_samples;
   return count_between_intervals(cumsum(probs), u);

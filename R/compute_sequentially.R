@@ -90,3 +90,4 @@ compute_sequentially <- function(
 
   ret <- run_smc(input_timeseries, hyperparameters, smc_options)
 }
+

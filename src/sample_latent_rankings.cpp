@@ -8,6 +8,11 @@
 using namespace arma;
 namespace fs = std::filesystem;
 
+uvec shuffle_rcpp(const uvec& values_in) {
+  ivec inds = Rcpp::sample(values_in.size(), values_in.size(), false) - 1;
+  return values_in(conv_to<uvec>::from(inds));
+}
+
 LatentRankingProposal sample_latent_rankings(
     const std::unique_ptr<Data>& data, unsigned int t, const Prior& prior,
     std::string latent_rank_proposal,
@@ -45,7 +50,7 @@ LatentRankingProposal sample_latent_rankings(
       uvec tmp = ndit->second.observation;
 
       if(latent_rank_proposal == "uniform") {
-        tmp(ndit->second.available_items) = shuffle(ndit->second.available_rankings);
+        tmp(ndit->second.available_items) = shuffle_rcpp(ndit->second.available_rankings);
         proposal.proposal = join_horiz(proposal.proposal, tmp);
         proposal.log_probability = join_vert(
           proposal.log_probability, vec{-lgamma(ndit->second.available_rankings.size() + 1.0)});
@@ -55,7 +60,7 @@ LatentRankingProposal sample_latent_rankings(
         }
         double logprob{0};
 
-        uvec available_items_shuffled = shuffle(ndit->second.available_items);
+        uvec available_items_shuffled = shuffle_rcpp(ndit->second.available_items);
         uvec available_rankings = ndit->second.available_rankings;
 
         while(available_items_shuffled.size() > 1) {
@@ -135,7 +140,7 @@ LatentRankingProposal sample_latent_rankings(
       Rcpp::stop("No files.");
     }
 
-    int random_index = randi(distr_param(0, file_count - 1));
+    int random_index = Rcpp::sample(file_count, 1, false)[0] - 1;
 
     fs::path random_file_path;
     size_t current_index = 0;
