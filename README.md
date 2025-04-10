@@ -8,8 +8,8 @@
 [![R-CMD-check](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of BayesMallowsSMC2 is to provide sequential inference in the
-Bayesian Mallows model using the SMC$^{2}$ algorithm.
+BayesMallowsSMC2 provides functions for performing sequential inference
+in the Bayesian Mallows model using the SMC$^{2}$ algorithm.
 
 ## Installation
 
