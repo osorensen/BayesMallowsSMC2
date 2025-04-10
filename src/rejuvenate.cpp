@@ -85,7 +85,7 @@ bool Particle::rejuvenate(
   int proposed_particle_filter = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
 
   bool accepted{};
-  if(log_ratio > log(randu())) {
+  if(log_ratio > log(R::runif(0, 1))) {
     this->parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
     this->conditioned_particle_filter = proposed_particle_filter;
     this->log_incremental_likelihood = proposal_particle.log_incremental_likelihood;

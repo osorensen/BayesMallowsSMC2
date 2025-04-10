@@ -11,11 +11,13 @@ StaticParameters::StaticParameters(const vec& alpha, const umat& rho, const vec&
   alpha { alpha }, rho { rho }, tau { tau } {}
 
 StaticParameters::StaticParameters(const Prior& prior) :
-  alpha { randg(prior.n_clusters, distr_param(prior.alpha_shape, 1 / prior.alpha_rate)) },
+  alpha { Rcpp::rgamma(prior.n_clusters, prior.alpha_shape, 1 / prior.alpha_rate) },
   rho { umat(prior.n_items, prior.n_clusters) },
-  tau { normalise(randg(prior.n_clusters, distr_param(prior.cluster_concentration, 1)), 1) }
+  tau { normalise(Rcpp::as<vec>(Rcpp::rgamma(prior.n_clusters, prior.cluster_concentration, 1)), 1) }
   {
-    rho.each_col([&prior](uvec& a){ a = shuffle(regspace<uvec>(1, prior.n_items)); });
+    rho.each_col([&prior](uvec& a){
+      a = Rcpp::as<uvec>(Rcpp::sample(prior.n_items, prior.n_items, false));
+      });
   }
 
 Particle::Particle(const Options& options, const StaticParameters& parameters,
