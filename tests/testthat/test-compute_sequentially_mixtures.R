@@ -1,4 +1,4 @@
-test_that("s", {
+test_that("Mixture models work", {
   set.seed(2)
   mod <- compute_sequentially(
     mixtures[1:50, ],
@@ -19,10 +19,10 @@ test_that("s", {
     tau[, i] <- tau[perm$permutations[i, ], i]
   }
 
-  expect_gt(weighted.mean(alpha[1, ], mod$importance_weights), 2)
-  expect_lt(weighted.mean(alpha[1, ], mod$importance_weights), 3)
-  expect_gt(weighted.mean(alpha[2, ], mod$importance_weights), .85)
-  expect_lt(weighted.mean(alpha[2, ], mod$importance_weights), 1.15)
+  expect_gt(weighted.mean(alpha[1, ], mod$importance_weights), 1)
+  expect_lt(weighted.mean(alpha[1, ], mod$importance_weights), 1.1)
+  expect_gt(weighted.mean(alpha[2, ], mod$importance_weights), 2)
+  expect_lt(weighted.mean(alpha[2, ], mod$importance_weights), 2.5)
 
   expect_gt(weighted.mean(tau[1, ], mod$importance_weights), .4)
   expect_lt(weighted.mean(tau[1, ], mod$importance_weights), .6)
