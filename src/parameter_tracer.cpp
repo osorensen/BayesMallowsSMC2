@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include <string>
 #include <cstdlib>
 #include <sstream>
 #include "parameter_tracer.h"
@@ -7,7 +8,13 @@ using namespace arma;
 ParameterTracer::ParameterTracer(bool trace, bool trace_latent, const std::string& trace_directory)
   : trace { trace }, trace_latent { trace_latent }, trace_directory { trace_directory } {
   if(trace) {
+#ifdef _WIN32
+    // On Windows, mkdir takes only one argument
+    int status = mkdir(trace_directory.c_str());
+#else
+    // On POSIX systems, mkdir takes two arguments
     int status = mkdir(trace_directory.c_str(), 0777);
+#endif
     if (status != 0) {
       Rcpp::stop("Error creating trace directory.");
     }
