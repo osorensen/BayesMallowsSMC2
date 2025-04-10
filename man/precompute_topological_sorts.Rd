@@ -7,7 +7,9 @@
 precompute_topological_sorts(prefs, n_items, output_directory, save_frac)
 }
 \arguments{
-\item{prefs}{An integer matrix (\code{arma::umat}) representing the preference relations.}
+\item{prefs}{A matrix representing the preference relations. This matrix
+must have two columns, the first of which represents the preferred item
+and the second of which represents the disfavored item.}
 
 \item{n_items}{An integer specifying the number of items to sort.}
 
@@ -25,6 +27,20 @@ and creates it if it does not.
 }
 \details{
 The function generates all possible topological sorts for the provided preference matrix
-and saves each sort as a binary file in the specified output directory. The output files
-are named sequentially as \code{sort0.bin}, \code{sort1.bin}, and so on.
+and saves approximately \code{save_frac} of the sorts as binary file in the specified output directory.
+The output files are named sequentially as \code{sort0.bin}, \code{sort1.bin}, and so on.
+}
+\examples{
+# Extract preferences from user 1 in the included example data.
+prefs <- pairwise_preferences[
+ pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
+
+# Count the number of sorts without saving them.
+precompute_topological_sorts(
+  prefs = as.matrix(prefs),
+  n_items = 5,
+  output_directory = tempdir(),
+  save_frac = 0
+)
+
 }
