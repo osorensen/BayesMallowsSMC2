@@ -29,11 +29,13 @@ Rankings::Rankings(const Rcpp::List& input_timeseries, bool partial_rankings) :
   original_timeseries = timeseries;
 }
 
-PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
-  topological_sorts_directory (input_timeseries.attr("topological_sorts_directory")),
-  num_topological_sorts (input_timeseries.attr("num_topological_sorts")),
-  file_count (input_timeseries.attr("file_count")) {
+PairwisePreferences::PairwisePreferences(
+  const Rcpp::List& input_timeseries,
+  const Rcpp::List& input_sort_matrices,
+  const Rcpp::List& input_sort_counts
+) {
   timeseries.reserve(input_timeseries.size());
+
   for(Rcpp::List a : input_timeseries) {
     pairwise_tp new_data;
     Rcpp::CharacterVector nm = a.names();
@@ -48,15 +50,43 @@ PairwisePreferences::PairwisePreferences(const Rcpp::List& input_timeseries) :
     timeseries.push_back(new_data);
   }
   original_timeseries = timeseries;
+
+  sort_matrix_timeseries.reserve(input_sort_matrices.size());
+
+  for(Rcpp::List a : input_sort_matrices) {
+    sort_matrices_tp new_data;
+    Rcpp::CharacterVector nm = a.names();
+    for(size_t i{}; i < nm.size(); i++) {
+      umat sort_matrix = a[i];
+      new_data[std::string(nm[i])] = sort_matrix;
+    }
+    sort_matrix_timeseries.push_back(new_data);
+  }
+
+  sort_count_timeseries.reserve(input_sort_counts.size());
+  for(Rcpp::List a : input_sort_counts) {
+    sort_counts_tp new_data;
+    Rcpp::CharacterVector nm = a.names();
+    for(size_t i{}; i < nm.size(); i++) {
+      new_data[std::string(nm[i])] = a[i];
+    }
+    sort_count_timeseries.push_back(new_data);
+  }
 }
 
-std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries) {
+std::unique_ptr<Data> setup_data(
+    const Rcpp::List& input_timeseries,
+    const Rcpp::List& input_sort_matrices,
+    const Rcpp::List& input_sort_counts
+) {
   std::string type = Rcpp::as<std::string>(input_timeseries.attr("type"));
 
   if (type == "complete rankings" || type == "partial rankings") {
     return std::make_unique<Rankings>(input_timeseries, type == "partial rankings");
   } else if (type == "pairwise preferences") {
-    return std::make_unique<PairwisePreferences>(input_timeseries);
+    return std::make_unique<PairwisePreferences>(
+      input_timeseries, input_sort_matrices, input_sort_counts
+      );
   } else {
     Rcpp::stop("Wrong data type.");
   }

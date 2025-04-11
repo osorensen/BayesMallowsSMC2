@@ -20,13 +20,15 @@ using namespace arma;
 Rcpp::List run_smc(
   Rcpp::List input_timeseries,
   Rcpp::List input_prior,
-  Rcpp::List input_options
+  Rcpp::List input_options,
+  Rcpp::List input_sort_matrices,
+  Rcpp::List input_sort_counts
 ) {
 
   Prior prior{input_prior};
   Options options{input_options};
 
-  auto data = setup_data(input_timeseries);
+  auto data = setup_data(input_timeseries, input_sort_matrices, input_sort_counts);
   auto pfun = choose_partition_function(prior.n_items, options.metric);
   auto particle_vector = create_particle_vector(options, prior, pfun);
   auto distfun = choose_distance_function(options.metric);

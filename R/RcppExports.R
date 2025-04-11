@@ -25,13 +25,23 @@
 #' prefs <- pairwise_preferences[
 #'  pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
 #'
-#' # Generate all topological sorts:
+#' # Generate all topological sorts, but don't save them:
 #' sorts <- precompute_topological_sorts(
 #'   prefs = as.matrix(prefs),
 #'   n_items = 5,
 #'   save_frac = 0
 #' )
+#' # Number of sorts
+#' sorts$sort_count
+#' # Empty matrix
+#' sorts$sort_matrix
 #'
+#' # Generate all topological sorts and save them:
+#' sorts <- precompute_topological_sorts(
+#'   prefs = as.matrix(prefs),
+#'   n_items = 5,
+#'   save_frac = 1
+#' )
 #' # Number of sorts
 #' sorts$sort_count
 #' # Matrix with all of them
@@ -41,7 +51,7 @@ precompute_topological_sorts <- function(prefs, n_items, save_frac) {
     .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, save_frac)
 }
 
-run_smc <- function(input_timeseries, input_prior, input_options) {
-    .Call(`_BayesMallowsSMC2_run_smc`, input_timeseries, input_prior, input_options)
+run_smc <- function(input_timeseries, input_prior, input_options, input_sort_matrices, input_sort_counts) {
+    .Call(`_BayesMallowsSMC2_run_smc`, input_timeseries, input_prior, input_options, input_sort_matrices, input_sort_counts)
 }
 

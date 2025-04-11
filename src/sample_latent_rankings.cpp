@@ -127,43 +127,17 @@ LatentRankingProposal sample_latent_rankings(
   LatentRankingProposal proposal;
   proposal.proposal = umat(prior.n_items, data->timeseries[t].size());
   pairwise_tp new_data = data->timeseries[t];
+  sort_matrices_tp new_sort_matrices = data->sort_matrix_timeseries[t];
+  sort_counts_tp new_sort_counts = data->sort_count_timeseries[t];
   size_t proposal_index{};
 
   for(auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
-    Rcpp::CharacterVector nn = data->num_topological_sorts.names();
-    Rcpp::IntegerVector matching_index = Rcpp::match(Rcpp::CharacterVector::create(ndit->first), nn) - 1;
+    umat sort_matrix = new_sort_matrices[ndit->first];
+    int random_index = Rcpp::sample(sort_matrix.n_rows, 1, false)[0] - 1;
 
-    std::string directory_path = data->topological_sorts_directory + std::string("/user") + ndit->first;
-    size_t file_count = data->file_count[matching_index[0]];
-
-    if (file_count == 0) {
-      Rcpp::stop("No files.");
-    }
-
-    int random_index = Rcpp::sample(file_count, 1, false)[0] - 1;
-
-    fs::path random_file_path;
-    size_t current_index = 0;
-    for (const auto& entry : fs::directory_iterator(directory_path)) {
-      if (entry.is_regular_file()) {
-        if (current_index == random_index) {
-          random_file_path = entry.path();
-          break;
-        }
-        ++current_index;
-      }
-    }
-
-    ivec tmp;
-    bool ok = tmp.load(random_file_path.string(), arma_binary);
-    if(ok == false) {
-      Rcpp::stop("Could not find file.");
-    }
-
-    proposal.proposal.col(proposal_index++) = conv_to<uvec>::from(tmp);
+    proposal.proposal.col(proposal_index++) = sort_matrix.col(random_index);
     proposal.log_probability = join_vert(
-      proposal.log_probability,
-      vec{-log(data->num_topological_sorts[matching_index[0]])}
+      proposal.log_probability, vec{-log(new_sort_counts[ndit->first])}
     );
   }
 

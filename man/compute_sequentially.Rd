@@ -8,9 +8,7 @@ compute_sequentially(
   data,
   hyperparameters = set_hyperparameters(),
   smc_options = set_smc_options(),
-  topological_sorts_directory = NULL,
-  num_topological_sorts = NULL,
-  file_count = NULL
+  topological_sorts = NULL
 )
 }
 \arguments{
@@ -40,17 +38,9 @@ structure:
 
 \item{smc_options}{A list returned from \code{\link[=set_smc_options]{set_smc_options()}}}
 
-\item{topological_sorts_directory}{Path to a directory where precomputed
-topological sorts can be found. Must contain subdirectories with names
-\code{user1}, \code{user2}, etc., exactly matching the \code{user} column of \code{data}. See
-\code{\link[=precompute_topological_sorts]{precompute_topological_sorts()}}. Defaults to \code{NULL}, but has to be
-provided when data contain pairwise preferences.}
-
-\item{num_topological_sorts}{Integer vector containing the number of
-topological sorts for each user.}
-
-\item{file_count}{Integer vector containing the number of files with
-topological sorts for each user.}
+\item{topological_sorts}{A list returned from
+\code{\link[=precompute_topological_sorts]{precompute_topological_sorts()}}. Only used with preference data, and
+defaults to \code{NULL}.}
 }
 \value{
 An object

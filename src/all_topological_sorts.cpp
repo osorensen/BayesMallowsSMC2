@@ -74,9 +74,13 @@ arma::imat Graph::alltopologicalSort(long long int& sort_count, double save_frac
   std::vector<arma::ivec> sorts;
   alltopologicalSortUtil(res, visited, sort_count, sorts, save_frac);
 
-  arma::imat sort_matrix(sorts.size(), sorts[0].n_elem);
+  if(sorts.empty()) {
+    return arma::imat(0, 0);
+  }
+
+  arma::imat sort_matrix(sorts[0].n_elem, sorts.size());
   for (size_t i = 0; i < sorts.size(); ++i) {
-    sort_matrix.row(i) = sorts[i].t();
+    sort_matrix.col(i) = sorts[i];
   }
 
   return sort_matrix;
@@ -106,13 +110,23 @@ arma::imat Graph::alltopologicalSort(long long int& sort_count, double save_frac
 //' prefs <- pairwise_preferences[
 //'  pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
 //'
-//' # Generate all topological sorts:
+//' # Generate all topological sorts, but don't save them:
 //' sorts <- precompute_topological_sorts(
 //'   prefs = as.matrix(prefs),
 //'   n_items = 5,
 //'   save_frac = 0
 //' )
+//' # Number of sorts
+//' sorts$sort_count
+//' # Empty matrix
+//' sorts$sort_matrix
 //'
+//' # Generate all topological sorts and save them:
+//' sorts <- precompute_topological_sorts(
+//'   prefs = as.matrix(prefs),
+//'   n_items = 5,
+//'   save_frac = 1
+//' )
 //' # Number of sorts
 //' sorts$sort_count
 //' # Matrix with all of them

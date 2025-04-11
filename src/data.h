@@ -23,15 +23,22 @@ struct Rankings : Data {
 };
 
 struct PairwisePreferences : Data{
-  PairwisePreferences(const Rcpp::List& input_timeseries);
+  PairwisePreferences(
+    const Rcpp::List& input_timeseries,
+    const Rcpp::List& input_sort_matrices,
+    const Rcpp::List& input_sort_counts
+  );
   pairwise_ts timeseries;
   pairwise_ts original_timeseries;
   unsigned int n_timepoints() override { return timeseries.size(); }
-  std::string topological_sorts_directory;
-  Rcpp::IntegerVector num_topological_sorts;
-  Rcpp::IntegerVector file_count;
+  sort_matrices_ts sort_matrix_timeseries;
+  sort_counts_ts sort_count_timeseries;
 };
 
-std::unique_ptr<Data> setup_data(const Rcpp::List& input_timeseries);
+std::unique_ptr<Data> setup_data(
+    const Rcpp::List& input_timeseries,
+    const Rcpp::List& input_sort_matrices,
+    const Rcpp::List& input_sort_counts
+);
 
 
