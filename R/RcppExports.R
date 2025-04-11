@@ -35,8 +35,8 @@
 #'   save_frac = 0
 #' )
 #'
-precompute_topological_sorts <- function(prefs, n_items, output_directory, save_frac) {
-    .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, output_directory, save_frac)
+precompute_topological_sorts <- function(prefs, n_items, save_frac) {
+    .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, save_frac)
 }
 
 run_smc <- function(input_timeseries, input_prior, input_options) {

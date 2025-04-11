@@ -12,16 +12,15 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // precompute_topological_sorts
-long long int precompute_topological_sorts(arma::umat prefs, int n_items, std::string output_directory, double save_frac);
-RcppExport SEXP _BayesMallowsSMC2_precompute_topological_sorts(SEXP prefsSEXP, SEXP n_itemsSEXP, SEXP output_directorySEXP, SEXP save_fracSEXP) {
+Rcpp::List precompute_topological_sorts(arma::umat prefs, int n_items, double save_frac);
+RcppExport SEXP _BayesMallowsSMC2_precompute_topological_sorts(SEXP prefsSEXP, SEXP n_itemsSEXP, SEXP save_fracSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::umat >::type prefs(prefsSEXP);
     Rcpp::traits::input_parameter< int >::type n_items(n_itemsSEXP);
-    Rcpp::traits::input_parameter< std::string >::type output_directory(output_directorySEXP);
     Rcpp::traits::input_parameter< double >::type save_frac(save_fracSEXP);
-    rcpp_result_gen = Rcpp::wrap(precompute_topological_sorts(prefs, n_items, output_directory, save_frac));
+    rcpp_result_gen = Rcpp::wrap(precompute_topological_sorts(prefs, n_items, save_frac));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -40,7 +39,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_BayesMallowsSMC2_precompute_topological_sorts", (DL_FUNC) &_BayesMallowsSMC2_precompute_topological_sorts, 4},
+    {"_BayesMallowsSMC2_precompute_topological_sorts", (DL_FUNC) &_BayesMallowsSMC2_precompute_topological_sorts, 3},
     {"_BayesMallowsSMC2_run_smc", (DL_FUNC) &_BayesMallowsSMC2_run_smc, 3},
     {NULL, NULL, 0}
 };
