@@ -11,5 +11,4 @@ Options::Options(const Rcpp::List& input_options) :
   max_rejuvenation_steps{input_options["max_rejuvenation_steps"]},
   verbose{input_options["verbose"]},
   trace{input_options["trace"]},
-  trace_latent{input_options["trace_latent"]},
-  trace_directory(input_options["trace_directory"]){}
+  trace_latent{input_options["trace_latent"]}{}

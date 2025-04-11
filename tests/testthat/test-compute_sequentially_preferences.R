@@ -26,3 +26,59 @@ test_that("compute_sequentially works with preference data", {
   expect_gt(mean(mod$alpha), 1.03)
   expect_lt(mean(mod$alpha), 1.06)
 })
+
+test_that("compute_sequentially works with preference data and tracing", {
+  dat <- subset(pairwise_preferences, user <= 3)
+  topological_sorts <- split(dat, f =~ timepoint) |>
+    lapply(split, f =~ user) |>
+    lapply(function(x) {
+      lapply(x, function(y) {
+        precompute_topological_sorts(
+          prefs = as.matrix(y[, c("top_item", "bottom_item"), drop = FALSE]),
+          n_items = 5,
+          save_frac = 1
+        )
+      })
+    })
+
+  set.seed(2)
+  mod <- compute_sequentially(
+    data = dat,
+    hyperparameters = set_hyperparameters(n_items = 5),
+    smc_options = set_smc_options(
+      n_particles = 100,
+      max_rejuvenation_steps = 5,
+      trace = TRUE, trace_latent = FALSE
+    ),
+    topological_sorts = topological_sorts
+  )
+
+  expect_equal(length(mod$alpha_traces), 3)
+  expect_equal(length(mod$alpha_traces[[2]]), 100)
+  expect_gt(mod$alpha_traces[[2]][[3]], .7)
+  expect_lt(mod$alpha_traces[[2]][[3]], .8)
+
+  set.seed(3)
+  mod <- compute_sequentially(
+    data = dat,
+    hyperparameters = set_hyperparameters(n_items = 5),
+    smc_options = set_smc_options(
+      n_particles = 100,
+      max_rejuvenation_steps = 5,
+      trace = TRUE, trace_latent = TRUE
+    ),
+    topological_sorts = topological_sorts
+  )
+
+  expect_equal(length(mod$alpha_traces), 3)
+  expect_equal(length(mod$alpha_traces[[2]]), 100)
+  expect_gt(mod$alpha_traces[[2]][[3]], .7)
+  expect_lt(mod$alpha_traces[[2]][[3]], .8)
+
+  expect_equal(length(mod$latent_rankings_traces), 3)
+  expect_equal(length(mod$latent_rankings_traces[[2]]), 100)
+  expect_equal(
+    mod$latent_rankings_traces[[2]][[3]],
+    c(1, 2, 5, 3, 4, 2, 1, 4, 5, 3)
+  )
+})
