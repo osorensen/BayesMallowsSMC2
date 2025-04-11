@@ -1,17 +1,15 @@
 test_that("compute_sequentially works with preference data", {
   skip()
   dat <- subset(pairwise_preferences, user <= 20)
-  sorts_dir <- paste0(tempdir(), "/sorts")
-  num_topological_sorts <- as.numeric(
-    lapply(split(dat, f = dat$user), function(dd) {
-      precompute_topological_sorts(
-        prefs = as.matrix(dd[, c("top_item", "bottom_item"), drop = FALSE]),
-        n_items = 5,
-        output_directory = paste0(sorts_dir, "/user", unique(dd$user)),
-        save_frac = 1
-      )
-    })
-  )
+
+  sorts <- lapply(split(dat, f = dat$user), function(dd) {
+    precompute_topological_sorts(
+      prefs = as.matrix(dd[, c("top_item", "bottom_item"), drop = FALSE]),
+      n_items = 5,
+      save_frac = 1
+    )
+  })
+
 
   set.seed(2)
   mod <- compute_sequentially(
