@@ -4,7 +4,7 @@
 \alias{precompute_topological_sorts}
 \title{Precompute All Topological Sorts}
 \usage{
-precompute_topological_sorts(prefs, n_items, output_directory, save_frac)
+precompute_topological_sorts(prefs, n_items, save_frac)
 }
 \arguments{
 \item{prefs}{A matrix representing the preference relations. This matrix
@@ -12,8 +12,6 @@ must have two columns, the first of which represents the preferred item
 and the second of which represents the disfavored item.}
 
 \item{n_items}{An integer specifying the number of items to sort.}
-
-\item{output_directory}{A string specifying the directory where the output files will be saved.}
 
 \item{save_frac}{Number between 0 and 1 specifying which fraction of sorts to save.}
 }
@@ -27,20 +25,33 @@ and creates it if it does not.
 }
 \details{
 The function generates all possible topological sorts for the provided preference matrix
-and saves approximately \code{save_frac} of the sorts as binary file in the specified output directory.
-The output files are named sequentially as \code{sort0.bin}, \code{sort1.bin}, and so on.
+and saves approximately \code{save_frac} of the sorts in a matrix which is returned.
 }
 \examples{
 # Extract preferences from user 1 in the included example data.
 prefs <- pairwise_preferences[
  pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
 
-# Count the number of sorts without saving them.
-precompute_topological_sorts(
+# Generate all topological sorts, but don't save them:
+sorts <- precompute_topological_sorts(
   prefs = as.matrix(prefs),
   n_items = 5,
-  output_directory = tempdir(),
   save_frac = 0
 )
+# Number of sorts
+sorts$sort_count
+# Empty matrix
+sorts$sort_matrix
+
+# Generate all topological sorts and save them:
+sorts <- precompute_topological_sorts(
+  prefs = as.matrix(prefs),
+  n_items = 5,
+  save_frac = 1
+)
+# Number of sorts
+sorts$sort_count
+# Matrix with all of them
+sorts$sort_matrix
 
 }

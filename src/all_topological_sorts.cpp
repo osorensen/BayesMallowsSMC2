@@ -15,13 +15,13 @@ class Graph {
   std::vector<std::list<int>> adj;
   vector<int> indegree;
   void alltopologicalSortUtil(
-      vector<int>& res, vector<bool>& visited, const std::string& output_directory,
-      long long int& sort_count, double save_frac);
+      vector<int>& res, vector<bool>& visited, long long int& sort_count,
+      std::vector<arma::ivec>& sorts, double save_frac);
 
 public:
   Graph(int n_items);
   void addEdge(int v, int w);
-  void alltopologicalSort(const std::string& output_directory, long long int& sort_count, double save_frac);
+  arma::imat alltopologicalSort(long long int& sort_count, double save_frac);
 };
 
 Graph::Graph(int n_items) : n_items { n_items }, adj(n_items),
@@ -32,9 +32,9 @@ void Graph::addEdge(int v, int w) {
   indegree[w]++;
 }
 
-void Graph::alltopologicalSortUtil(vector<int>& res, vector<bool>& visited,
-                                   const std::string& output_directory, long long int& sort_count,
-                                   double save_frac) {
+void Graph::alltopologicalSortUtil(
+    vector<int>& res, vector<bool>& visited, long long int& sort_count,
+    std::vector<arma::ivec>& sorts, double save_frac) {
   bool flag = false;
 
   for (size_t i{}; i < n_items; i++) {
@@ -45,7 +45,7 @@ void Graph::alltopologicalSortUtil(vector<int>& res, vector<bool>& visited,
 
       res.push_back(i);
       visited[i] = true;
-      alltopologicalSortUtil(res, visited, output_directory, sort_count, save_frac);
+      alltopologicalSortUtil(res, visited, sort_count, sorts, save_frac);
 
       visited[i] = false;
       res.erase(res.end() - 1);
@@ -58,27 +58,32 @@ void Graph::alltopologicalSortUtil(vector<int>& res, vector<bool>& visited,
 
   if (!flag){
     if(R::runif(0, 1) < save_frac) {
-      std::ostringstream filename_stream;
-      filename_stream << output_directory << "/sort" << sort_count << ".bin";
-      std::string filename = filename_stream.str();
-
-      // Save the current found topological sort to file
       arma::ivec sort_vector(res.size());
       for(size_t i = 0; i < res.size(); ++i) {
         sort_vector(i) = res[i] + 1; // converting to 1-based indexing
       }
-      sort_vector.save(filename);
+      sorts.push_back(sort_vector);
     }
     sort_count++;
   }
 }
 
-void Graph::alltopologicalSort(const std::string& output_directory,
-                               long long int& sort_count,
-                               double save_frac) {
+arma::imat Graph::alltopologicalSort(long long int& sort_count, double save_frac) {
   vector<bool> visited(n_items, false);
   vector<int> res;
-  alltopologicalSortUtil(res, visited, output_directory, sort_count, save_frac);
+  std::vector<arma::ivec> sorts;
+  alltopologicalSortUtil(res, visited, sort_count, sorts, save_frac);
+
+  if(sorts.empty()) {
+    return arma::imat(0, 0);
+  }
+
+  arma::imat sort_matrix(sorts[0].n_elem, sorts.size());
+  for (size_t i = 0; i < sorts.size(); ++i) {
+    sort_matrix.col(i) = sorts[i];
+  }
+
+  return sort_matrix;
 }
 
 //' Precompute All Topological Sorts
@@ -91,13 +96,11 @@ void Graph::alltopologicalSort(const std::string& output_directory,
 //'   must have two columns, the first of which represents the preferred item
 //'   and the second of which represents the disfavored item.
 //' @param n_items An integer specifying the number of items to sort.
-//' @param output_directory A string specifying the directory where the output files will be saved.
 //' @param save_frac Number between 0 and 1 specifying which fraction of sorts to save.
 //'
 //' @details
 //' The function generates all possible topological sorts for the provided preference matrix
-//' and saves approximately `save_frac` of the sorts as binary file in the specified output directory.
-//' The output files are named sequentially as `sort0.bin`, `sort1.bin`, and so on.
+//' and saves approximately `save_frac` of the sorts in a matrix which is returned.
 //'
 //' @return This function returns the number of topological sorts.
 //'
@@ -107,30 +110,41 @@ void Graph::alltopologicalSort(const std::string& output_directory,
 //' prefs <- pairwise_preferences[
 //'  pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
 //'
-//' # Count the number of sorts without saving them.
-//' precompute_topological_sorts(
+//' # Generate all topological sorts, but don't save them:
+//' sorts <- precompute_topological_sorts(
 //'   prefs = as.matrix(prefs),
 //'   n_items = 5,
-//'   output_directory = tempdir(),
 //'   save_frac = 0
 //' )
+//' # Number of sorts
+//' sorts$sort_count
+//' # Empty matrix
+//' sorts$sort_matrix
+//'
+//' # Generate all topological sorts and save them:
+//' sorts <- precompute_topological_sorts(
+//'   prefs = as.matrix(prefs),
+//'   n_items = 5,
+//'   save_frac = 1
+//' )
+//' # Number of sorts
+//' sorts$sort_count
+//' # Matrix with all of them
+//' sorts$sort_matrix
 //'
 // [[Rcpp::export]]
-long long int precompute_topological_sorts(
-   arma::umat prefs, int n_items, std::string output_directory, double save_frac) {
- if (!std::filesystem::exists(output_directory)) {
-   if (!std::filesystem::create_directory(output_directory)) {
-     Rcpp::stop("Failed to create directory " + output_directory);
-   }
- }
-
+Rcpp::List precompute_topological_sorts(
+   arma::umat prefs, int n_items, double save_frac) {
  Graph g(n_items);
  for(size_t i{}; i < prefs.n_rows; i++) {
    g.addEdge(prefs.at(i, 0) - 1, prefs.at(i, 1) - 1);
  }
 
  long long int sort_count = 0;
- g.alltopologicalSort(output_directory, sort_count, save_frac);
+ arma::imat sort_matrix = g.alltopologicalSort(sort_count, save_frac);
 
- return sort_count;
+ return Rcpp::List::create(
+   Rcpp::Named("sort_count") = sort_count,
+   Rcpp::Named("sort_matrix") = sort_matrix
+ );
 }

@@ -11,13 +11,11 @@
 #'   must have two columns, the first of which represents the preferred item
 #'   and the second of which represents the disfavored item.
 #' @param n_items An integer specifying the number of items to sort.
-#' @param output_directory A string specifying the directory where the output files will be saved.
 #' @param save_frac Number between 0 and 1 specifying which fraction of sorts to save.
 #'
 #' @details
 #' The function generates all possible topological sorts for the provided preference matrix
-#' and saves approximately `save_frac` of the sorts as binary file in the specified output directory.
-#' The output files are named sequentially as `sort0.bin`, `sort1.bin`, and so on.
+#' and saves approximately `save_frac` of the sorts in a matrix which is returned.
 #'
 #' @return This function returns the number of topological sorts.
 #'
@@ -27,19 +25,33 @@
 #' prefs <- pairwise_preferences[
 #'  pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
 #'
-#' # Count the number of sorts without saving them.
-#' precompute_topological_sorts(
+#' # Generate all topological sorts, but don't save them:
+#' sorts <- precompute_topological_sorts(
 #'   prefs = as.matrix(prefs),
 #'   n_items = 5,
-#'   output_directory = tempdir(),
 #'   save_frac = 0
 #' )
+#' # Number of sorts
+#' sorts$sort_count
+#' # Empty matrix
+#' sorts$sort_matrix
 #'
-precompute_topological_sorts <- function(prefs, n_items, output_directory, save_frac) {
-    .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, output_directory, save_frac)
+#' # Generate all topological sorts and save them:
+#' sorts <- precompute_topological_sorts(
+#'   prefs = as.matrix(prefs),
+#'   n_items = 5,
+#'   save_frac = 1
+#' )
+#' # Number of sorts
+#' sorts$sort_count
+#' # Matrix with all of them
+#' sorts$sort_matrix
+#'
+precompute_topological_sorts <- function(prefs, n_items, save_frac) {
+    .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, save_frac)
 }
 
-run_smc <- function(input_timeseries, input_prior, input_options) {
-    .Call(`_BayesMallowsSMC2_run_smc`, input_timeseries, input_prior, input_options)
+run_smc <- function(input_timeseries, input_prior, input_options, input_sort_matrices, input_sort_counts) {
+    .Call(`_BayesMallowsSMC2_run_smc`, input_timeseries, input_prior, input_options, input_sort_matrices, input_sort_counts)
 }
 
