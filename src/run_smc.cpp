@@ -41,8 +41,12 @@ Rcpp::List run_smc(
   int T = data->n_timepoints();
   vec ESS(T);
   ivec resampling = zeros<ivec>(T);
+
+  std::vector<double> iteration_times;
+
   for(size_t t{}; t < T; t++) {
     reporter.report_time(t);
+    auto start = std::chrono::steady_clock::now();
 
     for(auto& p : particle_vector) {
       p.run_particle_filter(t, prior, data, pfun, distfun, resampler,
@@ -110,6 +114,10 @@ Rcpp::List run_smc(
 
     tracer.update_trace(particle_vector, t);
     n_particle_filters(t) = options.n_particle_filters;
+
+    auto end = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+    iteration_times.push_back(static_cast<double>(duration));
   }
 
   mat alpha(prior.n_clusters, particle_vector.size());
@@ -138,6 +146,7 @@ Rcpp::List run_smc(
     Rcpp::Named("ESS") = ESS,
     Rcpp::Named("resampling") = resampling,
     Rcpp::Named("n_particle_filters") = n_particle_filters,
+    Rcpp::Named("iteration_times") = iteration_times,
     Rcpp::Named("importance_weights") = exp(normalize_log_importance_weights(particle_vector)),
     Rcpp::Named("log_marginal_likelihood") = log_marginal_likelihood,
     Rcpp::Named("alpha_traces") = tracer.alpha_traces,
