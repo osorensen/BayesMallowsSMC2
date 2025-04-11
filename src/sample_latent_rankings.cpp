@@ -1,12 +1,8 @@
 #include <RcppArmadillo.h>
-#include <filesystem>
-#include <vector>
-#include <iterator>
 #include "sample_latent_rankings.h"
 #include "data.h"
 #include "misc.h"
 using namespace arma;
-namespace fs = std::filesystem;
 
 uvec shuffle_rcpp(const uvec& values_in) {
   ivec inds = Rcpp::sample(values_in.size(), values_in.size(), false) - 1;
