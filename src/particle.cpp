@@ -33,12 +33,6 @@ Particle::Particle(const Options& options, const StaticParameters& parameters,
     }
   }
 
-std::vector<std::pair<std::string, int>>::const_iterator findIntInPairs(const std::vector<std::pair<std::string, int>>& vec, int a) {
-  return std::find_if(vec.begin(), vec.end(), [a](const std::pair<std::string, int>& element) {
-    return element.second == a;
-  });
-}
-
 void Particle::run_particle_filter(
     unsigned int t, const Prior& prior,
     const std::unique_ptr<Data>& data,
