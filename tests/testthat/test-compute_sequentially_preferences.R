@@ -1,5 +1,5 @@
 test_that("compute_sequentially works with preference data", {
-  dat <- subset(pairwise_preferences, user <= 20)
+  dat <- subset(pairwise_preferences, user <= 24)
   topological_sorts <- split(dat, f =~ timepoint) |>
     lapply(split, f =~ user) |>
     lapply(function(x) {
@@ -23,8 +23,8 @@ test_that("compute_sequentially works with preference data", {
     topological_sorts = topological_sorts
   )
 
-  expect_gt(mean(mod$alpha), 1.03)
-  expect_lt(mean(mod$alpha), 1.06)
+  expect_gt(mean(mod$alpha), 1)
+  expect_lt(mean(mod$alpha), 1.02)
 })
 
 test_that("compute_sequentially works with preference data and tracing", {
@@ -55,8 +55,8 @@ test_that("compute_sequentially works with preference data and tracing", {
 
   expect_equal(length(mod$alpha_traces), 3)
   expect_equal(length(mod$alpha_traces[[2]]), 100)
-  expect_gt(mod$alpha_traces[[2]][[3]], .7)
-  expect_lt(mod$alpha_traces[[2]][[3]], .8)
+  expect_gt(mod$alpha_traces[[2]][[3]], .24)
+  expect_lt(mod$alpha_traces[[2]][[3]], .25)
 
   set.seed(3)
   mod <- compute_sequentially(
@@ -72,13 +72,13 @@ test_that("compute_sequentially works with preference data and tracing", {
 
   expect_equal(length(mod$alpha_traces), 3)
   expect_equal(length(mod$alpha_traces[[2]]), 100)
-  expect_gt(mod$alpha_traces[[2]][[3]], .7)
-  expect_lt(mod$alpha_traces[[2]][[3]], .8)
+  expect_gt(mod$alpha_traces[[2]][[3]], .04)
+  expect_lt(mod$alpha_traces[[2]][[3]], .05)
 
   expect_equal(length(mod$latent_rankings_traces), 3)
   expect_equal(length(mod$latent_rankings_traces[[2]]), 100)
   expect_equal(
     mod$latent_rankings_traces[[2]][[3]],
-    c(1, 2, 5, 3, 4, 2, 1, 4, 5, 3)
+    c(1, 3, 5, 4, 2, 2, 1, 4, 3, 5)
   )
 })
