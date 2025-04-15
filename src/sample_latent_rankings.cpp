@@ -129,7 +129,7 @@ LatentRankingProposal sample_latent_rankings(
 
   for(auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
     umat sort_matrix = new_sort_matrices[ndit->first];
-    int random_index = Rcpp::sample(sort_matrix.n_rows, 1, false)[0] - 1;
+    int random_index = Rcpp::sample(sort_matrix.n_cols, 1, false)[0] - 1;
 
     proposal.proposal.col(proposal_index++) = sort_matrix.col(random_index);
     proposal.log_probability = join_vert(
