@@ -29,7 +29,7 @@
 #'   [precompute_topological_sorts()]. Only used with preference data, and
 #'   defaults to `NULL`.
 #'
-#' @return An object
+#' @return An object of class BayesMallowsSMC2.
 #' @export
 #'
 compute_sequentially <- function(
@@ -79,5 +79,8 @@ compute_sequentially <- function(
 
   ret <- run_smc(input_timeseries, hyperparameters, smc_options,
                  sort_matrices, sort_counts)
+
+  class(ret) <- "BayesMallowsSMC2"
+  ret
 }
 

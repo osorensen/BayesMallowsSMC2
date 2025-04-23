@@ -43,7 +43,7 @@ structure:
 defaults to \code{NULL}.}
 }
 \value{
-An object
+An object of class BayesMallowsSMC2.
 }
 \description{
 Compute the Bayesian Mallows model sequentially
