@@ -16,7 +16,7 @@ and the second of which represents the disfavored item.}
 \item{save_frac}{Number between 0 and 1 specifying which fraction of sorts to save.}
 }
 \value{
-This function returns the number of topological sorts.
+A list containing the number of topological sorts and optionally a matrix of sorts.
 }
 \description{
 This function precomputes all topological sorts for a given preference matrix and

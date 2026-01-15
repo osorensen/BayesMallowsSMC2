@@ -17,7 +17,7 @@
 #' The function generates all possible topological sorts for the provided preference matrix
 #' and saves approximately `save_frac` of the sorts in a matrix which is returned.
 #'
-#' @return This function returns the number of topological sorts.
+#' @return A list containing the number of topological sorts and optionally a matrix of sorts.
 #'
 #' @export
 #' @examples
