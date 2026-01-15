@@ -1,4 +1,4 @@
-url: ~
+url: https://yourusername.github.io/BayesMallowsSMC2/
 template:
   bootstrap: 5
 
@@ -15,11 +15,13 @@ reference:
   - set_hyperparameters
   - set_smc_options
 
-articles:
-- title: Get started
-  navbar: ~
+- title: Data Functions
+  desc: Functions for handling different data types
   contents:
-  - articles/introduction
+  - complete_rankings
+  - mixtures
+  - pairwise_preferences
+  - partial_rankings
 
 development:
   mode: auto
