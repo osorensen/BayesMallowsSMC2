@@ -1,5 +1,6 @@
 ---
 output: github_document
+bibliography: inst/REFERENCES.bib
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -19,7 +20,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-BayesMallowsSMC2 provides functions for performing sequential inference in the Bayesian Mallows model using the SMC$^{2}$ algorithm. The package implements the methods described in Sørensen, Frigessi, and Scheel (2025), "Sequential Rank and Preference Learning with the Bayesian Mallows Model", *Bayesian Analysis*.
+BayesMallowsSMC2 provides functions for performing sequential inference in the Bayesian Mallows model using the SMC$^{2}$ algorithm. The package implements the methods described in @sorensen2025sequential.
 
 The Bayesian Mallows model is a probabilistic framework for analyzing ranking data, and this package extends it to handle sequential learning scenarios where rankings arrive over time. The SMC$^{2}$ (Sequential Monte Carlo squared) algorithm enables efficient Bayesian inference by combining particle filtering with MCMC methods.
 
@@ -46,7 +47,5 @@ library(BayesMallowsSMC2)
 For detailed examples and reproducible code, see the OSF repository at https://osf.io/pquk4/.
 
 ## References
-
-Sørensen, Ø., Frigessi, A., & Scheel, I. (2025). Sequential Rank and Preference Learning with the Bayesian Mallows Model. *Bayesian Analysis*. https://doi.org/10.1214/25-BA1564
 
 
