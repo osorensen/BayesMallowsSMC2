@@ -12,39 +12,77 @@ compute_sequentially(
 )
 }
 \arguments{
-\item{data}{A dataframe containing partial rankings or pairwise preferences.
-If \code{data} contains complete or partial rankings, it must have the following
-columns:
+\item{data}{A data frame containing ranking or preference data with temporal
+structure. The data frame must include \code{timepoint} and \code{user} columns.
 
+For complete or partial rankings, additional columns should be:
 \itemize{
-\item \code{timepoint}: a numeric vector denoting the timepoint, starting at 1.
-\item \code{user}: a vector identifying the user.
-\item \code{item1}: ranking of item 1.
-\item \code{item2}: ranking of item 2.
-\item etc.
+\item \code{timepoint}: Numeric vector denoting the timepoint, starting at 1.
+\item \code{user}: Vector identifying the user providing the ranking.
+\item \code{item1}, \code{item2}, etc.: Rankings of items (use NA for missing items
+in partial rankings).
 }
 
-If data contains pairwise preferences, it must have the following
-structure:
-
+For pairwise preferences, the structure should be:
 \itemize{
-\item \code{timepoint}: a numeric vector denoting the timepoint, starting at 1.
-\item \code{user}: a vector identifying the user.
-\item \code{top_item}: identifier for the preferred item.
-\item \code{bottom_item}: identifier for the dispreferred item.
+\item \code{timepoint}: Numeric vector denoting the timepoint, starting at 1.
+\item \code{user}: Vector identifying the user providing the preference.
+\item \code{top_item}: Identifier for the preferred item.
+\item \code{bottom_item}: Identifier for the less preferred item.
 }}
 
-\item{hyperparameters}{A list returned from \code{\link[=set_hyperparameters]{set_hyperparameters()}}.}
+\item{hyperparameters}{A list of hyperparameters returned from
+\code{\link{set_hyperparameters}}. Defines the prior distributions for
+model parameters.}
 
-\item{smc_options}{A list returned from \code{\link[=set_smc_options]{set_smc_options()}}}
+\item{smc_options}{A list of SMC algorithm options returned from
+\code{\link{set_smc_options}}. Controls the behavior of the particle
+filtering algorithm.}
 
 \item{topological_sorts}{A list returned from
-\code{\link[=precompute_topological_sorts]{precompute_topological_sorts()}}. Only used with preference data, and
-defaults to \code{NULL}.}
+\code{\link{precompute_topological_sorts}}. Required when using pairwise
+preference data, otherwise should be \code{NULL} (default).}
 }
 \value{
-An object of class BayesMallowsSMC2.
+An object of class \code{BayesMallowsSMC2} containing the results
+of the sequential inference, including parameter traces, log marginal
+likelihood estimates, and other algorithm diagnostics.
 }
 \description{
-Compute the Bayesian Mallows model sequentially
+This function performs sequential Bayesian inference for the Mallows model
+using the SMC² (Sequential Monte Carlo squared) algorithm. It can handle
+both complete/partial rankings and pairwise preference data that arrive
+sequentially over time.
+}
+\examples{
+# Example with complete rankings
+set.seed(123)
+n_items <- 4
+
+# Create synthetic ranking data
+ranking_data <- data.frame(
+  timepoint = c(1, 1, 2, 2),
+  user = c(1, 2, 3, 4),
+  item1 = c(1, 2, 1, 3),
+  item2 = c(2, 1, 3, 1),
+  item3 = c(3, 4, 2, 4),
+  item4 = c(4, 3, 4, 2)
+)
+
+# Set up hyperparameters and options
+hyper <- set_hyperparameters(n_items = n_items)
+opts <- set_smc_options(n_particles = 100, verbose = FALSE)
+
+\dontrun{
+# Run sequential inference (requires compiled C++ code)
+result <- compute_sequentially(
+  data = ranking_data,
+  hyperparameters = hyper,
+  smc_options = opts
+)
+}
+
+}
+\references{
+\insertRef{sorensen2025sequential}{BayesMallowsSMC2}
 }

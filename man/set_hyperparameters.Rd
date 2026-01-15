@@ -2,7 +2,7 @@
 % Please edit documentation in R/set_hyperparameters.R
 \name{set_hyperparameters}
 \alias{set_hyperparameters}
-\title{Set hyperparameters}
+\title{Set hyperparameters for Bayesian Mallows model}
 \usage{
 set_hyperparameters(
   n_items,
@@ -13,19 +13,46 @@ set_hyperparameters(
 )
 }
 \arguments{
-\item{n_items}{Integer defining the number of items.}
+\item{n_items}{Integer defining the number of items to be ranked. Must be a
+positive integer.}
 
-\item{alpha_shape}{Shape of gamma prior for alpha.}
+\item{alpha_shape}{Positive numeric value specifying the shape parameter of
+the gamma prior distribution for the scale parameter alpha. Default is 1.}
 
-\item{alpha_rate}{Rate of gamma prior for alpha.}
+\item{alpha_rate}{Positive numeric value specifying the rate parameter of
+the gamma prior distribution for the scale parameter alpha. Default is 0.5.}
 
-\item{cluster_concentration}{Concentration parameter of Dirichlet distribution for cluster probabilities.}
+\item{cluster_concentration}{Positive numeric value specifying the
+concentration parameter of the Dirichlet distribution for cluster
+probabilities. Default is 10.}
 
-\item{n_clusters}{Integer defining the number of clusters.}
+\item{n_clusters}{Positive integer defining the number of clusters in the
+mixture model. Default is 1.}
 }
 \value{
-A list
+A list containing the hyperparameter values with elements:
+\item{n_items}{Number of items}
+\item{alpha_shape}{Shape parameter for alpha prior}
+\item{alpha_rate}{Rate parameter for alpha prior}
+\item{cluster_concentration}{Concentration parameter for cluster probabilities}
+\item{n_clusters}{Number of clusters}
 }
 \description{
-Set hyperparameters
+This function creates a list of hyperparameters for the Bayesian Mallows model
+used in sequential Monte Carlo inference. The hyperparameters define the prior
+distributions for the model parameters.
+}
+\examples{
+# Basic hyperparameters for 5 items
+hyper <- set_hyperparameters(n_items = 5)
+
+# Custom hyperparameters with multiple clusters
+hyper <- set_hyperparameters(
+  n_items = 10,
+  alpha_shape = 2,
+  alpha_rate = 1,
+  cluster_concentration = 5,
+  n_clusters = 3
+)
+
 }

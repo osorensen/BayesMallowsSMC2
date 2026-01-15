@@ -21,14 +21,14 @@
 #'
 #' @export
 #' @examples
-#' # Create simple preference data: item 1 > item 2 > item 3
-#' prefs <- matrix(c(1, 2, 2, 3), ncol = 2, byrow = TRUE)
-#' colnames(prefs) <- c("top_item", "bottom_item")
+#' # Extract preferences from user 1 in the included example data.
+#' prefs <- pairwise_preferences[
+#'  pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
 #'
 #' # Generate all topological sorts, but don't save them:
 #' sorts <- precompute_topological_sorts(
-#'   prefs = prefs,
-#'   n_items = 3,
+#'   prefs = as.matrix(prefs),
+#'   n_items = 5,
 #'   save_frac = 0
 #' )
 #' # Number of sorts
@@ -38,8 +38,8 @@
 #'
 #' # Generate all topological sorts and save them:
 #' sorts <- precompute_topological_sorts(
-#'   prefs = prefs,
-#'   n_items = 3,
+#'   prefs = as.matrix(prefs),
+#'   n_items = 5,
 #'   save_frac = 1
 #' )
 #' # Number of sorts
@@ -51,19 +51,6 @@ precompute_topological_sorts <- function(prefs, n_items, save_frac) {
     .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, save_frac)
 }
 
-#' Run Sequential Monte Carlo Algorithm (Internal Function)
-#'
-#' This is an internal function that implements the core SMC² algorithm.
-#' Users should typically use \code{\link{compute_sequentially}} instead.
-#'
-#' @param input_timeseries List of time series data.
-#' @param input_prior List of prior parameters.
-#' @param input_options List of algorithm options.
-#' @param input_sort_matrices List of precomputed sort matrices.
-#' @param input_sort_counts List of precomputed sort counts.
-#'
-#' @return List containing SMC algorithm results.
-#' @keywords internal
 run_smc <- function(input_timeseries, input_prior, input_options, input_sort_matrices, input_sort_counts) {
     .Call(`_BayesMallowsSMC2_run_smc`, input_timeseries, input_prior, input_options, input_sort_matrices, input_sort_counts)
 }
