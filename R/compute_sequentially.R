@@ -7,7 +7,7 @@
 #'
 #' @param data A data frame containing ranking or preference data with temporal
 #'   structure. The data frame must include `timepoint` and `user` columns.
-#'   
+#'
 #'   For complete or partial rankings, additional columns should be:
 #'   \itemize{
 #'   \item `timepoint`: Numeric vector denoting the timepoint, starting at 1.
@@ -15,7 +15,7 @@
 #'   \item `item1`, `item2`, etc.: Rankings of items (use NA for missing items
 #'     in partial rankings).
 #'   }
-#'   
+#'
 #'   For pairwise preferences, the structure should be:
 #'   \itemize{
 #'   \item `timepoint`: Numeric vector denoting the timepoint, starting at 1.
@@ -24,13 +24,13 @@
 #'   \item `bottom_item`: Identifier for the less preferred item.
 #'   }
 #'
-#' @param hyperparameters A list of hyperparameters returned from 
+#' @param hyperparameters A list of hyperparameters returned from
 #'   \code{\link{set_hyperparameters}}. Defines the prior distributions for
 #'   model parameters.
-#' @param smc_options A list of SMC algorithm options returned from 
+#' @param smc_options A list of SMC algorithm options returned from
 #'   \code{\link{set_smc_options}}. Controls the behavior of the particle
 #'   filtering algorithm.
-#' @param topological_sorts A list returned from 
+#' @param topological_sorts A list returned from
 #'   \code{\link{precompute_topological_sorts}}. Required when using pairwise
 #'   preference data, otherwise should be \code{NULL} (default).
 #'
@@ -42,7 +42,7 @@
 #' # Example with complete rankings
 #' set.seed(123)
 #' n_items <- 4
-#' 
+#'
 #' # Create synthetic ranking data
 #' ranking_data <- data.frame(
 #'   timepoint = c(1, 1, 2, 2),
@@ -52,23 +52,21 @@
 #'   item3 = c(3, 4, 2, 4),
 #'   item4 = c(4, 3, 4, 2)
 #' )
-#' 
+#'
 #' # Set up hyperparameters and options
 #' hyper <- set_hyperparameters(n_items = n_items)
 #' opts <- set_smc_options(n_particles = 100, verbose = FALSE)
-#' 
-#' \dontrun{
-#' # Run sequential inference (requires compiled C++ code)
+#'
+#' # Run sequential inference
 #' result <- compute_sequentially(
 #'   data = ranking_data,
 #'   hyperparameters = hyper,
 #'   smc_options = opts
 #' )
-#' }
-#' 
+#'
 #' @references
 #' \insertRef{sorensen2025sequential}{BayesMallowsSMC2}
-#' 
+#'
 #' @export
 #'
 compute_sequentially <- function(
@@ -115,7 +113,7 @@ compute_sequentially <- function(
   user_timepoint_combinations <- unique(data[c("user", "timepoint")])
   if(max(table(user_timepoint_combinations$user)) > 1) {
     stop("Each user can only enter the pool once. Users appearing at multiple timepoints: ",
-         paste(names(table(user_timepoint_combinations$user))[table(user_timepoint_combinations$user) > 1], 
+         paste(names(table(user_timepoint_combinations$user))[table(user_timepoint_combinations$user) > 1],
                collapse = ", "))
   }
 

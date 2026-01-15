@@ -28,14 +28,14 @@ The function generates all possible topological sorts for the provided preferenc
 and saves approximately \code{save_frac} of the sorts in a matrix which is returned.
 }
 \examples{
-# Create simple preference data: item 1 > item 2 > item 3
-prefs <- matrix(c(1, 2, 2, 3), ncol = 2, byrow = TRUE)
-colnames(prefs) <- c("top_item", "bottom_item")
+# Extract preferences from user 1 in the included example data.
+prefs <- pairwise_preferences[
+ pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
 
 # Generate all topological sorts, but don't save them:
 sorts <- precompute_topological_sorts(
-  prefs = prefs,
-  n_items = 3,
+  prefs = as.matrix(prefs),
+  n_items = 5,
   save_frac = 0
 )
 # Number of sorts
@@ -45,8 +45,8 @@ sorts$sort_matrix
 
 # Generate all topological sorts and save them:
 sorts <- precompute_topological_sorts(
-  prefs = prefs,
-  n_items = 3,
+  prefs = as.matrix(prefs),
+  n_items = 5,
   save_frac = 1
 )
 # Number of sorts

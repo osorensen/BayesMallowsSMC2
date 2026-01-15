@@ -73,14 +73,12 @@ ranking_data <- data.frame(
 hyper <- set_hyperparameters(n_items = n_items)
 opts <- set_smc_options(n_particles = 100, verbose = FALSE)
 
-\dontrun{
-# Run sequential inference (requires compiled C++ code)
+# Run sequential inference
 result <- compute_sequentially(
   data = ranking_data,
   hyperparameters = hyper,
   smc_options = opts
 )
-}
 
 }
 \references{
