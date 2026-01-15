@@ -16,6 +16,7 @@ Description: Implements nested sequential Monte Carlo (SMC) algorithms for
     and Ulam distances. Based on the methodology described in 
     <doi:10.1214/25-BA1564>.
 License: GPL-3
+URL: https://osorensen.github.io/BayesMallowsSMC2/
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
@@ -29,5 +30,6 @@ Depends:
     R (>= 4.1.0)
 Suggests: 
     testthat (>= 3.0.0),
-    label.switching (>= 1.8)
+    label.switching (>= 1.8),
+    pkgdown
 Config/testthat/edition: 3
