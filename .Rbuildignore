@@ -4,3 +4,6 @@
 ^data-raw$
 ^dev$
 ^\.github$
+^\.aider\.chat\.history\.md$
+^\.aider\.input\.history$
+^\.aider\.tags\.cache\.v4$
