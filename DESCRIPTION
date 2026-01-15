@@ -13,7 +13,8 @@ Description: Implements nested sequential Monte Carlo (SMC) algorithms for
     and partial rankings using particle filtering techniques. The algorithms 
     handle time-varying ranking data and can accommodate various distance 
     metrics including Kendall's tau, Spearman, footrule, Cayley, Hamming, 
-    and Ulam distances.
+    and Ulam distances. Based on the methodology described in 
+    <doi:10.1214/25-BA1564>.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
