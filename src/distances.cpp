@@ -1,4 +1,5 @@
 #include "distances.h"
+#include <cmath>
 using namespace arma;
 
 std::unique_ptr<Distance> choose_distance_function(const std::string& metric) {
