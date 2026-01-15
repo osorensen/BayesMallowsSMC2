@@ -5,7 +5,3 @@
 ^dev$
 ^\.github$
 ^cran-comments\.md$
-^\.travis\.yml$
-^appveyor\.yml$
-^codecov\.yml$
-^\.covrignore$
