@@ -9,7 +9,25 @@
 <!-- badges: end -->
 
 BayesMallowsSMC2 provides functions for performing sequential inference
-in the Bayesian Mallows model using the SMC$^{2}$ algorithm.
+in the Bayesian Mallows model using the nested sequential Monte Carlo
+(SMC²) algorithm. This package implements the methodology described in
+Sørensen et al. (2025) for learning from ranking and preference data
+that arrives sequentially over time.
+
+## Key Features
+
+- **Sequential Learning**: Process ranking and preference data as it
+  arrives over time
+- **Nested SMC² Algorithm**: Efficient particle-based inference for
+  complex parameter-latent state dependencies
+- **Multiple Data Types**: Support for complete rankings, partial
+  rankings, and pairwise preferences
+- **Flexible Distance Metrics**: Kendall, Cayley, Hamming, Footrule,
+  Spearman, and Ulam distances
+- **Mixture Models**: Multi-cluster Bayesian Mallows models for
+  heterogeneous populations
+- **Real-time Inference**: Online posterior updates without reprocessing
+  historical data
 
 ## Installation
 
@@ -21,8 +39,163 @@ You can install the development version of BayesMallowsSMC2 from
 devtools::install_github("osorensen/BayesMallowsSMC2")
 ```
 
-## Usage
+## Quick Start
 
-This package is under development, and is not yet well documented. For
-examples on how to use it, see the code in the OSF repository
-<https://osf.io/pquk4/>.
+Here’s a basic example of sequential ranking analysis:
+
+``` r
+library(BayesMallowsSMC2)
+
+# Generate synthetic ranking data
+set.seed(123)
+n_items <- 5
+n_users <- 20
+n_timepoints <- 10
+
+# Create sequential ranking data
+data <- expand.grid(
+  timepoint = 1:n_timepoints,
+  user = 1:n_users
+)
+
+# Add rankings for each item (1 = most preferred, 5 = least preferred)
+for(i in 1:n_items) {
+  data[[paste0("item", i)]] <- sample(1:n_items, nrow(data), replace = TRUE)
+}
+
+# Set up model parameters
+hyperparams <- set_hyperparameters(
+  n_items = n_items,
+  n_clusters = 2,           # Two preference groups
+  alpha_shape = 2,          # Precision prior
+  alpha_rate = 1
+)
+
+# Configure SMC² algorithm
+smc_opts <- set_smc_options(
+  n_particles = 500,        # Parameter particles
+  n_particle_filters = 100, # Latent state filters per particle
+  metric = "kendall",       # Distance metric
+  verbose = TRUE
+)
+
+# Run sequential inference
+result <- compute_sequentially(
+  data = data,
+  hyperparameters = hyperparams,
+  smc_options = smc_opts
+)
+
+# Analyze results
+summary(result)
+plot(result)
+```
+
+## Algorithm Overview
+
+The nested SMC² algorithm operates on two levels:
+
+1.  **Outer SMC (Parameter Level)**: Maintains particles representing
+    samples from the posterior distribution of static parameters
+    (precision α, modal rankings ρ, cluster probabilities τ)
+
+2.  **Inner SMC (Latent State Level)**: For each parameter particle,
+    runs multiple particle filters to track the evolution of latent
+    rankings and cluster assignments over time
+
+This nested structure enables efficient inference in the complex joint
+parameter-latent state space while maintaining proper uncertainty
+quantification.
+
+## Data Formats
+
+### Complete Rankings
+
+``` r
+data <- data.frame(
+  timepoint = c(1, 1, 2, 2),
+  user = c(1, 2, 1, 2),
+  item1 = c(1, 2, 1, 3),  # Rankings for item 1
+  item2 = c(2, 1, 2, 1),  # Rankings for item 2
+  item3 = c(3, 3, 3, 2)   # Rankings for item 3
+)
+```
+
+### Pairwise Preferences
+
+``` r
+# First precompute topological sorts
+prefs_matrix <- matrix(c(1, 2, 2, 3, 3, 1), ncol = 2, byrow = TRUE)
+topo_sorts <- precompute_topological_sorts(
+  prefs = prefs_matrix,
+  n_items = 3,
+  save_frac = 0.1
+)
+
+# Create preference data
+pref_data <- data.frame(
+  timepoint = c(1, 1, 2, 2),
+  user = c(1, 2, 1, 2),
+  top_item = c(1, 2, 3, 1),     # Preferred item
+  bottom_item = c(2, 3, 1, 3)   # Dispreferred item
+)
+
+# Run analysis
+result <- compute_sequentially(
+  data = pref_data,
+  hyperparameters = set_hyperparameters(n_items = 3),
+  smc_options = set_smc_options(n_particles = 200),
+  topological_sorts = topo_sorts
+)
+```
+
+## Performance Tuning
+
+The algorithm’s performance depends on several key parameters:
+
+- **n_particles**: More particles improve accuracy but increase
+  computational cost
+- **n_particle_filters**: More filters per particle improve latent state
+  estimation
+- **resampling_threshold**: Controls when to resample particles
+  (default: n_particles/2)
+- **metric**: Different distance metrics capture different aspects of
+  ranking disagreement
+
+For large-scale problems, consider:
+
+``` r
+# High-performance configuration
+smc_opts <- set_smc_options(
+  n_particles = 1000,
+  n_particle_filters = 200,
+  max_particle_filters = 1000,
+  resampler = "systematic",
+  trace = FALSE,              # Reduce memory usage
+  trace_latent = FALSE
+)
+```
+
+## Citation
+
+If you use this package in your research, please cite:
+
+> Sørensen, Ø., Stein, A., Netto, W. L., & Leslie, D. S. (2025).
+> Sequential Rank and Preference Learning with the Bayesian Mallows
+> Model. *Bayesian Analysis*. DOI: 10.1214/25-BA1564.
+
+## Additional Resources
+
+- **Paper**: The foundational methodology paper with theoretical details
+  and empirical studies
+- **OSF Repository**: <https://osf.io/pquk4/> - Contains replication
+  code and additional examples
+- **Vignettes**: Detailed tutorials and case studies (coming soon)
+
+## Getting Help
+
+- **Issues**: Report bugs and request features on [GitHub
+  Issues](https://github.com/osorensen/BayesMallowsSMC2/issues)
+- **Documentation**: Use `?function_name` for detailed help on specific
+  functions
+- **Examples**: See function documentation for comprehensive examples
