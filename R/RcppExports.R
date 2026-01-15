@@ -51,6 +51,19 @@ precompute_topological_sorts <- function(prefs, n_items, save_frac) {
     .Call(`_BayesMallowsSMC2_precompute_topological_sorts`, prefs, n_items, save_frac)
 }
 
+#' Run Sequential Monte Carlo Algorithm (Internal Function)
+#'
+#' This is an internal function that implements the core SMC² algorithm.
+#' Users should typically use \code{\link{compute_sequentially}} instead.
+#'
+#' @param input_timeseries List of time series data.
+#' @param input_prior List of prior parameters.
+#' @param input_options List of algorithm options.
+#' @param input_sort_matrices List of precomputed sort matrices.
+#' @param input_sort_counts List of precomputed sort counts.
+#'
+#' @return List containing SMC algorithm results.
+#' @keywords internal
 run_smc <- function(input_timeseries, input_prior, input_options, input_sort_matrices, input_sort_counts) {
     .Call(`_BayesMallowsSMC2_run_smc`, input_timeseries, input_prior, input_options, input_sort_matrices, input_sort_counts)
 }
