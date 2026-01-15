@@ -1,0 +1,25 @@
+url: ~
+template:
+  bootstrap: 5
+
+reference:
+- title: Main Functions
+  desc: Core functions for Bayesian Mallows SMC
+  contents:
+  - compute_sequentially
+  - precompute_topological_sorts
+
+- title: Configuration
+  desc: Functions to set up parameters and options
+  contents:
+  - set_hyperparameters
+  - set_smc_options
+
+articles:
+- title: Get started
+  navbar: ~
+  contents:
+  - articles/introduction
+
+development:
+  mode: auto
