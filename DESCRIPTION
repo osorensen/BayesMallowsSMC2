@@ -21,7 +21,9 @@ LinkingTo:
     Rcpp,
     RcppArmadillo
 Imports: 
-    Rcpp
+    Rcpp,
+    Rdpack
+RdMacros: Rdpack
 Depends: 
     R (>= 4.1.0)
 Suggests: 
