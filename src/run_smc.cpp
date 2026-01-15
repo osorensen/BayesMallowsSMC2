@@ -1,5 +1,6 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
+#include <R_ext/Utils.h>
 #include "prior.h"
 #include "data.h"
 #include "distances.h"
@@ -42,6 +43,7 @@ Rcpp::List run_smc(
   std::vector<double> iteration_times;
 
   for(size_t t{}; t < T; t++) {
+    R_CheckUserInterrupt();
     reporter.report_time(t);
 
     for(auto& p : particle_vector) {
