@@ -7,8 +7,11 @@ Authors@R: c(person("Oystein", "Sorensen",
                     role = c("aut", "cre"),
                     comment = c(ORCID = "0000-0003-0724-3542")))
 Maintainer: Oystein Sorensen <oystein.sorensen.1985@gmail.com>
-Description: Nested sequential Monte Carlo algorithms for the Bayesian Mallows
-    model.
+Description: Provides nested sequential Monte Carlo (SMC^2) algorithms for 
+    performing Bayesian inference in the Mallows model for ranking data. 
+    The package implements efficient algorithms for sequential learning 
+    with both complete and partial rankings, supporting multiple distance 
+    metrics including Kendall, Spearman, Cayley, Hamming, and footrule distances.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
