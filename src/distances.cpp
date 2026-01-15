@@ -36,6 +36,9 @@ unsigned int CayleyDistance::d(const uvec& r1, const uvec& r2) {
 }
 
 unsigned int FootruleDistance::d(const uvec& r1, const uvec& r2) {
+  if(r1.size() != r2.size()) {
+    Rcpp::stop("Rankings must have the same length");
+  }
   unsigned int value{};
   for(size_t i{}; i < r1.size(); i++) {
     value += r1[i] > r2[i] ? r1[i] - r2[i] : r2[i] - r1[i];
@@ -61,6 +64,9 @@ unsigned int KendallDistance::d(const uvec& r1, const uvec& r2) {
 }
 
 unsigned int SpearmanDistance::d(const uvec& r1, const uvec& r2) {
+  if(r1.size() != r2.size()) {
+    Rcpp::stop("Rankings must have the same length");
+  }
   unsigned int value{};
   for(size_t i{}; i < r1.size(); i++) {
     value += r1[i] > r2[i] ? pow(r1[i] - r2[i], 2) : pow(r2[i] - r1[i], 2);

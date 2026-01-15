@@ -7,7 +7,7 @@
 #include <list>
 #include <string>
 #include <sstream>
-#include <filesystem>
+#include <R_ext/Utils.h>
 using namespace std;
 
 class Graph {
@@ -36,6 +36,11 @@ void Graph::alltopologicalSortUtil(
     vector<int>& res, vector<bool>& visited, long long int& sort_count,
     std::vector<arma::ivec>& sorts, double save_frac) {
   bool flag = false;
+
+  // Check for user interrupts in long-running recursive function
+  if (sort_count % 1000 == 0) {
+    R_CheckUserInterrupt();
+  }
 
   for (size_t i{}; i < n_items; i++) {
     if (indegree[i] == 0 && !visited[i]) {
@@ -102,7 +107,7 @@ arma::imat Graph::alltopologicalSort(long long int& sort_count, double save_frac
 //' The function generates all possible topological sorts for the provided preference matrix
 //' and saves approximately `save_frac` of the sorts in a matrix which is returned.
 //'
-//' @return This function returns the number of topological sorts.
+//' @return A list containing the number of topological sorts and optionally a matrix of sorts.
 //'
 //' @export
 //' @examples
