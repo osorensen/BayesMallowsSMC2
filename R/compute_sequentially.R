@@ -72,9 +72,12 @@ compute_sequentially <- function(
     stop("Something wrong with data")
   }
 
-  if(max(table(data$user)) > 1 &&
-     attr(input_timeseries, "type") != "pairwise preferences") {
-    stop("Updated users not supported.")
+  # Check that each user appears at most once across all timepoints
+  user_timepoint_combinations <- unique(data[c("user", "timepoint")])
+  if(max(table(user_timepoint_combinations$user)) > 1) {
+    stop("Each user can only enter the pool once. Users appearing at multiple timepoints: ",
+         paste(names(table(user_timepoint_combinations$user))[table(user_timepoint_combinations$user) > 1], 
+               collapse = ", "))
   }
 
   ret <- run_smc(input_timeseries, hyperparameters, smc_options,
