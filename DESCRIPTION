@@ -9,6 +9,8 @@ Authors@R: c(person("Oystein", "Sorensen",
 Maintainer: Oystein Sorensen <oystein.sorensen.1985@gmail.com>
 Description: Nested sequential Monte Carlo algorithms for the Bayesian Mallows
     model.
+URL: https://github.com/oystein-sorensen/BayesMallowsSMC2
+BugReports: https://github.com/oystein-sorensen/BayesMallowsSMC2/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
