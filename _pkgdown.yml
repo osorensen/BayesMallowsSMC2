@@ -20,3 +20,23 @@ reference:
       - set_hyperparameters
       - set_smc_options
       - precompute_topological_sorts
+url: https://oystein-sorensen.github.io/BayesMallowsSMC2
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+
+home:
+  sidebar:
+    structure: [links, license, community, citation, authors, dev]
+
+navbar:
+  structure:
+    left:  [reference, news]
+    right: [github]
+  components:
+    reference:
+      text: Reference
+      href: reference/index.html
+    news:
+      text: Changelog
+      href: news/index.html
