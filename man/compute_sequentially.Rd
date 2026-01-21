@@ -48,3 +48,12 @@ An object of class BayesMallowsSMC2.
 \description{
 Compute the Bayesian Mallows model sequentially
 }
+\examples{
+# Compute the model sequentially with complete rankings
+mod <- compute_sequentially(
+  complete_rankings,
+  hyperparameters = set_hyperparameters(n_items = 5),
+  smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
+)
+
+}
