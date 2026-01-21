@@ -1,7 +1,7 @@
 #' Set SMC options
 #'
 #' @description
-#' Configure the SMC² (Sequential Monte Carlo Squared) algorithm for the
+#' Configure the SMC2 (Sequential Monte Carlo Squared) algorithm for the
 #' Bayesian Mallows model. This function sets parameters that control the
 #' particle filter, resampling strategy, and diagnostic output.
 #'
@@ -49,7 +49,7 @@
 #'   substantially increases memory usage. Defaults to `FALSE`.
 #'
 #' @details
-#' The SMC² algorithm uses a nested particle filter structure:
+#' The SMC2 algorithm uses a nested particle filter structure:
 #' \itemize{
 #'   \item The outer loop maintains `n_particles` particles, each representing
 #'     a hypothesis about the static parameters (alpha, rho, cluster
