@@ -50,7 +50,7 @@ print.BayesMallowsSMC2 <- function(x, ...) {
   
   # Create header
   cat("BayesMallowsSMC2 Model\n")
-  cat(strrep("=", 23), "\n\n", sep = "")
+  cat(strrep("=", nchar("BayesMallowsSMC2 Model")), "\n\n", sep = "")
   
   # Display basic information
   cat("Number of particles:    ", n_particles, "\n", sep = "")
@@ -59,9 +59,9 @@ print.BayesMallowsSMC2 <- function(x, ...) {
   cat("Number of clusters:     ", n_clusters, "\n\n", sep = "")
   
   # Display model fit information
-  cat("Log marginal likelihood:", sprintf("%.2f", x$log_marginal_likelihood), "\n")
-  cat("Final ESS:              ", sprintf("%.2f", x$ESS[n_timepoints]), "\n")
-  cat("Resampling events:      ", n_resampling_events, "/", n_timepoints, "\n", sep = "")
+  cat("Log marginal likelihood: ", sprintf("%.2f", x$log_marginal_likelihood), "\n", sep = "")
+  cat("Final ESS:               ", sprintf("%.2f", x$ESS[n_timepoints]), "\n", sep = "")
+  cat("Resampling events:       ", n_resampling_events, "/", n_timepoints, "\n", sep = "")
   
   invisible(x)
 }
