@@ -138,13 +138,13 @@ opts_trace <- set_smc_options(
 
 # For partial rankings with more rejuvenation steps
 mod_partial <- compute_sequentially(
-  partial_rankings,
+  partial_rankings[1:10, ],
   hyperparameters = set_hyperparameters(n_items = 5),
   smc_options = set_smc_options(
-    n_particles = 100,
+    n_particles = 30,
     n_particle_filters = 5,
     max_rejuvenation_steps = 10,
-    latent_rank_proposal = "pseudo"
+    latent_rank_proposal = "uniform"
   )
 )
 
