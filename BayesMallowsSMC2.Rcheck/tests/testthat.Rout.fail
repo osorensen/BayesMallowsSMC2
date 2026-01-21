@@ -1,0 +1,45 @@
+
+R version 4.3.3 (2024-02-29) -- "Angel Food Cake"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # This file is part of the standard setup for testthat.
+> # It is recommended that you do not modify it.
+> #
+> # Where should you do additional test configuration?
+> # Learn more about the roles of various files in:
+> # * https://r-pkgs.org/testing-design.html#sec-tests-files-overview
+> # * https://testthat.r-lib.org/articles/special-files.html
+> 
+> library(testthat)
+> library(BayesMallowsSMC2)
+> 
+> test_check("BayesMallowsSMC2")
+[ FAIL 1 | WARN 0 | SKIP 0 | PASS 35 ]
+
+══ Failed tests ════════════════════════════════════════════════════════════════
+── Error ('test-compute_sequentially_mixtures.R:10:3'): Mixture models work ────
+<packageNotFoundError/error/condition>
+Error in `loadNamespace(x)`: there is no package called 'label.switching'
+Backtrace:
+    ▆
+ 1. └─base::loadNamespace(x) at test-compute_sequentially_mixtures.R:10:3
+ 2.   └─base::withRestarts(stop(cond), retry_loadNamespace = function() NULL)
+ 3.     └─base (local) withOneRestart(expr, restarts[[1L]])
+ 4.       └─base (local) doWithOneRestart(return(expr), restart)
+
+[ FAIL 1 | WARN 0 | SKIP 0 | PASS 35 ]
+Error: Test failures
+Execution halted

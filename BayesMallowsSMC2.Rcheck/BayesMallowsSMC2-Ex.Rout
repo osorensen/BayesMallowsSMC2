@@ -1,0 +1,111 @@
+
+R version 4.3.3 (2024-02-29) -- "Angel Food Cake"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "BayesMallowsSMC2"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('BayesMallowsSMC2')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("compute_sequentially")
+> ### * compute_sequentially
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: compute_sequentially
+> ### Title: Compute the Bayesian Mallows model sequentially
+> ### Aliases: compute_sequentially
+> 
+> ### ** Examples
+> 
+> # Compute the model sequentially with complete rankings
+> mod <- compute_sequentially(
++   complete_rankings,
++   hyperparameters = set_hyperparameters(n_items = 5),
++   smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
++ )
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("precompute_topological_sorts")
+> ### * precompute_topological_sorts
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: precompute_topological_sorts
+> ### Title: Precompute All Topological Sorts
+> ### Aliases: precompute_topological_sorts
+> 
+> ### ** Examples
+> 
+> # Extract preferences from user 1 in the included example data.
+> prefs <- pairwise_preferences[
++  pairwise_preferences$user == 1, c("top_item", "bottom_item"), drop = FALSE]
+> 
+> # Generate all topological sorts, but don't save them:
+> sorts <- precompute_topological_sorts(
++   prefs = as.matrix(prefs),
++   n_items = 5,
++   save_frac = 0
++ )
+> # Number of sorts
+> sorts$sort_count
+[1] 12
+> # Empty matrix
+> sorts$sort_matrix
+<0 x 0 matrix>
+> 
+> # Generate all topological sorts and save them:
+> sorts <- precompute_topological_sorts(
++   prefs = as.matrix(prefs),
++   n_items = 5,
++   save_frac = 1
++ )
+> # Number of sorts
+> sorts$sort_count
+[1] 12
+> # Matrix with all of them
+> sorts$sort_matrix
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12]
+[1,]    1    1    1    1    1    1    1    1    1     1     1     1
+[2,]    2    2    2    3    3    3    5    5    5     5     5     5
+[3,]    3    5    5    2    5    5    2    2    3     3     4     4
+[4,]    5    3    4    5    2    4    3    4    2     4     2     3
+[5,]    4    4    3    4    4    2    4    3    4     2     3     2
+> 
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  0.169 0.009 0.179 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

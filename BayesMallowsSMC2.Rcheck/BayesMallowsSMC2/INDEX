@@ -1,0 +1,9 @@
+complete_rankings       Simulated Data
+compute_sequentially    Compute the Bayesian Mallows model sequentially
+mixtures                Simulated Two-Component Mixtures Data
+pairwise_preferences    Simulated Data with Pairwise Preferences
+partial_rankings        Simulated Data with Missing Values
+precompute_topological_sorts
+                        Precompute All Topological Sorts
+set_hyperparameters     Set hyperparameters
+set_smc_options         Set SMC options
