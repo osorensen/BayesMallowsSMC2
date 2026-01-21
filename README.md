@@ -9,7 +9,7 @@
 <!-- badges: end -->
 
 BayesMallowsSMC2 provides functions for performing sequential inference
-in the Bayesian Mallows model using the SMC$^{2}$ algorithm.
+in the Bayesian Mallows model using the SMC2 algorithm.
 
 ## Installation
 
