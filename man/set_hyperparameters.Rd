@@ -15,17 +15,51 @@ set_hyperparameters(
 \arguments{
 \item{n_items}{Integer defining the number of items.}
 
-\item{alpha_shape}{Shape of gamma prior for alpha.}
+\item{alpha_shape}{Shape parameter of the gamma prior distribution for the
+scale parameter alpha. Defaults to 1.}
 
-\item{alpha_rate}{Rate of gamma prior for alpha.}
+\item{alpha_rate}{Rate parameter of the gamma prior distribution for the
+scale parameter alpha. Defaults to 0.5.}
 
-\item{cluster_concentration}{Concentration parameter of Dirichlet distribution for cluster probabilities.}
+\item{cluster_concentration}{Concentration parameter of the Dirichlet
+distribution for cluster probabilities. Only used when \code{n_clusters > 1}.
+Defaults to 10.}
 
-\item{n_clusters}{Integer defining the number of clusters.}
+\item{n_clusters}{Integer defining the number of clusters. Defaults to 1.}
 }
 \value{
-A list
+A list with components \code{n_items}, \code{alpha_shape}, \code{alpha_rate},
+\code{cluster_concentration}, and \code{n_clusters}.
 }
 \description{
-Set hyperparameters
+Set the hyperparameters for the Bayesian Mallows model. This function
+creates a list of hyperparameter values that can be passed to
+\code{\link[=compute_sequentially]{compute_sequentially()}}.
+}
+\examples{
+# Example: Set hyperparameters and use them with partial rankings
+# Set hyperparameters with default values
+hyperparams1 <- set_hyperparameters(n_items = 5)
+
+# Set hyperparameters with custom prior for alpha
+# A larger alpha_shape and smaller alpha_rate increases the prior mean
+hyperparams2 <- set_hyperparameters(
+  n_items = 5, 
+  alpha_shape = 2, 
+  alpha_rate = 1
+)
+
+# Use the hyperparameters with compute_sequentially
+# This example uses partial rankings with a small number of particles
+# for fast execution suitable for CRAN checks
+set.seed(123)
+mod <- compute_sequentially(
+  partial_rankings,
+  hyperparameters = hyperparams2,
+  smc_options = set_smc_options(
+    n_particles = 20, 
+    n_particle_filters = 4,
+    max_rejuvenation_steps = 3
+  )
+)
 }
