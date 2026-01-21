@@ -16,12 +16,18 @@ and the second of which represents the disfavored item.}
 \item{save_frac}{Number between 0 and 1 specifying which fraction of sorts to save.}
 }
 \value{
-This function returns the number of topological sorts.
+A list with two elements:
+\describe{
+\item{sort_count}{An integer giving the total number of topological sorts.}
+\item{sort_matrix}{A matrix where each column represents one topological sort.
+The number of columns is approximately \code{save_frac} times \code{sort_count}.
+If \code{save_frac = 0}, this is an empty matrix with dimensions \code{c(0, 0)}.}
+}
 }
 \description{
-This function precomputes all topological sorts for a given preference matrix and
-saves them to a specified output directory. It ensures the output directory exists
-and creates it if it does not.
+This function precomputes all topological sorts for a given preference matrix.
+Topological sorts are consistent orderings of items that respect the given
+pairwise preference constraints.
 }
 \details{
 The function generates all possible topological sorts for the provided preference matrix

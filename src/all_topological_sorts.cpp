@@ -88,9 +88,9 @@ arma::imat Graph::alltopologicalSort(long long int& sort_count, double save_frac
 
 //' Precompute All Topological Sorts
 //'
-//' This function precomputes all topological sorts for a given preference matrix and
-//' saves them to a specified output directory. It ensures the output directory exists
-//' and creates it if it does not.
+//' This function precomputes all topological sorts for a given preference matrix.
+//' Topological sorts are consistent orderings of items that respect the given
+//' pairwise preference constraints.
 //'
 //' @param prefs A matrix representing the preference relations. This matrix
 //'   must have two columns, the first of which represents the preferred item
@@ -100,9 +100,15 @@ arma::imat Graph::alltopologicalSort(long long int& sort_count, double save_frac
 //'
 //' @details
 //' The function generates all possible topological sorts for the provided preference matrix
-//' and saves approximately `save_frac` of the sorts in a matrix which is returned.
+//' and saves approximately \code{save_frac} of the sorts in a matrix which is returned.
 //'
-//' @return This function returns the number of topological sorts.
+//' @return A list with two elements:
+//' \describe{
+//'   \item{sort_count}{An integer giving the total number of topological sorts.}
+//'   \item{sort_matrix}{A matrix where each column represents one topological sort.
+//'     The number of columns is approximately \code{save_frac} times \code{sort_count}.
+//'     If \code{save_frac = 0}, this is an empty matrix with dimensions \code{c(0, 0)}.}
+//' }
 //'
 //' @export
 //' @examples
