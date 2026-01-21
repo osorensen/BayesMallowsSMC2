@@ -64,15 +64,15 @@ print.BayesMallowsSMC2 <- function(x, ...) {
   cat(strrep("=", nchar("BayesMallowsSMC2 Model")), "\n\n", sep = "")
   
   # Display basic information
-  cat("Number of particles:    ", n_particles, "\n", sep = "")
-  cat("Number of timepoints:   ", n_timepoints, "\n", sep = "")
-  cat("Number of items:        ", n_items, "\n", sep = "")
-  cat("Number of clusters:     ", n_clusters, "\n\n", sep = "")
+  cat(sprintf("%-25s %s\n", "Number of particles:", n_particles))
+  cat(sprintf("%-25s %s\n", "Number of timepoints:", n_timepoints))
+  cat(sprintf("%-25s %s\n", "Number of items:", n_items))
+  cat(sprintf("%-25s %s\n\n", "Number of clusters:", n_clusters))
   
   # Display model fit information
-  cat("Log marginal likelihood: ", sprintf("%.2f", x$log_marginal_likelihood), "\n", sep = "")
-  cat("Final ESS:               ", sprintf("%.2f", x$ESS[n_timepoints]), "\n", sep = "")
-  cat("Resampling events:       ", n_resampling_events, "/", n_timepoints, "\n", sep = "")
+  cat(sprintf("%-25s %.2f\n", "Log marginal likelihood:", x$log_marginal_likelihood))
+  cat(sprintf("%-25s %.2f\n", "Final ESS:", x$ESS[n_timepoints]))
+  cat(sprintf("%-25s %d/%d\n", "Resampling events:", n_resampling_events, n_timepoints))
   
   invisible(x)
 }
