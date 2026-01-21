@@ -39,6 +39,17 @@
 #' mod
 #'
 print.BayesMallowsSMC2 <- function(x, ...) {
+  # Basic validation
+  if (!inherits(x, "BayesMallowsSMC2")) {
+    stop("x must be an object of class 'BayesMallowsSMC2'")
+  }
+  
+  required_fields <- c("alpha", "rho", "ESS", "resampling", "log_marginal_likelihood")
+  missing_fields <- setdiff(required_fields, names(x))
+  if (length(missing_fields) > 0) {
+    stop("Object is missing required fields: ", paste(missing_fields, collapse = ", "))
+  }
+  
   # Extract dimensions
   n_particles <- ncol(x$alpha)
   n_timepoints <- length(x$ESS)
