@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 parameter_trace
+*.Rcheck
+*.tar.gz
