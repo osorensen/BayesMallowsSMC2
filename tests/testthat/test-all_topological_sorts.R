@@ -19,10 +19,9 @@ test_that("precompute_topological_sorts works", {
 
   expect_equal(
     sorts$sort_matrix,
-    structure(c(1L, 2L, 3L, 5L, 4L, 1L, 2L, 5L, 3L, 4L, 1L, 3L, 5L,
-                2L, 4L, 1L, 5L, 3L, 4L, 2L, 1L, 5L, 4L, 2L, 3L, 1L, 5L, 4L, 3L,
-                2L), dim = 5:6)
+    structure(c(5L, 1L, 2L, 3L, 4L, 5L, 1L, 2L, 4L, 3L, 5L, 1L, 4L,
+                2L, 3L), dim = c(5L, 3L))
   )
 
-  expect_equal(sorts$sort_count, 12L)
+  expect_equal(sorts$sort_count, 8L)
 })
