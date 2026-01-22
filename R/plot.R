@@ -33,7 +33,6 @@
 #'
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_histogram geom_col facet_wrap xlab ylab theme_minimal
-#' @importFrom stats weighted.mean
 #'
 #' @examples
 #' \dontrun{
@@ -83,6 +82,20 @@ plot.BayesMallowsSMC2 <- function(x, parameter = "alpha", items = NULL, ...) {
 
 
 #' @keywords internal
+#' Helper function to create weighted samples from parameter values
+#' @param values Numeric vector of parameter values
+#' @param weights Numeric vector of importance weights
+#' @param n_samples Number of samples to draw (default 10000)
+#' @return Numeric vector of weighted samples
+create_weighted_samples <- function(values, weights, n_samples = 10000) {
+  sample_probs <- weights / sum(weights)
+  sampled_indices <- sample(seq_along(values), size = n_samples, 
+                            replace = TRUE, prob = sample_probs)
+  values[sampled_indices]
+}
+
+
+#' @keywords internal
 plot_alpha_smc <- function(x) {
   # Extract alpha values and weights
   # alpha is a matrix: [n_clusters, n_particles]
@@ -101,12 +114,7 @@ plot_alpha_smc <- function(x) {
     alpha_vals <- alpha_matrix[cluster, ]
     
     # Create weighted samples by replicating values
-    # Scale weights to get integer counts for sampling
-    n_samples <- 10000
-    sample_probs <- weights / sum(weights)
-    sampled_indices <- sample(seq_len(n_particles), size = n_samples, 
-                              replace = TRUE, prob = sample_probs)
-    sampled_alpha <- alpha_vals[sampled_indices]
+    sampled_alpha <- create_weighted_samples(alpha_vals, weights)
     
     plot_data_list[[cluster]] <- data.frame(
       value = sampled_alpha,
@@ -150,11 +158,7 @@ plot_tau_smc <- function(x) {
     tau_vals <- tau_matrix[cluster, ]
     
     # Create weighted samples
-    n_samples <- 10000
-    sample_probs <- weights / sum(weights)
-    sampled_indices <- sample(seq_len(n_particles), size = n_samples, 
-                              replace = TRUE, prob = sample_probs)
-    sampled_tau <- tau_vals[sampled_indices]
+    sampled_tau <- create_weighted_samples(tau_vals, weights)
     
     plot_data_list[[cluster]] <- data.frame(
       value = sampled_tau,
