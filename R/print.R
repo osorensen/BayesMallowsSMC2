@@ -43,37 +43,37 @@ print.BayesMallowsSMC2 <- function(x, ...) {
   if (!inherits(x, "BayesMallowsSMC2")) {
     stop("x must be an object of class 'BayesMallowsSMC2'")
   }
-  
+
   required_fields <- c("alpha", "rho", "ESS", "resampling", "log_marginal_likelihood")
   missing_fields <- setdiff(required_fields, names(x))
   if (length(missing_fields) > 0) {
     stop("Object is missing required fields: ", paste(missing_fields, collapse = ", "))
   }
-  
+
   # Extract dimensions
   n_particles <- ncol(x$alpha)
   n_timepoints <- length(x$ESS)
   n_items <- dim(x$rho)[1]
   n_clusters <- nrow(x$alpha)
-  
+
   # Count resampling events
   n_resampling_events <- sum(x$resampling)
-  
+
   # Create header
   cat("BayesMallowsSMC2 Model\n")
   cat(strrep("=", nchar("BayesMallowsSMC2 Model")), "\n\n", sep = "")
-  
+
   # Display basic information
   cat(sprintf("%-25s %s\n", "Number of particles:", n_particles))
   cat(sprintf("%-25s %s\n", "Number of timepoints:", n_timepoints))
   cat(sprintf("%-25s %s\n", "Number of items:", n_items))
   cat(sprintf("%-25s %s\n\n", "Number of clusters:", n_clusters))
-  
+
   # Display model fit information
   cat(sprintf("%-25s %.2f\n", "Log marginal likelihood:", x$log_marginal_likelihood))
   cat(sprintf("%-25s %.2f\n", "Final ESS:", x$ESS[n_timepoints]))
   cat(sprintf("%-25s %d/%d\n", "Resampling events:", n_resampling_events, n_timepoints))
-  
+
   invisible(x)
 }
 
@@ -121,27 +121,27 @@ summary.BayesMallowsSMC2 <- function(object, ...) {
   if (!inherits(object, "BayesMallowsSMC2")) {
     stop("object must be an object of class 'BayesMallowsSMC2'")
   }
-  
+
   required_fields <- c("alpha", "rho", "ESS", "resampling", "log_marginal_likelihood")
   missing_fields <- setdiff(required_fields, names(object))
   if (length(missing_fields) > 0) {
     stop("Object is missing required fields: ", paste(missing_fields, collapse = ", "))
   }
-  
+
   # Extract dimensions
   n_particles <- ncol(object$alpha)
   n_timepoints <- length(object$ESS)
   n_items <- dim(object$rho)[1]
   n_clusters <- nrow(object$alpha)
-  
+
   # Count resampling events
   n_resampling_events <- sum(object$resampling)
-  
+
   # Compute posterior mean and standard deviation of alpha
   # alpha is a matrix where rows are clusters and columns are particles
   alpha_mean <- rowMeans(object$alpha)
-  alpha_sd <- apply(object$alpha, 1, sd)
-  
+  alpha_sd <- apply(object$alpha, 1, stats::sd)
+
   # Create summary object
   summary_obj <- list(
     n_particles = n_particles,
@@ -154,7 +154,7 @@ summary.BayesMallowsSMC2 <- function(object, ...) {
     alpha_mean = alpha_mean,
     alpha_sd = alpha_sd
   )
-  
+
   class(summary_obj) <- "summary.BayesMallowsSMC2"
   summary_obj
 }
@@ -174,25 +174,25 @@ print.summary.BayesMallowsSMC2 <- function(x, ...) {
   # Create header
   cat("BayesMallowsSMC2 Model Summary\n")
   cat(strrep("=", nchar("BayesMallowsSMC2 Model Summary")), "\n\n", sep = "")
-  
+
   # Display basic information
   cat(sprintf("%-25s %s\n", "Number of particles:", x$n_particles))
   cat(sprintf("%-25s %s\n", "Number of timepoints:", x$n_timepoints))
   cat(sprintf("%-25s %s\n", "Number of items:", x$n_items))
   cat(sprintf("%-25s %s\n\n", "Number of clusters:", x$n_clusters))
-  
+
   # Display model fit information
   cat(sprintf("%-25s %.2f\n", "Log marginal likelihood:", x$log_marginal_likelihood))
   cat(sprintf("%-25s %.2f\n", "Final ESS:", x$final_ess))
   cat(sprintf("%-25s %d/%d\n\n", "Resampling events:", x$n_resampling_events, x$n_timepoints))
-  
+
   # Display posterior statistics for alpha
   cat("Posterior Statistics for Alpha:\n")
   cat(strrep("-", nchar("Posterior Statistics for Alpha:")), "\n", sep = "")
   for (i in seq_along(x$alpha_mean)) {
-    cat(sprintf("Cluster %d: Mean = %.4f, SD = %.4f\n", 
+    cat(sprintf("Cluster %d: Mean = %.4f, SD = %.4f\n",
                 i, x$alpha_mean[i], x$alpha_sd[i]))
   }
-  
+
   invisible(x)
 }

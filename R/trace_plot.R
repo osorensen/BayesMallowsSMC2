@@ -55,31 +55,31 @@
 trace_plot <- function(x, parameter = "alpha", ...) {
   # Validate parameter
   parameter <- match.arg(parameter, c("alpha", "tau"))
-  
+
   # Basic validation
   if (!inherits(x, "BayesMallowsSMC2")) {
     stop("x must be an object of class 'BayesMallowsSMC2'")
   }
-  
+
   # Check if trace was enabled
   trace_field <- paste0(parameter, "_traces")
   if (!trace_field %in% names(x)) {
     stop("Trace data not found. Please run compute_sequentially with trace = TRUE in set_smc_options().")
   }
-  
+
   traces <- x[[trace_field]]
-  
+
   if (length(traces) == 0) {
     stop("Trace data not found. Please run compute_sequentially with trace = TRUE in set_smc_options().")
   }
-  
+
   # Check for importance weights trace
   if (!"log_importance_weights_traces" %in% names(x)) {
     stop("Importance weights trace not found. This should not happen if trace = TRUE was used.")
   }
-  
+
   log_weights_traces <- x$log_importance_weights_traces
-  
+
   if (parameter == "alpha") {
     plot_trace_alpha_tau(traces, log_weights_traces, parameter_name = "alpha",
                          parameter_label = expression(alpha))
@@ -101,16 +101,16 @@ utils::globalVariables(c("timepoint", "mean", "lower", "upper", "cluster"))
 plot_trace_alpha_tau <- function(traces, log_weights_traces, parameter_name,
                                  parameter_label) {
   n_timepoints <- length(traces)
-  
+
   # Get dimensions from first trace
   # Need to infer n_clusters and n_particles from the trace
   first_trace <- traces[[1]]
-  
+
   # If trace is a vector, need to infer dimensions
   if (is.vector(first_trace)) {
     # Get n_particles from log_weights
     n_particles <- length(log_weights_traces[[1]])
-    
+
     # If trace is a vector, infer n_clusters from its length
     trace_length <- length(first_trace)
     if (trace_length %% n_particles == 0) {
@@ -120,10 +120,10 @@ plot_trace_alpha_tau <- function(traces, log_weights_traces, parameter_name,
                    trace_length, n_particles),
            "This indicates inconsistent dimensions in the trace data.")
     }
-    
+
     # Convert all traces to matrices [n_clusters x n_particles]
     # The C++ code stores traces as: alpha is [n_clusters x n_particles] matrix per timepoint
-    # When passed to R as vector, elements are in column-major order: 
+    # When passed to R as vector, elements are in column-major order:
     # cluster1_particle1, cluster2_particle1, cluster1_particle2, cluster2_particle2, ...
     traces <- lapply(traces, function(t) {
       matrix(t, nrow = n_clusters, ncol = n_particles, byrow = FALSE)
@@ -135,27 +135,27 @@ plot_trace_alpha_tau <- function(traces, log_weights_traces, parameter_name,
   } else {
     stop("Trace elements must be vectors or matrices")
   }
-  
+
   # Create data frame for plotting
   plot_data_list <- vector("list", n_timepoints * n_clusters)
   idx <- 1
-  
+
   for (t in seq_len(n_timepoints)) {
     param_matrix <- traces[[t]]
     log_weights <- log_weights_traces[[t]]
-    
+
     # Normalize weights
     weights <- exp(log_weights - max(log_weights))
     weights <- weights / sum(weights)
-    
+
     for (cluster in seq_len(n_clusters)) {
       param_values <- param_matrix[cluster, ]
-      
+
       # Compute weighted statistics
-      weighted_mean <- weighted.mean(param_values, weights)
-      weighted_quantiles <- weighted_quantile(param_values, weights, 
+      weighted_mean <- stats::weighted.mean(param_values, weights)
+      weighted_quantiles <- weighted_quantile(param_values, weights,
                                               probs = c(0.025, 0.975))
-      
+
       plot_data_list[[idx]] <- data.frame(
         timepoint = t,
         mean = weighted_mean,
@@ -166,12 +166,12 @@ plot_trace_alpha_tau <- function(traces, log_weights_traces, parameter_name,
       idx <- idx + 1
     }
   }
-  
+
   plot_data <- do.call(rbind, plot_data_list)
-  
+
   # Create line plot with credible interval
   p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = timepoint, y = mean)) +
-    ggplot2::geom_ribbon(ggplot2::aes(ymin = lower, ymax = upper), 
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = lower, ymax = upper),
                         alpha = 0.3, fill = "steelblue") +
     ggplot2::geom_line(color = "darkblue", linewidth = 1) +
     ggplot2::xlab("Timepoint") +
@@ -180,12 +180,12 @@ plot_trace_alpha_tau <- function(traces, log_weights_traces, parameter_name,
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank()
     )
-  
+
   # Add faceting if multiple clusters
   if (n_clusters > 1) {
     p <- p + ggplot2::facet_wrap(~ cluster, scales = "free_y")
   }
-  
+
   p
 }
 
@@ -200,10 +200,10 @@ weighted_quantile <- function(x, weights, probs) {
   ord <- order(x)
   x_sorted <- x[ord]
   weights_sorted <- weights[ord]
-  
+
   # Compute cumulative weights
   cum_weights <- cumsum(weights_sorted) / sum(weights_sorted)
-  
+
   # Find quantiles
   quantiles <- numeric(length(probs))
   for (i in seq_along(probs)) {
@@ -214,6 +214,6 @@ weighted_quantile <- function(x, weights, probs) {
     }
     quantiles[i] <- x_sorted[idx]
   }
-  
+
   quantiles
 }
