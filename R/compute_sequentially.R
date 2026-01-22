@@ -1,5 +1,10 @@
 #' Compute the Bayesian Mallows model sequentially
 #'
+#' @description
+#' Fits the Bayesian Mallows model to sequentially arriving ranking or preference
+#' data using the SMC2 (Sequential Monte Carlo Squared) algorithm. This function
+#' can handle complete rankings, partial rankings, and pairwise preference data,
+#' and supports mixture models with multiple clusters.
 #'
 #' @param data A dataframe containing partial rankings or pairwise preferences.
 #'   If `data` contains complete or partial rankings, it must have the following
@@ -29,7 +34,55 @@
 #'   [precompute_topological_sorts()]. Only used with preference data, and
 #'   defaults to `NULL`.
 #'
-#' @return An object of class BayesMallowsSMC2.
+#' @return An object of class `BayesMallowsSMC2`, which is a list containing:
+#' \describe{
+#'   \item{alpha}{A matrix of dispersion parameter values with dimensions
+#'     `[n_clusters, n_particles]`. Each column represents one particle, and
+#'     each row represents one cluster.}
+#'   \item{rho}{A 3-dimensional array of latent ranking values with dimensions
+#'     `[n_items, n_clusters, n_particles]`. Entry `[i, k, j]` gives the rank
+#'     of item `i` in cluster `k` for particle `j`.}
+#'   \item{tau}{A matrix of precision parameter values (for mixture models) with
+#'     dimensions `[n_clusters, n_particles]`. Each column represents one particle.}
+#'   \item{cluster_probabilities}{A 3-dimensional array of cluster assignment
+#'     probabilities (for mixture models) with dimensions
+#'     `[n_particles, n_users, n_clusters]`. Only present when `n_clusters > 1`.}
+#'   \item{importance_weights}{A numeric vector of length `n_particles` containing
+#'     the normalized importance weights for each particle.}
+#'   \item{ESS}{A numeric vector of length `n_timepoints` containing the effective
+#'     sample size at each timepoint.}
+#'   \item{resampling}{An integer vector of length `n_timepoints` indicating whether
+#'     resampling occurred at each timepoint (1 = yes, 0 = no).}
+#'   \item{n_particle_filters}{An integer vector of length `n_timepoints` showing
+#'     the number of particle filters used at each timepoint.}
+#'   \item{log_marginal_likelihood}{A numeric value giving the estimated log
+#'     marginal likelihood of the data.}
+#'   \item{alpha_traces}{A list of parameter traces (only if `trace = TRUE` in
+#'     [set_smc_options()]). Each element contains alpha values at one timepoint.}
+#'   \item{tau_traces}{A list of parameter traces (only if `trace = TRUE` in
+#'     [set_smc_options()]). Each element contains tau values at one timepoint.}
+#'   \item{rho_traces}{A list of parameter traces (only if `trace = TRUE` in
+#'     [set_smc_options()]). Each element contains rho values at one timepoint.}
+#'   \item{log_importance_weights_traces}{A list of importance weight traces
+#'     (only if `trace = TRUE` in [set_smc_options()]).}
+#'   \item{latent_rankings_traces}{A list of latent ranking traces (only if
+#'     `trace_latent = TRUE` in [set_smc_options()]).}
+#' }
+#'
+#' @details
+#' The function implements the SMC2 algorithm for sequential Bayesian inference
+#' in the Mallows model. At each timepoint, it updates the particle approximation
+#' to the posterior distribution as new ranking or preference data arrives. The
+#' algorithm automatically performs resampling and rejuvenation steps when the
+#' effective sample size drops below the specified threshold.
+#'
+#' The returned object has S3 methods for printing ([print.BayesMallowsSMC2]),
+#' summarizing ([summary.BayesMallowsSMC2]), and plotting ([plot.BayesMallowsSMC2]).
+#' For visualization of parameter evolution over time, see [trace_plot()].
+#'
+#' @references
+#' \insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}
+#'
 #' @export
 #'
 #' @examples
@@ -39,6 +92,12 @@
 #'   hyperparameters = set_hyperparameters(n_items = 5),
 #'   smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
 #' )
+#'
+#' # Print the model summary
+#' mod
+#'
+#' # Plot posterior distribution of alpha
+#' plot(mod, parameter = "alpha")
 #'
 compute_sequentially <- function(
     data,

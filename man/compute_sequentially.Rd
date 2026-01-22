@@ -43,10 +43,57 @@ structure:
 defaults to \code{NULL}.}
 }
 \value{
-An object of class BayesMallowsSMC2.
+An object of class \code{BayesMallowsSMC2}, which is a list containing:
+\describe{
+\item{alpha}{A matrix of dispersion parameter values with dimensions
+\verb{[n_clusters, n_particles]}. Each column represents one particle, and
+each row represents one cluster.}
+\item{rho}{A 3-dimensional array of latent ranking values with dimensions
+\verb{[n_items, n_clusters, n_particles]}. Entry \verb{[i, k, j]} gives the rank
+of item \code{i} in cluster \code{k} for particle \code{j}.}
+\item{tau}{A matrix of precision parameter values (for mixture models) with
+dimensions \verb{[n_clusters, n_particles]}. Each column represents one particle.}
+\item{cluster_probabilities}{A 3-dimensional array of cluster assignment
+probabilities (for mixture models) with dimensions
+\verb{[n_particles, n_users, n_clusters]}. Only present when \code{n_clusters > 1}.}
+\item{importance_weights}{A numeric vector of length \code{n_particles} containing
+the normalized importance weights for each particle.}
+\item{ESS}{A numeric vector of length \code{n_timepoints} containing the effective
+sample size at each timepoint.}
+\item{resampling}{An integer vector of length \code{n_timepoints} indicating whether
+resampling occurred at each timepoint (1 = yes, 0 = no).}
+\item{n_particle_filters}{An integer vector of length \code{n_timepoints} showing
+the number of particle filters used at each timepoint.}
+\item{log_marginal_likelihood}{A numeric value giving the estimated log
+marginal likelihood of the data.}
+\item{alpha_traces}{A list of parameter traces (only if \code{trace = TRUE} in
+\code{\link[=set_smc_options]{set_smc_options()}}). Each element contains alpha values at one timepoint.}
+\item{tau_traces}{A list of parameter traces (only if \code{trace = TRUE} in
+\code{\link[=set_smc_options]{set_smc_options()}}). Each element contains tau values at one timepoint.}
+\item{rho_traces}{A list of parameter traces (only if \code{trace = TRUE} in
+\code{\link[=set_smc_options]{set_smc_options()}}). Each element contains rho values at one timepoint.}
+\item{log_importance_weights_traces}{A list of importance weight traces
+(only if \code{trace = TRUE} in \code{\link[=set_smc_options]{set_smc_options()}}).}
+\item{latent_rankings_traces}{A list of latent ranking traces (only if
+\code{trace_latent = TRUE} in \code{\link[=set_smc_options]{set_smc_options()}}).}
+}
 }
 \description{
-Compute the Bayesian Mallows model sequentially
+Fits the Bayesian Mallows model to sequentially arriving ranking or preference
+data using the SMC2 (Sequential Monte Carlo Squared) algorithm. This function
+can handle complete rankings, partial rankings, and pairwise preference data,
+and supports mixture models with multiple clusters.
+}
+\details{
+The function implements the SMC2 algorithm for sequential Bayesian inference
+in the Mallows model. At each timepoint, it updates the particle approximation
+to the posterior distribution as new ranking or preference data arrives. The
+algorithm automatically performs resampling and rejuvenation steps when the
+effective sample size drops below the specified threshold.
+
+The returned object has S3 methods for printing (\link{print.BayesMallowsSMC2}),
+summarizing (\link{summary.BayesMallowsSMC2}), and plotting (\link{plot.BayesMallowsSMC2}).
+For visualization of parameter evolution over time, see \code{\link[=trace_plot]{trace_plot()}}.
 }
 \examples{
 # Compute the model sequentially with complete rankings
@@ -56,4 +103,13 @@ mod <- compute_sequentially(
   smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
 )
 
+# Print the model summary
+mod
+
+# Plot posterior distribution of alpha
+plot(mod, parameter = "alpha")
+
+}
+\references{
+\insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}
 }
