@@ -35,7 +35,6 @@
 #' `set.seed()`).
 #'
 #' @export
-#' @importFrom ggplot2 ggplot aes geom_histogram geom_col facet_wrap xlab ylab theme_minimal
 #'
 #' @examples
 #' \dontrun{
