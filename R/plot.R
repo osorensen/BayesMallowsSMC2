@@ -83,12 +83,11 @@ plot.BayesMallowsSMC2 <- function(x, parameter = "alpha", items = NULL, ...) {
 }
 
 
-#' @keywords internal
-#' Helper function to create weighted samples from parameter values
-#' @param values Numeric vector of parameter values
-#' @param weights Numeric vector of importance weights
-#' @param n_samples Number of samples to draw (default 10000)
-#' @return Numeric vector of weighted samples
+# Helper function to create weighted samples from parameter values
+# @param values Numeric vector of parameter values
+# @param weights Numeric vector of importance weights
+# @param n_samples Number of samples to draw (default 10000)
+# @return Numeric vector of weighted samples
 create_weighted_samples <- function(values, weights, n_samples = 10000) {
   sample_probs <- weights / sum(weights)
   sampled_indices <- sample(seq_along(values), size = n_samples, 
@@ -97,7 +96,7 @@ create_weighted_samples <- function(values, weights, n_samples = 10000) {
 }
 
 
-#' @keywords internal
+# Internal function to plot alpha parameter
 plot_alpha_smc <- function(x) {
   # Extract alpha values and weights
   # alpha is a matrix: [n_clusters, n_particles]
@@ -142,7 +141,7 @@ plot_alpha_smc <- function(x) {
 }
 
 
-#' @keywords internal
+# Internal function to plot tau parameter
 plot_tau_smc <- function(x) {
   # Extract tau values and weights
   # tau is a matrix: [n_clusters, n_particles]
@@ -186,7 +185,7 @@ plot_tau_smc <- function(x) {
 }
 
 
-#' @keywords internal
+# Internal function to plot rho parameter
 plot_rho_smc <- function(x, items = NULL) {
   # Extract rho array and weights
   # rho is a 3D array: [n_items, n_clusters, n_particles]
