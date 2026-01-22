@@ -27,7 +27,7 @@ the 95\% credible interval)
 \description{
 Visualize the timeseries dynamics of the alpha and tau parameters across
 timepoints. This function creates trace plots similar to Figure 4 (left) in
-Sørensen (2025).
+\insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}.
 }
 \details{
 This function requires that the model was fitted with \code{trace = TRUE} in the
@@ -57,8 +57,8 @@ mod <- compute_sequentially(
 
 # Create trace plot for alpha (default)
 trace_plot(mod)
-
-# Create trace plot for tau
-trace_plot(mod, parameter = "tau")
 }
+}
+\references{
+\insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}
 }

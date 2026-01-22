@@ -24,10 +24,12 @@ LinkingTo:
     RcppArmadillo
 Imports: 
     Rcpp,
-    ggplot2
+    ggplot2,
+    Rdpack
 Depends: 
     R (>= 4.1.0)
 Suggests: 
     testthat (>= 3.0.0),
     label.switching (>= 1.8)
+RdMacros: Rdpack
 Config/testthat/edition: 3

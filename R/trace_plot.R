@@ -2,7 +2,7 @@
 #'
 #' Visualize the timeseries dynamics of the alpha and tau parameters across
 #' timepoints. This function creates trace plots similar to Figure 4 (left) in
-#' Sørensen (2025).
+#' \insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}.
 #'
 #' @param x An object of class `BayesMallowsSMC2`, returned from
 #'   [compute_sequentially()] with `trace = TRUE` in [set_smc_options()].
@@ -33,6 +33,9 @@
 #'
 #' @export
 #'
+#' @references
+#' \insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}
+#'
 #' @examples
 #' \dontrun{
 #' # Fit a model with trace enabled
@@ -48,9 +51,6 @@
 #'
 #' # Create trace plot for alpha (default)
 #' trace_plot(mod)
-#'
-#' # Create trace plot for tau
-#' trace_plot(mod, parameter = "tau")
 #' }
 trace_plot <- function(x, parameter = "alpha", ...) {
   # Validate parameter
