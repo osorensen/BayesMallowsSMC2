@@ -1,4 +1,5 @@
 ## usethis namespace: start
+#' @importFrom Rdpack reprompt
 #' @importFrom Rcpp sourceCpp
 ## usethis namespace: end
 NULL
