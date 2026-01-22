@@ -30,6 +30,9 @@
 #'
 #' For `parameter = "rho"`, if the number of items is large (> 5) and `items`
 #' is not specified, a random subset of 5 items is selected for visualization.
+#' The random selection respects the current random seed, so results are
+#' reproducible if you set a seed before calling the function (e.g., with
+#' `set.seed()`).
 #'
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_histogram geom_col facet_wrap xlab ylab theme_minimal
