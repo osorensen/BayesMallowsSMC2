@@ -37,23 +37,19 @@ mod <- compute_sequentially(
   smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
 )
 
-# Show model summary
-summary(mod)
-#>                               Length Class  Mode   
-#> alpha                         100    -none- numeric
-#> rho                           500    -none- numeric
-#> tau                           100    -none- numeric
-#> cluster_probabilities           0    -none- numeric
-#> ESS                           100    -none- numeric
-#> resampling                    100    -none- numeric
-#> n_particle_filters            100    -none- numeric
-#> importance_weights            100    -none- numeric
-#> log_marginal_likelihood         1    -none- numeric
-#> alpha_traces                    0    -none- list   
-#> rho_traces                      0    -none- list   
-#> tau_traces                      0    -none- list   
-#> log_importance_weights_traces   0    -none- list   
-#> latent_rankings_traces          0    -none- list
+# Show model info
+mod
+#> BayesMallowsSMC2 Model
+#> ======================
+#> 
+#> Number of particles:      100
+#> Number of timepoints:     100
+#> Number of items:          5
+#> Number of clusters:       1
+#> 
+#> Log marginal likelihood:  -472.34
+#> Final ESS:                63.55
+#> Resampling events:        5/100
 ```
 
 ### Posterior Summaries
@@ -65,18 +61,19 @@ We can visualize the posterior distributions of the parameters:
 plot(mod, parameter = "alpha")
 ```
 
-<img src="man/figures/README-posterior-alpha-1.png" width="100%" />
+<img src="man/figures/README-posterior-alpha-1.png" alt="" width="100%" />
 
 ``` r
 # Posterior distribution of rho (ranking positions)
 plot(mod, parameter = "rho", items = c(1, 2, 3))
 ```
 
-<img src="man/figures/README-posterior-rho-1.png" width="100%" />
+<img src="man/figures/README-posterior-rho-1.png" alt="" width="100%" />
 
 ## References
 
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
 
 <div id="ref-10.1214/25-BA1564" class="csl-entry">
 

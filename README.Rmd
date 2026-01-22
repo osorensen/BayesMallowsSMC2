@@ -46,8 +46,8 @@ mod <- compute_sequentially(
   smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
 )
 
-# Show model summary
-summary(mod)
+# Show model info
+mod
 ```
 
 ### Posterior Summaries
