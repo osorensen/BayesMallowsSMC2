@@ -97,9 +97,7 @@
 #' mod
 #'
 #' # Plot posterior distribution of alpha
-#' \dontrun{
 #' plot(mod, parameter = "alpha")
-#' }
 #'
 compute_sequentially <- function(
     data,
