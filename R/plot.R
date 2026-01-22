@@ -82,6 +82,9 @@ plot.BayesMallowsSMC2 <- function(x, parameter = "alpha", items = NULL, ...) {
   }
 }
 
+# Avoid R CMD check NOTE about undefined global variables used in ggplot2::aes()
+utils::globalVariables(c("value", "probability"))
+
 
 # Helper function to create weighted samples from parameter values
 # @param values Numeric vector of parameter values
