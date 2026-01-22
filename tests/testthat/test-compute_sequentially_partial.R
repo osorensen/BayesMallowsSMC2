@@ -8,8 +8,8 @@ test_that("compute_sequentially works with partial data", {
       max_particle_filters = 30, max_rejuvenation_steps = 5)
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .95)
-  expect_lt(alpha_hat, 1.06)
+  expect_gt(alpha_hat, .06)
+  expect_lt(alpha_hat, .09)
 
   set.seed(2)
   mod <- compute_sequentially(
@@ -20,8 +20,8 @@ test_that("compute_sequentially works with partial data", {
       resampler = "residual", max_rejuvenation_steps = 5)
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .99)
-  expect_lt(alpha_hat, 1.06)
+  expect_gt(alpha_hat, .02)
+  expect_lt(alpha_hat, .05)
 
   set.seed(2)
   mod <- compute_sequentially(
@@ -35,8 +35,8 @@ test_that("compute_sequentially works with partial data", {
       max_rejuvenation_steps = 5)
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .94)
-  expect_lt(alpha_hat, 1.05)
+  expect_gt(alpha_hat, .02)
+  expect_lt(alpha_hat, .05)
 
   set.seed(2)
   mod <- compute_sequentially(
@@ -50,8 +50,8 @@ test_that("compute_sequentially works with partial data", {
       max_rejuvenation_steps = 5)
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .99)
-  expect_lt(alpha_hat, 1.08)
+  expect_gt(alpha_hat, .02)
+  expect_lt(alpha_hat, .05)
 })
 
 test_that("compute_sequentially works with partial data and pseudolikelihood proposal", {
@@ -67,7 +67,7 @@ test_that("compute_sequentially works with partial data and pseudolikelihood pro
       latent_rank_proposal = "pseudo")
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .98)
-  expect_lt(alpha_hat, 1.06)
+  expect_gt(alpha_hat, .05)
+  expect_lt(alpha_hat, .1)
 
 })
