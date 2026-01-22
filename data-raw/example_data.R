@@ -3,7 +3,7 @@ library(tidyverse)
 n_items <- 5
 set.seed(1)
 
-rankings <- BayesMallows::sample_mallows(1:5, 5, 100, thinning = 1000)
+rankings <- BayesMallows::sample_mallows(1:5, .2, 100, thinning = 1000)
 colnames(rankings) <- paste0("item", 1:5)
 
 complete_rankings <- tibble(timepoint = 1:100, user = 1:100) %>%
