@@ -95,7 +95,7 @@ plot_alpha_smc <- function(x) {
   
   # Create a data frame for plotting
   # Repeat each alpha value according to its weight to create weighted histogram
-  plot_data <- data.frame()
+  plot_data_list <- vector("list", n_clusters)
   
   for (cluster in seq_len(n_clusters)) {
     alpha_vals <- alpha_matrix[cluster, ]
@@ -108,12 +108,13 @@ plot_alpha_smc <- function(x) {
                               replace = TRUE, prob = sample_probs)
     sampled_alpha <- alpha_vals[sampled_indices]
     
-    cluster_data <- data.frame(
+    plot_data_list[[cluster]] <- data.frame(
       value = sampled_alpha,
       cluster = if (n_clusters > 1) paste0("Cluster ", cluster) else "All"
     )
-    plot_data <- rbind(plot_data, cluster_data)
   }
+  
+  plot_data <- do.call(rbind, plot_data_list)
   
   # Create histogram
   p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = value)) +
@@ -143,7 +144,7 @@ plot_tau_smc <- function(x) {
   n_particles <- ncol(tau_matrix)
   
   # Create a data frame for plotting
-  plot_data <- data.frame()
+  plot_data_list <- vector("list", n_clusters)
   
   for (cluster in seq_len(n_clusters)) {
     tau_vals <- tau_matrix[cluster, ]
@@ -155,12 +156,13 @@ plot_tau_smc <- function(x) {
                               replace = TRUE, prob = sample_probs)
     sampled_tau <- tau_vals[sampled_indices]
     
-    cluster_data <- data.frame(
+    plot_data_list[[cluster]] <- data.frame(
       value = sampled_tau,
       cluster = if (n_clusters > 1) paste0("Cluster ", cluster) else "All"
     )
-    plot_data <- rbind(plot_data, cluster_data)
   }
+  
+  plot_data <- do.call(rbind, plot_data_list)
   
   # Create histogram
   p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = value)) +
@@ -208,7 +210,8 @@ plot_rho_smc <- function(x, items = NULL) {
   }
   
   # Create data frame for plotting
-  plot_data <- data.frame()
+  plot_data_list <- vector("list", length(items) * n_clusters * n_items)
+  idx <- 1
   
   for (item_idx in items) {
     for (cluster in seq_len(n_clusters)) {
@@ -220,16 +223,18 @@ plot_rho_smc <- function(x, items = NULL) {
         # Weight of particles where this item has this rank
         prob <- sum(weights[rankings == rank]) / sum(weights)
         
-        cluster_data <- data.frame(
+        plot_data_list[[idx]] <- data.frame(
           item = paste0("Item ", item_idx),
           cluster = if (n_clusters > 1) paste0("Cluster ", cluster) else "All",
           rank = rank,
           probability = prob
         )
-        plot_data <- rbind(plot_data, cluster_data)
+        idx <- idx + 1
       }
     }
   }
+  
+  plot_data <- do.call(rbind, plot_data_list)
   
   # Create bar chart
   p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = factor(rank), y = probability)) +
