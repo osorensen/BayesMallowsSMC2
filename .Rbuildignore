@@ -5,3 +5,4 @@
 ^dev$
 ^\.github$
 ^\.git$
+^cran-comments\.md$
