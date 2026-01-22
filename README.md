@@ -37,19 +37,23 @@ mod <- compute_sequentially(
   smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
 )
 
-# Print model summary
-print(mod)
-#> BayesMallowsSMC2 Model
-#> ======================
-#> 
-#> Number of particles:      100
-#> Number of timepoints:     100
-#> Number of items:          5
-#> Number of clusters:       1
-#> 
-#> Log marginal likelihood:  -472.34
-#> Final ESS:                63.55
-#> Resampling events:        5/100
+# Show model summary
+summary(mod)
+#>                               Length Class  Mode   
+#> alpha                         100    -none- numeric
+#> rho                           500    -none- numeric
+#> tau                           100    -none- numeric
+#> cluster_probabilities           0    -none- numeric
+#> ESS                           100    -none- numeric
+#> resampling                    100    -none- numeric
+#> n_particle_filters            100    -none- numeric
+#> importance_weights            100    -none- numeric
+#> log_marginal_likelihood         1    -none- numeric
+#> alpha_traces                    0    -none- list   
+#> rho_traces                      0    -none- list   
+#> tau_traces                      0    -none- list   
+#> log_importance_weights_traces   0    -none- list   
+#> latent_rankings_traces          0    -none- list
 ```
 
 ### Posterior Summaries
@@ -62,13 +66,6 @@ plot(mod, parameter = "alpha")
 ```
 
 <img src="man/figures/README-posterior-alpha-1.png" width="100%" />
-
-``` r
-# Posterior distribution of tau (precision parameter)
-plot(mod, parameter = "tau")
-```
-
-<img src="man/figures/README-posterior-tau-1.png" width="100%" />
 
 ``` r
 # Posterior distribution of rho (ranking positions)

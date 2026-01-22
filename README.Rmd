@@ -46,8 +46,8 @@ mod <- compute_sequentially(
   smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
 )
 
-# Print model summary
-print(mod)
+# Show model summary
+summary(mod)
 ```
 
 ### Posterior Summaries
@@ -57,11 +57,6 @@ We can visualize the posterior distributions of the parameters:
 ```{r posterior-alpha}
 # Posterior distribution of alpha (dispersion parameter)
 plot(mod, parameter = "alpha")
-```
-
-```{r posterior-tau}
-# Posterior distribution of tau (precision parameter)
-plot(mod, parameter = "tau")
 ```
 
 ```{r posterior-rho}
