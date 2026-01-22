@@ -2,6 +2,8 @@
 
 S3method(plot,BayesMallowsSMC2)
 S3method(print,BayesMallowsSMC2)
+S3method(print,summary.BayesMallowsSMC2)
+S3method(summary,BayesMallowsSMC2)
 export(compute_sequentially)
 export(precompute_topological_sorts)
 export(set_hyperparameters)
