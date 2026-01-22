@@ -5,3 +5,4 @@
 parameter_trace
 *.Rcheck
 *.tar.gz
+README.html

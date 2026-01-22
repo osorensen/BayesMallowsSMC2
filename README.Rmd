@@ -1,5 +1,6 @@
 ---
 output: github_document
+bibliography: inst/REFERENCES.bib
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -19,7 +20,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-BayesMallowsSMC2 provides functions for performing sequential inference in the Bayesian Mallows model using the SMC2 algorithm.
+BayesMallowsSMC2 provides functions for performing sequential inference in the Bayesian Mallows model using the SMC2 algorithm [@10.1214/25-BA1564].
 
 ## Installation
 
@@ -30,8 +31,38 @@ You can install the development version of BayesMallowsSMC2 from [GitHub](https:
 devtools::install_github("osorensen/BayesMallowsSMC2")
 ```
 
-## Usage
+## Example
 
-This package is under development, and is not yet well documented. For examples on how to use it, see the code in the OSF repository https://osf.io/pquk4/.
+Here is a basic example using the included `complete_rankings` dataset:
 
+```{r example}
+library(BayesMallowsSMC2)
+
+# Fit the model with complete rankings
+set.seed(123)
+mod <- compute_sequentially(
+  complete_rankings,
+  hyperparameters = set_hyperparameters(n_items = 5),
+  smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1)
+)
+
+# Show model info
+mod
+```
+
+### Posterior Summaries
+
+We can visualize the posterior distributions of the parameters:
+
+```{r posterior-alpha}
+# Posterior distribution of alpha (dispersion parameter)
+plot(mod, parameter = "alpha")
+```
+
+```{r posterior-rho}
+# Posterior distribution of rho (ranking positions)
+plot(mod, parameter = "rho", items = c(1, 2, 3))
+```
+
+## References
 
