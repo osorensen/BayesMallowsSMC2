@@ -70,7 +70,7 @@ trace_plot <- function(x, parameter = "alpha", ...) {
   traces <- x[[trace_field]]
   
   if (length(traces) == 0) {
-    stop("No trace data available. Please run compute_sequentially with trace = TRUE in set_smc_options().")
+    stop("Trace data not found. Please run compute_sequentially with trace = TRUE in set_smc_options().")
   }
   
   # Check for importance weights trace
@@ -103,9 +103,38 @@ plot_trace_alpha_tau <- function(traces, log_weights_traces, parameter_name,
   n_timepoints <- length(traces)
   
   # Get dimensions from first trace
+  # Need to infer n_clusters and n_particles from the trace
   first_trace <- traces[[1]]
-  n_clusters <- nrow(first_trace)
-  n_particles <- ncol(first_trace)
+  
+  # If trace is a vector, need to infer dimensions
+  if (is.vector(first_trace)) {
+    # Get n_particles from log_weights
+    n_particles <- length(log_weights_traces[[1]])
+    
+    # If trace is a vector, infer n_clusters from its length
+    trace_length <- length(first_trace)
+    if (trace_length %% n_particles == 0) {
+      n_clusters <- trace_length %/% n_particles
+    } else {
+      stop(sprintf("Trace length (%d) is not divisible by n_particles (%d). ",
+                   trace_length, n_particles),
+           "This indicates inconsistent dimensions in the trace data.")
+    }
+    
+    # Convert all traces to matrices [n_clusters x n_particles]
+    # The C++ code stores traces as: alpha is [n_clusters x n_particles] matrix per timepoint
+    # When passed to R as vector, elements are in column-major order: 
+    # cluster1_particle1, cluster2_particle1, cluster1_particle2, cluster2_particle2, ...
+    traces <- lapply(traces, function(t) {
+      matrix(t, nrow = n_clusters, ncol = n_particles, byrow = FALSE)
+    })
+    first_trace <- traces[[1]]
+  } else if (is.matrix(first_trace)) {
+    n_clusters <- nrow(first_trace)
+    n_particles <- ncol(first_trace)
+  } else {
+    stop("Trace elements must be vectors or matrices")
+  }
   
   # Create data frame for plotting
   plot_data_list <- vector("list", n_timepoints * n_clusters)
