@@ -6,3 +6,4 @@ parameter_trace
 *.Rcheck
 *.tar.gz
 README.html
+_codeql_detected_source_root
