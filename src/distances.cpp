@@ -27,8 +27,8 @@ unsigned int CayleyDistance::d(const uvec& r1, const uvec& r2) {
     if(tmp2(i) != r2(i)) {
       distance += 1;
       unsigned int tmp1 = tmp2(i);
-      tmp2(i) = r2(i);
       uvec inds = find(tmp2 == r2(i));
+      tmp2(i) = r2(i);
       tmp2.elem(inds).fill(tmp1);
     }
   }

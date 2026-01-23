@@ -6,7 +6,6 @@ Authors@R: c(person("Oystein", "Sorensen",
                     email = "oystein.sorensen.1985@gmail.com",
                     role = c("aut", "cre"),
                     comment = c(ORCID = "0000-0003-0724-3542")))
-Maintainer: Oystein Sorensen <oystein.sorensen.1985@gmail.com>
 Description: Provides nested sequential Monte Carlo algorithms for performing
     sequential inference in the Bayesian Mallows model, which is a widely used
     probability model for rank and preference data. The package implements the
