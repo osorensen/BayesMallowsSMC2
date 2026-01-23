@@ -13,7 +13,7 @@ Description: Provides nested sequential Monte Carlo algorithms for performing
     SMC2 (Sequential Monte Carlo Squared) algorithm for handling sequentially
     arriving rankings and pairwise preferences, including support for complete
     rankings, partial rankings, and pairwise comparisons. The methods are based
-    on Sørensen (2025) <doi:10.1214/25-BA1564>.
+    on Sorensen (2025) <doi:10.1214/25-BA1564>.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
