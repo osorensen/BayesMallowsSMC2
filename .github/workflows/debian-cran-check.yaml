@@ -1,0 +1,30 @@
+# CRAN Debian incoming checks
+# Uses the official Debian-based CRAN check environment
+name: Debian CRAN Check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  check-cran-debian:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/r-devel/rcheckserver/debian:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install package dependencies
+        run: |
+          R -e 'install.packages(c("remotes", "rcmdcheck"), repos = "https://cloud.r-project.org")'
+          R -e 'remotes::install_deps(dependencies = TRUE)'
+
+      - name: Run R CMD check with --as-cran
+        run: |
+          cd ..
+          R CMD build --no-manual BayesMallowsSMC2
+          R CMD check --as-cran BayesMallowsSMC2*.tar.gz

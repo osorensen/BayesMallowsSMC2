@@ -23,8 +23,6 @@ jobs:
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
           - {os: windows-latest,  r: 'release'}
-          # CRAN-like checks on Debian (using ubuntu-latest with --as-cran)
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release', as-cran: true}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -50,4 +48,3 @@ jobs:
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
-          args: ${{ matrix.config.as-cran && 'c("--as-cran")' || 'c()' }}
