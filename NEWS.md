@@ -1,0 +1,3 @@
+# BayesMallowsSMC2 version 0.2.0
+
+Initial release.
