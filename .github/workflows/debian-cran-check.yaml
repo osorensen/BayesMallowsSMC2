@@ -20,11 +20,11 @@ jobs:
 
       - name: Install package dependencies
         run: |
-          R -e 'install.packages(c("remotes", "rcmdcheck"), repos = "https://cloud.r-project.org")'
+          R -e 'install.packages("remotes", repos = "https://cloud.r-project.org")'
           R -e 'remotes::install_deps(dependencies = TRUE)'
 
       - name: Run R CMD check with --as-cran
         run: |
           cd ..
-          R CMD build --no-manual BayesMallowsSMC2
-          R CMD check --as-cran BayesMallowsSMC2*.tar.gz
+          R CMD build --no-manual ${GITHUB_REPOSITORY#*/}
+          R CMD check --as-cran ${GITHUB_REPOSITORY#*/}*.tar.gz
