@@ -11,6 +11,8 @@ on:
 jobs:
   check-cran-debian:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     container:
       image: ghcr.io/r-devel/rcheckserver/debian:latest
 
