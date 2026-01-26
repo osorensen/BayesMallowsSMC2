@@ -22,7 +22,25 @@ Rankings::Rankings(const Rcpp::List& input_timeseries, bool partial_rankings) :
     ranking_tp new_data;
     Rcpp::CharacterVector nm = a.names();
     for(size_t i{}; i < nm.size(); i++) {
-      new_data[std::string(nm[i])] = RankingObs{uvec(a[i]), find_available_items(uvec(a[i])), find_available_rankings(uvec(a[i]))};
+      // 1. Read as Rcpp vector to safely check for NA
+      Rcpp::NumericVector r_vec = a[i];
+
+      // 2. Create a clean Armadillo vector, forcing NAs to 0
+      arma::uvec clean_vec(r_vec.size());
+      for(int j = 0; j < r_vec.size(); ++j) {
+        if (Rcpp::NumericVector::is_na(r_vec[j])) {
+          clean_vec[j] = 0; // Explicitly mark as missing
+        } else {
+          clean_vec[j] = (unsigned int)r_vec[j];
+        }
+      }
+
+      // 3. Use the clean vector
+      new_data[std::string(nm[i])] = RankingObs{
+        clean_vec,
+        find_available_items(clean_vec),
+        find_available_rankings(clean_vec)
+      };
     }
     timeseries.push_back(new_data);
   }
