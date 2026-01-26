@@ -12,7 +12,7 @@ build-env:
 # 2. Run the check (fast, uses cached dependencies)
 check-debian:
 	docker run --rm $(VOL) $(WORKDIR) --platform $(PLATFORM) $(IMAGE_NAME) \
-		bash -c "R CMD build . && R CMD check BayesMallowsSMC2_*.tar.gz"
+		bash -c "R CMD build . && R CMD check --as-cran BayesMallowsSMC2_*.tar.gz"
 
 # 3. Debugging shell
 shell:
