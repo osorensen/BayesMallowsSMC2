@@ -37,7 +37,7 @@
 #' \insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Fit a model with trace enabled
 #' mod <- compute_sequentially(
 #'   complete_rankings,
