@@ -43,7 +43,7 @@ quantiles) of the posterior distribution at each timepoint, computed using
 the importance weights from the SMC algorithm.
 }
 \examples{
-\dontrun{
+\donttest{
 # Fit a model with trace enabled
 mod <- compute_sequentially(
   complete_rankings,

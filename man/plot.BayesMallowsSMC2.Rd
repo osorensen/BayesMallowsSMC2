@@ -47,7 +47,7 @@ reproducible if you set a seed before calling the function (e.g., with
 \code{set.seed()}).
 }
 \examples{
-\dontrun{
+\donttest{
 # Fit a model with complete rankings
 mod <- compute_sequentially(
   complete_rankings,
