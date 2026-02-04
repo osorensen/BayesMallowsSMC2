@@ -1,4 +1,4 @@
-# BayesMallowsSMC2 version 0.2.0.9000
+# BayesMallowsSMC2 version 0.2.1
 
 ## Bug fixes
 
