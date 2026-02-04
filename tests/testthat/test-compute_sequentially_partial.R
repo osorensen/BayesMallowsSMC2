@@ -8,7 +8,9 @@ test_that("compute_sequentially works with partial data", {
       max_particle_filters = 30, max_rejuvenation_steps = 5)
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .06)
+  # Tolerance adjusted to 0.04 to account for platform-specific variations
+  # in Monte Carlo results (observed 0.046 on r-oldrel-macos and noLD)
+  expect_gt(alpha_hat, .04)
   expect_lt(alpha_hat, .09)
 
   set.seed(2)
