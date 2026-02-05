@@ -1,0 +1,23 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "Sequential Rank and Preference Learning with the Bayesian Mallows Model",
+  author   = c(
+    person("Øystein", "Sørensen"),
+    person("Anja", "Stein"),
+    person("Waldir Leoncio", "Netto"),
+    person("David S.", "Leslie")
+  ),
+  journal  = "Bayesian Analysis",
+  year     = "2025",
+  volume   = "1",
+  number   = "1",
+  pages    = "1--26",
+  doi      = "10.1214/25-BA1564",
+  url      = "https://doi.org/10.1214/25-BA1564",
+  textVersion = paste(
+    "Sørensen, Ø., Stein, A., Netto, W. L., & Leslie, D. S. (2025).",
+    "Sequential Rank and Preference Learning with the Bayesian Mallows Model.",
+    "Bayesian Analysis, 1(1), 1–26.",
+    "https://doi.org/10.1214/25-BA1564"
+  )
+)
