@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/BayesMallowsSMC2)](https://CRAN.R-project.org/package=BayesMallowsSMC2)
 [![R-CMD-check](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/osorensen/BayesMallowsSMC2/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
@@ -14,7 +16,14 @@ in the Bayesian Mallows model using the SMC2 algorithm (Sørensen et al.
 
 ## Installation
 
-You can install the development version of BayesMallowsSMC2 from
+You can install the released version of BayesMallowsSMC2 from
+[CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("BayesMallowsSMC2")
+```
+
+Or install the development version of BayesMallowsSMC2 from
 [GitHub](https://github.com/) with:
 
 ``` r
