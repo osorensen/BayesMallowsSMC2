@@ -10,3 +10,4 @@
 ^Dockerfile$
 ^CRAN-SUBMISSION$
 ^agents\.md$
+^.*\.code-workspace$
