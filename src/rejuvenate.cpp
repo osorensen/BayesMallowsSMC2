@@ -109,19 +109,26 @@ bool Particle::rejuvenate(
     gibbs_particle.conditioned_particle_filter = 0;
     gibbs_particle.particle_filters[0] = this->particle_filters[this->conditioned_particle_filter];
     gibbs_particle.particle_filters[0].cluster_probabilities = mat{};
-
+    
+    // In standard CPF we trace the lineage of conditioned_particle_filter. 
+    // In backward sampling, we run a completely unconditioned forward particle filter!
+    bool requires_conditional = !options.backward_sampling;
     for(size_t t{}; t < T + 1; t++) {
-      gibbs_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal, true);
+      gibbs_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal, requires_conditional);
     }
 
     this->log_incremental_likelihood = gibbs_particle.log_incremental_likelihood;
     this->log_normalized_particle_filter_weights = gibbs_particle.log_normalized_particle_filter_weights;
     this->particle_filters = gibbs_particle.particle_filters;
     this->logz = gibbs_particle.logz;
-
-    sample_particle_filter();
+    this->stored_weights = gibbs_particle.stored_weights;
+    
+    if(options.backward_sampling) {
+      this->assemble_backward_trajectory(T, resampler);
+    } else {
+      sample_particle_filter();
+    }
   }
-
 
   return accepted;
 }

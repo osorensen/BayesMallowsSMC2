@@ -55,6 +55,8 @@ struct Particle{
   int conditioned_particle_filter{};
   void sample_particle_filter();
   arma::vec logz{};
+  std::vector<arma::vec> stored_weights;
+  void assemble_backward_trajectory(unsigned int T, const std::unique_ptr<Resampler>& resampler);
 };
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior,

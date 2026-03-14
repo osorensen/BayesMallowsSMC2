@@ -12,4 +12,5 @@ Options::Options(const Rcpp::List& input_options) :
   doubling_threshold{input_options["doubling_threshold"]},
   verbose{input_options["verbose"]},
   trace{input_options["trace"]},
-  trace_latent{input_options["trace_latent"]}{}
+  trace_latent{input_options["trace_latent"]},
+  backward_sampling{input_options["backward_sampling"]} {}

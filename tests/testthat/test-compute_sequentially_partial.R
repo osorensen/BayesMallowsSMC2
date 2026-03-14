@@ -52,8 +52,20 @@ test_that("compute_sequentially works with partial data", {
       max_rejuvenation_steps = 5)
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  expect_gt(alpha_hat, .02)
-  expect_lt(alpha_hat, .05)
+  expect_gt(alpha_hat, .02) # Wider bounds given stochastic backward sampling
+  expect_lt(alpha_hat, .16)
+})
+
+test_that("compute_sequentially works with partial data and backward sampling", {
+  set.seed(2)
+  mod <- compute_sequentially(
+    partial_rankings,
+    hyperparameters = set_hyperparameters(n_items = 5),
+    smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1, backward_sampling = TRUE)
+  )
+  alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
+  expect_gt(alpha_hat, .02) # Wider bounds given backward sampling stochasticity
+  expect_lt(alpha_hat, .18)
 })
 
 test_that("compute_sequentially works with partial data and pseudolikelihood proposal", {

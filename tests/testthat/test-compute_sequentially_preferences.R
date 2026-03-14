@@ -27,6 +27,31 @@ test_that("compute_sequentially works with preference data", {
   expect_lt(mean(mod$alpha), .3)
 })
 
+test_that("compute_sequentially works with preferences and backward sampling", {
+  set.seed(2)
+  dat <- subset(pairwise_preferences, user <= 24)
+  topological_sorts <- split(dat, f =~ timepoint) |>
+    lapply(split, f =~ user) |>
+    lapply(function(x) {
+      lapply(x, function(y) {
+        precompute_topological_sorts(
+          prefs = as.matrix(y[, c("top_item", "bottom_item"), drop = FALSE]),
+          n_items = 5,
+          save_frac = 1
+        )
+      })
+    })
+  mod <- compute_sequentially(
+    data = dat,
+    hyperparameters = set_hyperparameters(n_items = 5),
+    smc_options = set_smc_options(n_particles = 100, n_particle_filters = 1, backward_sampling = TRUE),
+    topological_sorts = topological_sorts
+  )
+  expect_s3_class(mod, "BayesMallowsSMC2")
+  expect_gt(weighted.mean(as.numeric(mod$alpha), mod$importance_weights), .10) # Wider bounds given backward sampling stochastic variance
+  expect_lt(weighted.mean(as.numeric(mod$alpha), mod$importance_weights), .40)
+})
+
 test_that("compute_sequentially works with preference data and tracing", {
   dat <- subset(pairwise_preferences, user <= 3)
   topological_sorts <- split(dat, f =~ timepoint) |>
