@@ -77,7 +77,7 @@
 #' effective sample size drops below the specified threshold.
 #'
 #' Rejuvenation steps can optionally use Particle Gibbs with Backward Simulation
-#' \\insertCite{Whiteley2010Discussion,Lindsten2013Backward}{BayesMallowsSMC2}, enabled via the `backward_sampling` argument in [set_smc_options()].
+#' \insertCite{Whiteley2010Discussion,Lindsten2013Backward}{BayesMallowsSMC2}, enabled via the `backward_sampling` argument in [set_smc_options()].
 #'
 #' The returned object has S3 methods for printing ([print.BayesMallowsSMC2]),
 #' summarizing ([summary.BayesMallowsSMC2]), and plotting ([plot.BayesMallowsSMC2]).
