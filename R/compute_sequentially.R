@@ -76,11 +76,16 @@
 #' algorithm automatically performs resampling and rejuvenation steps when the
 #' effective sample size drops below the specified threshold.
 #'
+#' Rejuvenation steps can optionally use Particle Gibbs with Backward Simulation
+#' \\insertCite{Whiteley2010Discussion,Lindsten2013Backward}{BayesMallowsSMC2}, enabled via the `backward_sampling` argument in [set_smc_options()].
+#'
 #' The returned object has S3 methods for printing ([print.BayesMallowsSMC2]),
 #' summarizing ([summary.BayesMallowsSMC2]), and plotting ([plot.BayesMallowsSMC2]).
 #' For visualization of parameter evolution over time, see [trace_plot()].
 #'
 #' @references
+#' \insertAllCited{}
+#'
 #' \insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}
 #'
 #' @export
@@ -100,31 +105,31 @@
 #' plot(mod, parameter = "alpha")
 #'
 compute_sequentially <- function(
-    data,
-    hyperparameters = set_hyperparameters(),
-    smc_options = set_smc_options(),
-    topological_sorts = NULL
-    ){
+  data,
+  hyperparameters = set_hyperparameters(),
+  smc_options = set_smc_options(),
+  topological_sorts = NULL
+) {
   rank_columns <- grepl("item[0-9]+", colnames(data))
   preference_columns <- grepl("top\\_item|bottom\\_item", colnames(data))
 
-  if(any(rank_columns)) {
-    input_timeseries <- split(data, f = ~ timepoint) |>
-      lapply(split, f = ~ user) |>
+  if (any(rank_columns)) {
+    input_timeseries <- split(data, f = ~timepoint) |>
+      lapply(split, f = ~user) |>
       lapply(function(x) lapply(x, function(y) as.numeric(y[rank_columns])))
 
-    if(any(is.na(data[rank_columns]))) {
+    if (any(is.na(data[rank_columns]))) {
       attr(input_timeseries, "type") <- "partial rankings"
     } else {
       attr(input_timeseries, "type") <- "complete rankings"
     }
     sort_matrices <- sort_counts <- list()
-  } else if(sum(preference_columns) == 2) {
-    if(is.null(topological_sorts)) {
+  } else if (sum(preference_columns) == 2) {
+    if (is.null(topological_sorts)) {
       stop("topological_sorts must be provided with preference data.")
     }
-    input_timeseries <- split(data, f = ~ timepoint) |>
-      lapply(split, f = ~ user) |>
+    input_timeseries <- split(data, f = ~timepoint) |>
+      lapply(split, f = ~user) |>
       lapply(function(x) lapply(x, function(y) as.matrix(y[preference_columns])))
     attr(input_timeseries, "type") <- "pairwise preferences"
 
@@ -139,15 +144,16 @@ compute_sequentially <- function(
     stop("Something wrong with data")
   }
 
-  if(max(table(data$user)) > 1 &&
-     attr(input_timeseries, "type") != "pairwise preferences") {
+  if (max(table(data$user)) > 1 &&
+    attr(input_timeseries, "type") != "pairwise preferences") {
     stop("Updated users not supported.")
   }
 
-  ret <- run_smc(input_timeseries, hyperparameters, smc_options,
-                 sort_matrices, sort_counts)
+  ret <- run_smc(
+    input_timeseries, hyperparameters, smc_options,
+    sort_matrices, sort_counts
+  )
 
   class(ret) <- "BayesMallowsSMC2"
   ret
 }
-

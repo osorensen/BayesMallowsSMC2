@@ -48,11 +48,7 @@
 #'   can be used to inspect the evolution of rankings over time but
 #'   substantially increases memory usage. Defaults to `FALSE`.
 #' @param backward_sampling Logical specifying whether to use Particle Gibbs with
-#'   Backward Simulation (PGBS) during the rejuvenation step. PGBS greatly improves
-#'   mixing for static parameters like cluster probabilities and the error rate by
-#'   eliminating path degeneracy in the latent variables. Since user preferences are
-#'   conditionally independent, this utilizes $\\mathcal{O}(S)$ independent 
-#'   Backward Simulation (CPF-IBS). Defaults to `FALSE`.
+#'   Backward Simulation (PGBS) \insertCite{Whiteley2010Discussion,Lindsten2013Backward}{BayesMallowsSMC2} during the rejuvenation step. Defaults to `FALSE`.
 #'
 #' @details
 #' The SMC2 algorithm uses a nested particle filter structure:
@@ -78,6 +74,9 @@
 #'   [compute_sequentially()].
 #'
 #' @seealso [compute_sequentially()], [set_hyperparameters()]
+#'
+#' @references
+#' \insertAllCited{}
 #'
 #' @export
 #'
@@ -127,11 +126,12 @@
 #' )
 #'
 set_smc_options <- function(
-    n_particles = 1000, n_particle_filters = 50, max_particle_filters = 10000,
-    resampling_threshold = n_particles / 2, doubling_threshold = .2,
-    max_rejuvenation_steps = 20,
-    metric = "footrule", resampler = "multinomial",
-    latent_rank_proposal = "uniform", verbose = FALSE,
-    trace = FALSE, trace_latent = FALSE, backward_sampling = FALSE) {
+  n_particles = 1000, n_particle_filters = 50, max_particle_filters = 10000,
+  resampling_threshold = n_particles / 2, doubling_threshold = .2,
+  max_rejuvenation_steps = 20,
+  metric = "footrule", resampler = "multinomial",
+  latent_rank_proposal = "uniform", verbose = FALSE,
+  trace = FALSE, trace_latent = FALSE, backward_sampling = FALSE
+) {
   as.list(environment())
 }

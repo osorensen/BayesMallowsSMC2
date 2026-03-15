@@ -76,11 +76,7 @@ can be used to inspect the evolution of rankings over time but
 substantially increases memory usage. Defaults to \code{FALSE}.}
 
 \item{backward_sampling}{Logical specifying whether to use Particle Gibbs with
-Backward Simulation (PGBS) during the rejuvenation step. PGBS greatly improves
-mixing for static parameters like cluster probabilities and the error rate by
-eliminating path degeneracy in the latent variables. Since user preferences are
-conditionally independent, this utilizes $\\mathcal{O}(S)$ independent
-Backward Simulation (CPF-IBS). Defaults to \code{FALSE}.}
+Backward Simulation (PGBS) \insertCite{Whiteley2010Discussion,Lindsten2013Backward}{BayesMallowsSMC2} during the rejuvenation step. Defaults to \code{FALSE}.}
 }
 \value{
 A list containing all the specified options, suitable for passing to
@@ -156,6 +152,9 @@ mod_partial <- compute_sequentially(
   )
 )
 
+}
+\references{
+\insertAllCited{}
 }
 \seealso{
 \code{\link[=compute_sequentially]{compute_sequentially()}}, \code{\link[=set_hyperparameters]{set_hyperparameters()}}

@@ -91,6 +91,9 @@ to the posterior distribution as new ranking or preference data arrives. The
 algorithm automatically performs resampling and rejuvenation steps when the
 effective sample size drops below the specified threshold.
 
+Rejuvenation steps can optionally use Particle Gibbs with Backward Simulation
+\\insertCite{Whiteley2010Discussion,Lindsten2013Backward}{BayesMallowsSMC2}, enabled via the \code{backward_sampling} argument in \code{\link[=set_smc_options]{set_smc_options()}}.
+
 The returned object has S3 methods for printing (\link{print.BayesMallowsSMC2}),
 summarizing (\link{summary.BayesMallowsSMC2}), and plotting (\link{plot.BayesMallowsSMC2}).
 For visualization of parameter evolution over time, see \code{\link[=trace_plot]{trace_plot()}}.
@@ -111,5 +114,7 @@ plot(mod, parameter = "alpha")
 
 }
 \references{
+\insertAllCited{}
+
 \insertRef{10.1214/25-BA1564}{BayesMallowsSMC2}
 }
