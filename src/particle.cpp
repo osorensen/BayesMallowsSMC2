@@ -111,39 +111,36 @@ void Particle::run_particle_filter(
 
 void Particle::assemble_backward_trajectory(
     unsigned int T, const std::unique_ptr<Resampler> &resampler) {
+  // Pre-allocate storage so each column/element is written in O(1) rather than
+  // prepending with insert_cols/insert_rows, which would be O(T^2) overall.
+  unsigned int n_items = parameters.rho.n_rows;
+  bool multi_cluster = (parameters.tau.size() > 1);
 
   ParticleFilter new_reference;
   new_reference.log_weight.resize(T + 1);
+  new_reference.latent_rankings.set_size(n_items, T + 1);
+  if (multi_cluster) {
+    new_reference.cluster_assignments.set_size(T + 1);
+    new_reference.cluster_probabilities.set_size(parameters.tau.size(), T + 1);
+    new_reference.index = uvec(T + 1, fill::zeros);
+  }
 
   for (int t = T; t >= 0; --t) {
-    arma::vec current_weights = stored_weights[t];
-
-    // Sample a single index b_t based on current_weights
-    arma::ivec counts = resampler->resample(1, current_weights);
+    // Draw b_t independently from the forward filtering weights W_t.
+    // Because cross-sectional users are conditionally independent given the
+    // static parameters, the backward weights reduce to W_t exactly.
+    arma::ivec counts = resampler->resample(1, stored_weights[t]);
     unsigned int b_t = arma::as_scalar(arma::find(counts > 0, 1));
 
-    if (new_reference.latent_rankings.is_empty()) {
-      new_reference.latent_rankings =
-          particle_filters[b_t].latent_rankings.col(t);
-      if (parameters.tau.size() > 1) {
-        new_reference.cluster_assignments =
-            particle_filters[b_t].cluster_assignments.subvec(t, t);
-        new_reference.cluster_probabilities =
-            particle_filters[b_t].cluster_probabilities.cols(t, t);
-        new_reference.index = uvec(T + 1, fill::zeros);
-      }
-    } else {
-      new_reference.latent_rankings.insert_cols(
-          0, particle_filters[b_t].latent_rankings.col(t));
-      if (parameters.tau.size() > 1) {
-        new_reference.cluster_assignments.insert_rows(
-            0, particle_filters[b_t].cluster_assignments.subvec(t, t));
-        new_reference.cluster_probabilities.insert_cols(
-            0, particle_filters[b_t].cluster_probabilities.cols(t, t));
-      }
-    }
-
+    new_reference.latent_rankings.col(t) =
+        particle_filters[b_t].latent_rankings.col(t);
     new_reference.log_weight(t) = particle_filters[b_t].log_weight(t);
+    if (multi_cluster) {
+      new_reference.cluster_assignments(t) =
+          particle_filters[b_t].cluster_assignments(t);
+      new_reference.cluster_probabilities.col(t) =
+          particle_filters[b_t].cluster_probabilities.col(t);
+    }
   }
 
   this->particle_filters[0] = new_reference;

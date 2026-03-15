@@ -100,6 +100,7 @@ bool Particle::rejuvenate(unsigned int T, const Options &options,
     this->log_normalized_particle_filter_weights =
         proposal_particle.log_normalized_particle_filter_weights;
     this->particle_filters = proposal_particle.particle_filters;
+    this->stored_weights = proposal_particle.stored_weights;
     this->logz = proposal_particle.logz;
     accepted = true;
   } else {
@@ -143,6 +144,10 @@ bool Particle::rejuvenate(unsigned int T, const Options &options,
     } else {
       sample_particle_filter();
     }
+  } else if (options.backward_sampling) {
+    // For single-cluster models, apply backward sampling to update the
+    // reference trajectory from the current particle filter weights.
+    this->assemble_backward_trajectory(T, resampler);
   }
 
   return accepted;

@@ -40,7 +40,6 @@ test_that("compute_sequentially works with complete data", {
                                   resampler = "systematic")
   )
   alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
-  alpha_hat <- weighted.mean(x = as.numeric(mod$alpha), w = mod$importance_weights)
   expect_gt(alpha_hat, .02)
   expect_lt(alpha_hat, .05)
 })
