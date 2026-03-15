@@ -11,3 +11,4 @@
 ^CRAN-SUBMISSION$
 ^agents\.md$
 ^.*\.code-workspace$
+^agents\.md$

@@ -123,9 +123,6 @@ bool Particle::rejuvenate(unsigned int T, const Options &options,
         this->particle_filters[this->conditioned_particle_filter];
     gibbs_particle.particle_filters[0].cluster_probabilities = mat{};
 
-    // In standard CPF we trace the lineage of conditioned_particle_filter.
-    // In backward sampling, we run a completely unconditioned forward particle
-    // filter!
     bool requires_conditional = !options.backward_sampling;
     for (size_t t{}; t < T + 1; t++) {
       gibbs_particle.run_particle_filter(

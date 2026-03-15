@@ -111,54 +111,21 @@ void Particle::run_particle_filter(
 
 void Particle::assemble_backward_trajectory(
     unsigned int T, const std::unique_ptr<Resampler> &resampler) {
-  // We need to assemble a new reference trajectory traversing backwards from T
-  // to 0. The independence property means the transition density factors out of
-  // backward weights. Thus B_t is simply drawn from W_t independently.
 
   ParticleFilter new_reference;
   new_reference.log_weight.resize(T + 1);
-
-  // Note: cluster_probabilities has size [cluster x (number of users up to T)]
-  // We need to build these up. Actually, they are built horizontally (joined).
-  // So we insert columns at the beginning.
 
   for (int t = T; t >= 0; --t) {
     arma::vec current_weights = stored_weights[t];
 
     // Sample a single index b_t based on current_weights
     arma::ivec counts = resampler->resample(1, current_weights);
-    unsigned int b_t =
-        arma::as_scalar(arma::find(counts > 0, 1)); // The chosen index
-
-    unsigned int num_users_at_t =
-        particle_filters[b_t]
-            .latent_rankings.col(t)
-            .n_cols; // actually wait, .col(t) returns EXACTLY 1 column.
+    unsigned int b_t = arma::as_scalar(arma::find(counts > 0, 1));
 
     if (new_reference.latent_rankings.is_empty()) {
       new_reference.latent_rankings =
           particle_filters[b_t].latent_rankings.col(t);
       if (parameters.tau.size() > 1) {
-        // The total number of users up to time t in the forward pass is the
-        // length of cluster_assignments
-        unsigned int end_idx =
-            particle_filters[b_t].cluster_assignments.n_elem - 1;
-        // Since .col(t) grabbed 1 column, but what if multiple users were
-        // processed? Ah! In `run_particle_filter`, `proposal.proposal` is
-        // joined! Wait, `pf.latent_rankings = join_horiz(pf.latent_rankings,
-        // proposal.proposal);` If `proposal.proposal` had 5 columns at time
-        // `t`, then `pf.latent_rankings` grew by 5 columns! So
-        // `latent_rankings` columns correspond to USERS, not timepoints! So
-        // `col(t)` is completely wrong! We need to extract the columns
-        // corresponding to time `t`. Let's look at `sample_latent_rankings`.
-        // For complete data, 1 user = 1 row = 1 timepoint! Wait... for mixture
-        // models, see test: `compute_sequentially(mixtures[1:50,])`. `mixtures`
-        // has 1 row per user. So `n_timepoints` = 50. At each timepoint, 1 user
-        // is processed. So `proposal.proposal.n_cols` = 1. Thus
-        // `latent_rankings` has exactly 1 column per timepoint.
-        // `num_users_at_t` is always 1! SO WHY DID IT SEGFAULT? Because
-        // `col(t)` returns exactly 1 column, `num_users_at_t` is 1. Let's check
-        // `start_idx`.
         new_reference.cluster_assignments =
             particle_filters[b_t].cluster_assignments.subvec(t, t);
         new_reference.cluster_probabilities =
