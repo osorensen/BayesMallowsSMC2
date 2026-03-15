@@ -1,23 +1,24 @@
 #pragma once
-#include <RcppArmadillo.h>
-#include <vector>
-#include "prior.h"
 #include "data.h"
+#include "distances.h"
 #include "options.h"
 #include "partition_functions.h"
-#include "distances.h"
+#include "prior.h"
 #include "resampler.h"
+#include <RcppArmadillo.h>
+#include <vector>
 
-struct StaticParameters{
+struct StaticParameters {
   StaticParameters() {}
-  StaticParameters(const arma::vec& alpha, const arma::umat& rho, const arma::vec& tau);
-  StaticParameters(const Prior& prior);
+  StaticParameters(const arma::vec &alpha, const arma::umat &rho,
+                   const arma::vec &tau);
+  StaticParameters(const Prior &prior);
   arma::vec alpha;
   arma::umat rho;
   arma::vec tau;
 };
 
-struct ParticleFilter{
+struct ParticleFilter {
   ParticleFilter() {}
   ~ParticleFilter() = default;
   arma::umat latent_rankings{};
@@ -27,48 +28,48 @@ struct ParticleFilter{
   arma::mat cluster_probabilities{};
 };
 
-struct Particle{
+struct Particle {
   Particle() {}
-  Particle(const Options& options, const StaticParameters& parameters,
-           const std::unique_ptr<PartitionFunction>& pfun);
+  Particle(const Options &options, const StaticParameters &parameters,
+           const std::unique_ptr<PartitionFunction> &pfun);
   ~Particle() = default;
   StaticParameters parameters;
   std::vector<ParticleFilter> particle_filters;
   double log_importance_weight{};
   arma::vec log_incremental_likelihood{};
   Rcpp::NumericVector log_normalized_particle_filter_weights;
-  void run_particle_filter(
-      unsigned int t, const Prior& prior, const std::unique_ptr<Data>& data,
-      const std::unique_ptr<PartitionFunction>& pfun,
-      const std::unique_ptr<Distance>& distfun,
-      const std::unique_ptr<Resampler>& resampler,
-      std::string latent_rank_proposal,
-      bool conditional = false);
-  bool rejuvenate(
-    unsigned int T, const Options& options, const Prior& prior,
-    const std::unique_ptr<Data>& data,
-    const std::unique_ptr<PartitionFunction>& pfun,
-    const std::unique_ptr<Distance>& distfun,
-    const std::unique_ptr<Resampler>& resampler,
-    const arma::vec& alpha_sd
-  );
+  void run_particle_filter(unsigned int t, const Prior &prior,
+                           const std::unique_ptr<Data> &data,
+                           const std::unique_ptr<PartitionFunction> &pfun,
+                           const std::unique_ptr<Distance> &distfun,
+                           const std::unique_ptr<Resampler> &resampler,
+                           std::string latent_rank_proposal,
+                           bool conditional = false);
+  bool rejuvenate(unsigned int T, const Options &options, const Prior &prior,
+                  const std::unique_ptr<Data> &data,
+                  const std::unique_ptr<PartitionFunction> &pfun,
+                  const std::unique_ptr<Distance> &distfun,
+                  const std::unique_ptr<Resampler> &resampler,
+                  const arma::vec &alpha_sd);
   int conditioned_particle_filter{};
   void sample_particle_filter();
   arma::vec logz{};
   std::vector<arma::vec> stored_weights;
-  void assemble_backward_trajectory(unsigned int T, const std::unique_ptr<Resampler>& resampler);
+  void
+  assemble_backward_trajectory(unsigned int T,
+                               const std::unique_ptr<Resampler> &resampler);
 };
 
-std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior,
-                                             const std::unique_ptr<PartitionFunction>& pfun);
-std::vector<ParticleFilter> create_particle_filters(const Options& options);
-arma::vec normalize_log_importance_weights(const std::vector<Particle>& particle_vector);
+std::vector<Particle>
+create_particle_vector(const Options &options, const Prior &prior,
+                       const std::unique_ptr<PartitionFunction> &pfun);
+std::vector<ParticleFilter> create_particle_filters(const Options &options);
+arma::vec
+normalize_log_importance_weights(const std::vector<Particle> &particle_vector);
 double log_marginal_likelihood_increment(
-    const std::vector<Particle>& particle_vector,
-    const arma::vec& normalized_log_importance_weights,
-    int t
-);
-arma::vec compute_alpha_stddev(const std::vector<Particle>& particle_vector);
-int find_unique_alphas(const std::vector<Particle>& particle_vector);
+    const std::vector<Particle> &particle_vector,
+    const arma::vec &normalized_log_importance_weights, int t);
+arma::vec compute_alpha_stddev(const std::vector<Particle> &particle_vector);
+int find_unique_alphas(const std::vector<Particle> &particle_vector);
 
-double compute_log_Z(const std::vector<ParticleFilter>& pf, int max_time);
+double compute_log_Z(const std::vector<ParticleFilter> &pf, int max_time);
