@@ -7,3 +7,4 @@ parameter_trace
 *.tar.gz
 README.html
 _codeql_detected_source_root
+.agents/
