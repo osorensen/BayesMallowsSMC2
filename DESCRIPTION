@@ -1,7 +1,7 @@
 Package: BayesMallowsSMC2
 Type: Package
 Title: Nested Sequential Monte Carlo for the Bayesian Mallows Model
-Version: 0.2.1
+Version: 0.3.0
 Authors@R: c(person("Oystein", "Sorensen",
                     email = "oystein.sorensen.1985@gmail.com",
                     role = c("aut", "cre"),
@@ -17,7 +17,6 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 LinkingTo: 
     Rcpp,
     RcppArmadillo
@@ -32,3 +31,4 @@ Suggests:
     label.switching (>= 1.8)
 RdMacros: Rdpack
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

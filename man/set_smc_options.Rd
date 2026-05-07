@@ -16,7 +16,8 @@ set_smc_options(
   latent_rank_proposal = "uniform",
   verbose = FALSE,
   trace = FALSE,
-  trace_latent = FALSE
+  trace_latent = FALSE,
+  use_backward_simulation = FALSE
 )
 }
 \arguments{
@@ -73,6 +74,10 @@ diagnostic purposes but increases memory usage. Defaults to \code{FALSE}.}
 complete set of latent rankings for each particle at each timepoint. This
 can be used to inspect the evolution of rankings over time but
 substantially increases memory usage. Defaults to \code{FALSE}.}
+
+\item{use_backward_simulation}{Logical specifying whether to use
+Particle Gibbs with Backward Simulation (PG-BSi) during the rejuvenation
+step. Defaults to \code{FALSE}.}
 }
 \value{
 A list containing all the specified options, suitable for passing to

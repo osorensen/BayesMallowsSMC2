@@ -47,6 +47,9 @@
 #'   complete set of latent rankings for each particle at each timepoint. This
 #'   can be used to inspect the evolution of rankings over time but
 #'   substantially increases memory usage. Defaults to `FALSE`.
+#' @param use_backward_simulation Logical specifying whether to use
+#'   Particle Gibbs with Backward Simulation (PG-BSi) during the rejuvenation
+#'   step. Defaults to `FALSE`.
 #'
 #' @details
 #' The SMC2 algorithm uses a nested particle filter structure:

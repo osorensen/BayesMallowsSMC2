@@ -10,11 +10,11 @@
 
 ## Submission notes
 
-This is a resubmission to fix test failures reported on CRAN checks for the BayesMallowsSMC2 package.
+This is a major feature release (0.3.0) for the BayesMallowsSMC2 package.
 
 ### Changes in this version
 
-* Adjusted numerical tolerance in `test-compute_sequentially_partial.R` (line 11) to account for platform-specific differences in Monte Carlo results. The test was failing on r-oldrel-macos and noLD platforms due to slight variations in the computed alpha_hat value (0.046 vs expected > 0.06). The tolerance has been relaxed from 0.06 to 0.04 to accommodate these platform differences while still ensuring the test validates the expected behavior.
+* Introduced Particle Gibbs with Backward Simulation (PG-BSi) during the rejuvenation step for mixture models via the `use_backward_simulation` option in `set_smc_options()`. This eliminates path degeneracy during conditional particle filtering, vastly improving the effective sample size and sampling efficiency.
 
 ## Previous submission
 
