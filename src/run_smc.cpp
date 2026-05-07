@@ -45,8 +45,7 @@ Rcpp::List run_smc(
     reporter.report_time(t);
 
     for(auto& p : particle_vector) {
-      p.run_particle_filter(t, prior, data, pfun, distfun, resampler,
-                            options.latent_rank_proposal);
+      p.run_particle_filter(t, prior, data, pfun, distfun, resampler, options);
       p.log_importance_weight += p.log_incremental_likelihood(t);
       p.sample_particle_filter();
     }

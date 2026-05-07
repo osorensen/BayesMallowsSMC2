@@ -126,6 +126,6 @@ set_smc_options <- function(
     max_rejuvenation_steps = 20,
     metric = "footrule", resampler = "multinomial",
     latent_rank_proposal = "uniform", verbose = FALSE,
-    trace = FALSE, trace_latent = FALSE) {
+    trace = FALSE, trace_latent = FALSE, use_backward_simulation = FALSE) {
   as.list(environment())
 }

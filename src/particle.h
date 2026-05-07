@@ -42,7 +42,7 @@ struct Particle{
       const std::unique_ptr<PartitionFunction>& pfun,
       const std::unique_ptr<Distance>& distfun,
       const std::unique_ptr<Resampler>& resampler,
-      std::string latent_rank_proposal,
+      const Options& options,
       bool conditional = false);
   bool rejuvenate(
     unsigned int T, const Options& options, const Prior& prior,
@@ -55,6 +55,8 @@ struct Particle{
   int conditioned_particle_filter{};
   void sample_particle_filter();
   arma::vec logz{};
+  arma::umat reference_latent_rankings{};
+  arma::uvec reference_cluster_assignments{};
 };
 
 std::vector<Particle> create_particle_vector(const Options& options, const Prior& prior,

@@ -75,7 +75,7 @@ bool Particle::rejuvenate(
     prior.alpha_rate * (alpha_proposal - parameters.alpha);
 
   for(size_t t{}; t < T + 1; t++) {
-    proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal);
+    proposal_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options);
   }
 
   log_ratio = sum(proposal_particle.log_incremental_likelihood) -
@@ -107,11 +107,40 @@ bool Particle::rejuvenate(
     parameters.tau = normalise(parameters.tau, 1);
     Particle gibbs_particle(options, this->parameters, pfun);
     gibbs_particle.conditioned_particle_filter = 0;
-    gibbs_particle.particle_filters[0] = this->particle_filters[this->conditioned_particle_filter];
-    gibbs_particle.particle_filters[0].cluster_probabilities = mat{};
+    
+    arma::umat bsi_latent_rankings(prior.n_items, T + 1);
+    arma::uvec bsi_cluster_assignments(T + 1);
+    
+    if (options.use_backward_simulation) {
+      for(size_t t{}; t < T + 1; t++) {
+        vec log_w(this->particle_filters.size());
+        for(size_t s{}; s < this->particle_filters.size(); s++) {
+          log_w(s) = this->particle_filters[s].log_weight(t);
+        }
+        vec w_norm = softmax(log_w);
+        Rcpp::NumericVector probs = Rcpp::as<Rcpp::NumericVector>(Rcpp::wrap(exp(w_norm)));
+        int b_t = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
+        
+        bsi_latent_rankings.col(t) = this->particle_filters[b_t].latent_rankings.col(t);
+        bsi_cluster_assignments(t) = this->particle_filters[b_t].cluster_assignments(t);
+      }
+      gibbs_particle.reference_latent_rankings = bsi_latent_rankings;
+      gibbs_particle.reference_cluster_assignments = bsi_cluster_assignments;
+    } else {
+      gibbs_particle.reference_latent_rankings = this->particle_filters[this->conditioned_particle_filter].latent_rankings;
+      gibbs_particle.reference_cluster_assignments = this->particle_filters[this->conditioned_particle_filter].cluster_assignments;
+    }
+    
+    if (options.use_backward_simulation) {
+      gibbs_particle.particle_filters[0] = ParticleFilter{};
+      gibbs_particle.particle_filters[0].cluster_probabilities = mat{};
+    } else {
+      gibbs_particle.particle_filters[0] = this->particle_filters[this->conditioned_particle_filter];
+      gibbs_particle.particle_filters[0].cluster_probabilities = mat{};
+    }
 
     for(size_t t{}; t < T + 1; t++) {
-      gibbs_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options.latent_rank_proposal, true);
+      gibbs_particle.run_particle_filter(t, prior, data, pfun, distfun, resampler, options, true);
     }
 
     this->log_incremental_likelihood = gibbs_particle.log_incremental_likelihood;

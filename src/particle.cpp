@@ -39,24 +39,35 @@ void Particle::run_particle_filter(
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun,
     const std::unique_ptr<Resampler>& resampler,
-    std::string latent_rank_proposal,
+    const Options& options,
     bool conditional) {
 
   if(t > 0) {
+    int num_to_resample = particle_filters.size();
+    if (conditional && !options.use_backward_simulation) {
+      num_to_resample -= 1;
+    }
     ivec new_counts = resampler->resample(
-      conditional ? particle_filters.size() - 1 : particle_filters.size(),
+      num_to_resample,
       exp(log_normalized_particle_filter_weights));
-    if(conditional) new_counts(0) += 1;
+    if(conditional && !options.use_backward_simulation) new_counts(0) += 1;
     particle_filters = update_vector(new_counts, particle_filters);
   }
 
   unsigned int pf_index{};
   for(auto& pf : particle_filters) {
     auto proposal = sample_latent_rankings(
-      data, t, prior, latent_rank_proposal, parameters, pfun, distfun);
+      data, t, prior, options.latent_rank_proposal, parameters, pfun, distfun);
 
     if(conditional && pf_index == 0) {
-      proposal.proposal = particle_filters[0].latent_rankings.col(t);
+      if (options.use_backward_simulation) {
+        proposal.proposal = this->reference_latent_rankings.col(t);
+        if (prior.n_clusters > 1) {
+          proposal.cluster_assignment = uvec{this->reference_cluster_assignments(t)};
+        }
+      } else {
+        proposal.proposal = particle_filters[0].latent_rankings.col(t);
+      }
     }
 
     double log_prob{};
@@ -74,7 +85,7 @@ void Particle::run_particle_filter(
       pf.cluster_probabilities, proposal.cluster_probabilities
     );
 
-    if(!(conditional && pf_index == 0)) {
+    if(!(conditional && pf_index == 0 && !options.use_backward_simulation)) {
       if(prior.n_clusters > 1) {
         pf.index = join_cols(pf.index, uvec{pf_index});
         pf.cluster_assignments =

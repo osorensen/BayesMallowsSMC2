@@ -18,4 +18,5 @@ struct Options{
   const bool verbose;
   const bool trace;
   const bool trace_latent;
+  const bool use_backward_simulation;
 };
