@@ -19,4 +19,5 @@ struct Options{
   const bool trace;
   const bool trace_latent;
   const bool use_backward_simulation;
+  const std::string error_model;
 };

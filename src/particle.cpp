@@ -7,14 +7,22 @@
 
 using namespace arma;
 
-StaticParameters::StaticParameters(const vec& alpha, const umat& rho, const vec& tau) :
-  alpha { alpha }, rho { rho }, tau { tau } {}
+StaticParameters::StaticParameters(const vec& alpha, const umat& rho, const vec& tau, double epsilon) :
+  alpha { alpha }, rho { rho }, tau { tau }, epsilon { epsilon } {}
 
-StaticParameters::StaticParameters(const Prior& prior) :
+StaticParameters::StaticParameters(const Prior& prior, const Options& options) :
   alpha { Rcpp::rgamma(prior.n_clusters, prior.alpha_shape, 1 / prior.alpha_rate) },
   rho { umat(prior.n_items, prior.n_clusters) },
   tau { normalise(Rcpp::as<vec>(Rcpp::rgamma(prior.n_clusters, prior.cluster_concentration, 1)), 1) }
   {
+    if (options.error_model == "bernoulli") {
+      double max_p = R::pbeta(0.5, prior.kappa_1, prior.kappa_2, 1, 0);
+      double u = R::runif(0, 1) * max_p;
+      epsilon = R::qbeta(u, prior.kappa_1, prior.kappa_2, 1, 0);
+      if (epsilon == 0.0) epsilon = 1e-6;
+    } else {
+      epsilon = 0.0;
+    }
     rho.each_col([&prior](uvec& a){
       a = Rcpp::as<uvec>(Rcpp::sample(prior.n_items, prior.n_items, false));
       });
@@ -57,7 +65,7 @@ void Particle::run_particle_filter(
   unsigned int pf_index{};
   for(auto& pf : particle_filters) {
     auto proposal = sample_latent_rankings(
-      data, t, prior, options.latent_rank_proposal, parameters, pfun, distfun);
+      data, t, prior, options.latent_rank_proposal, options.error_model, parameters, pfun, distfun);
 
     if(conditional && pf_index == 0) {
       if (options.use_backward_simulation) {
@@ -72,13 +80,41 @@ void Particle::run_particle_filter(
 
     double log_prob{};
 
-    for(size_t i{}; i < proposal.proposal.n_cols; i++) {
-      vec log_cluster_contribution(prior.n_clusters);
-      for(size_t c{}; c < prior.n_clusters; c++) {
-        log_cluster_contribution(c) = log(parameters.tau(c)) - this->logz(c) -
-          parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
+    if (options.error_model == "bernoulli" && dynamic_cast<PairwisePreferences*>(data.get())) {
+      PairwisePreferences* pp = dynamic_cast<PairwisePreferences*>(data.get());
+      pairwise_tp new_data = pp->timeseries[t];
+      size_t user_idx = 0;
+      for (auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
+        vec log_cluster_contribution(prior.n_clusters);
+        for(size_t c{}; c < prior.n_clusters; c++) {
+          log_cluster_contribution(c) = log(parameters.tau(c)) - this->logz(c) -
+            parameters.alpha(c) * distfun->d(proposal.proposal.col(user_idx), parameters.rho.col(c));
+        }
+        log_prob += log_sum_exp(log_cluster_contribution);
+
+        int a = 0;
+        int p_n = ndit->second.size();
+        for (auto pair : ndit->second) {
+          unsigned int item_A = pair.first - 1;
+          unsigned int item_B = pair.second - 1;
+          unsigned int rank_A = proposal.proposal(item_A, user_idx);
+          unsigned int rank_B = proposal.proposal(item_B, user_idx);
+          if (rank_A > rank_B) {
+            a++;
+          }
+        }
+        log_prob += a * log(parameters.epsilon / (1.0 - parameters.epsilon)) + p_n * log(1.0 - parameters.epsilon);
+        user_idx++;
       }
-      log_prob += log_sum_exp(log_cluster_contribution);
+    } else {
+      for(size_t i{}; i < proposal.proposal.n_cols; i++) {
+        vec log_cluster_contribution(prior.n_clusters);
+        for(size_t c{}; c < prior.n_clusters; c++) {
+          log_cluster_contribution(c) = log(parameters.tau(c)) - this->logz(c) -
+            parameters.alpha(c) * distfun->d(proposal.proposal.col(i), parameters.rho.col(c));
+        }
+        log_prob += log_sum_exp(log_cluster_contribution);
+      }
     }
 
     pf.cluster_probabilities = join_horiz(
@@ -120,7 +156,7 @@ std::vector<Particle> create_particle_vector(const Options& options, const Prior
   result.reserve(options.n_particles);
 
   for(size_t i{}; i < options.n_particles; i++) {
-    result.push_back(Particle{options, StaticParameters(prior), pfun});
+    result.push_back(Particle{options, StaticParameters(prior, options), pfun});
   }
 
   return result;

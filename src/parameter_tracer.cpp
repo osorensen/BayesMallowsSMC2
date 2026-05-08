@@ -27,6 +27,12 @@ void ParameterTracer::update_trace(const std::vector<Particle>& pvec, int t) {
     }
     tau_traces.push_back(tau);
 
+    vec epsilon(pvec.size());
+    for(size_t i{}; i < pvec.size(); i++) {
+      epsilon(i) = pvec[i].parameters.epsilon;
+    }
+    epsilon_traces.push_back(epsilon);
+
     vec log_importance_weights(pvec.size());
     for(size_t i{}; i < pvec.size(); i++) {
       log_importance_weights(i) = pvec[i].log_importance_weight;

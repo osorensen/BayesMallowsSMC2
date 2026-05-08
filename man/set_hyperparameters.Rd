@@ -9,7 +9,9 @@ set_hyperparameters(
   alpha_shape = 1,
   alpha_rate = 0.5,
   cluster_concentration = 10,
-  n_clusters = 1
+  n_clusters = 1,
+  kappa_1 = 1,
+  kappa_2 = 1
 )
 }
 \arguments{
@@ -26,10 +28,16 @@ distribution for cluster probabilities. Only used when \code{n_clusters > 1}.
 Defaults to 10.}
 
 \item{n_clusters}{Integer defining the number of clusters. Defaults to 1.}
+
+\item{kappa_1}{First shape parameter of the Beta prior distribution for the
+error probability epsilon. Defaults to 1.}
+
+\item{kappa_2}{Second shape parameter of the Beta prior distribution for the
+error probability epsilon. Defaults to 1.}
 }
 \value{
 A list with components \code{n_items}, \code{alpha_shape}, \code{alpha_rate},
-\code{cluster_concentration}, and \code{n_clusters}.
+\code{cluster_concentration}, \code{n_clusters}, \code{kappa_1}, and \code{kappa_2}.
 }
 \description{
 Set the hyperparameters for the Bayesian Mallows model. This function

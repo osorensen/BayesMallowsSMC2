@@ -11,7 +11,7 @@ uvec shuffle_rcpp(const uvec& values_in) {
 
 LatentRankingProposal sample_latent_rankings(
     const std::unique_ptr<Data>& data, unsigned int t, const Prior& prior,
-    std::string latent_rank_proposal,
+    std::string latent_rank_proposal, std::string error_model,
     const StaticParameters& parameters,
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun
@@ -20,7 +20,7 @@ LatentRankingProposal sample_latent_rankings(
     return sample_latent_rankings(r, t, latent_rank_proposal,
                                   parameters, pfun, distfun);
   } else if (PairwisePreferences* pp = dynamic_cast<PairwisePreferences*>(data.get())) {
-    return sample_latent_rankings(pp, t, prior);
+    return sample_latent_rankings(pp, t, prior, error_model);
   } else {
     Rcpp::stop("Unknown type.");
   }
@@ -119,7 +119,7 @@ LatentRankingProposal sample_latent_rankings(
 }
 
 LatentRankingProposal sample_latent_rankings(
-    const PairwisePreferences* data, unsigned int t, const Prior& prior) {
+    const PairwisePreferences* data, unsigned int t, const Prior& prior, std::string error_model) {
   LatentRankingProposal proposal;
   proposal.proposal = umat(prior.n_items, data->timeseries[t].size());
   pairwise_tp new_data = data->timeseries[t];
@@ -128,13 +128,26 @@ LatentRankingProposal sample_latent_rankings(
   size_t proposal_index{};
 
   for(auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
-    umat sort_matrix = new_sort_matrices[ndit->first];
-    int random_index = Rcpp::sample(sort_matrix.n_cols, 1, false)[0] - 1;
+    if (error_model == "bernoulli") {
+      uvec all_items = regspace<uvec>(1, prior.n_items);
+      proposal.proposal.col(proposal_index++) = shuffle_rcpp(all_items);
+      proposal.log_probability = join_vert(
+        proposal.log_probability, vec{-std::lgamma(prior.n_items + 1.0)}
+      );
+    } else {
+      umat sort_matrix = new_sort_matrices[ndit->first];
+      int random_index = Rcpp::sample(sort_matrix.n_cols, 1, false)[0] - 1;
 
-    proposal.proposal.col(proposal_index++) = sort_matrix.col(random_index);
-    proposal.log_probability = join_vert(
-      proposal.log_probability, vec{-log(new_sort_counts[ndit->first])}
-    );
+      uvec ordering = sort_matrix.col(random_index);
+      uvec ranking(prior.n_items);
+      for(size_t i = 0; i < ordering.size(); i++) {
+        ranking(ordering(i) - 1) = i + 1;
+      }
+      proposal.proposal.col(proposal_index++) = ranking;
+      proposal.log_probability = join_vert(
+        proposal.log_probability, vec{-log(new_sort_counts[ndit->first])}
+      );
+    }
   }
 
   return proposal;

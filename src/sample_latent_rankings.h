@@ -12,7 +12,7 @@ struct LatentRankingProposal{
 
 LatentRankingProposal sample_latent_rankings(
   const std::unique_ptr<Data>& data, unsigned int t, const Prior& prior,
-  std::string latent_rank_proposal,
+  std::string latent_rank_proposal, std::string error_model,
   const StaticParameters& parameters,
   const std::unique_ptr<PartitionFunction>& pfun,
   const std::unique_ptr<Distance>& distfun
@@ -24,5 +24,5 @@ LatentRankingProposal sample_latent_rankings(
     const std::unique_ptr<PartitionFunction>& pfun,
     const std::unique_ptr<Distance>& distfun);
 LatentRankingProposal sample_latent_rankings(
-    const PairwisePreferences* data, unsigned int t, const Prior& prior);
+    const PairwisePreferences* data, unsigned int t, const Prior& prior, std::string error_model);
 

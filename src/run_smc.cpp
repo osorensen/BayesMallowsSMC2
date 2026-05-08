@@ -115,6 +115,7 @@ Rcpp::List run_smc(
   mat alpha(prior.n_clusters, particle_vector.size());
   ucube rho(prior.n_items, prior.n_clusters, particle_vector.size());
   mat tau(prior.n_clusters, particle_vector.size());
+  vec epsilon(particle_vector.size());
   cube cluster_probabilities;
   if(prior.n_clusters > 1) {
     cluster_probabilities = cube(particle_vector.size(), particle_vector[0].particle_filters[0].cluster_probabilities.n_cols, prior.n_clusters);
@@ -124,6 +125,7 @@ Rcpp::List run_smc(
     alpha.col(i) = particle_vector[i].parameters.alpha;
     rho.slice(i) = particle_vector[i].parameters.rho;
     tau.col(i) = particle_vector[i].parameters.tau;
+    epsilon(i) = particle_vector[i].parameters.epsilon;
 
     if(prior.n_clusters > 1) {
       cluster_probabilities.row(i) = particle_vector[i].particle_filters[particle_vector[i].conditioned_particle_filter].cluster_probabilities.t();
@@ -134,6 +136,7 @@ Rcpp::List run_smc(
     Rcpp::Named("alpha") = alpha,
     Rcpp::Named("rho") = rho,
     Rcpp::Named("tau") = tau,
+    Rcpp::Named("epsilon") = epsilon,
     Rcpp::Named("cluster_probabilities") = cluster_probabilities,
     Rcpp::Named("ESS") = ESS,
     Rcpp::Named("resampling") = resampling,
@@ -143,6 +146,7 @@ Rcpp::List run_smc(
     Rcpp::Named("alpha_traces") = tracer.alpha_traces,
     Rcpp::Named("rho_traces") = tracer.rho_traces,
     Rcpp::Named("tau_traces") = tracer.tau_traces,
+    Rcpp::Named("epsilon_traces") = tracer.epsilon_traces,
     Rcpp::Named("log_importance_weights_traces") = tracer.log_importance_weights_traces,
     Rcpp::Named("latent_rankings_traces") = tracer.latent_rankings_traces
   );
