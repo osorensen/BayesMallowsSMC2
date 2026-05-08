@@ -16,10 +16,10 @@ StaticParameters::StaticParameters(const Prior& prior, const Options& options) :
   tau { normalise(Rcpp::as<vec>(Rcpp::rgamma(prior.n_clusters, prior.cluster_concentration, 1)), 1) }
   {
     if (options.error_model == "bernoulli") {
-      epsilon = Rcpp::rbeta(1, prior.kappa_1, prior.kappa_2)[0];
-      if (epsilon >= 0.5) {
-         epsilon = 0.4999; // Simple way to handle the truncation for the initial value
-      }
+      double max_p = R::pbeta(0.5, prior.kappa_1, prior.kappa_2, 1, 0);
+      double u = R::runif(0, 1) * max_p;
+      epsilon = R::qbeta(u, prior.kappa_1, prior.kappa_2, 1, 0);
+      if (epsilon == 0.0) epsilon = 1e-6;
     } else {
       epsilon = 0.0;
     }

@@ -145,10 +145,10 @@ bool Particle::rejuvenate(
       int total_p = 0;
       PairwisePreferences* pp = dynamic_cast<PairwisePreferences*>(data.get());
       for (size_t t{}; t < T + 1; t++) {
-        pairwise_tp new_data = pp->timeseries[t];
+        const pairwise_tp& new_data = pp->timeseries[t];
         for (auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
           total_p += ndit->second.size();
-          for (auto pair : ndit->second) {
+          for (const auto& pair : ndit->second) {
             unsigned int item_A = pair.first - 1;
             unsigned int item_B = pair.second - 1;
             unsigned int rank_A = gibbs_particle.reference_latent_rankings(item_A, t);
@@ -161,10 +161,10 @@ bool Particle::rejuvenate(
       }
       int total_b = total_p - total_a;
       
-      double epsilon_prime = 1.0;
-      while (epsilon_prime >= 0.5) {
-        epsilon_prime = Rcpp::rbeta(1, prior.kappa_1 + total_a, prior.kappa_2 + total_b)[0];
-      }
+      double max_p = R::pbeta(0.5, prior.kappa_1 + total_a, prior.kappa_2 + total_b, 1, 0);
+      double u = R::runif(0, 1) * max_p;
+      double epsilon_prime = R::qbeta(u, prior.kappa_1 + total_a, prior.kappa_2 + total_b, 1, 0);
+      if (epsilon_prime == 0.0) epsilon_prime = 1e-6;
       parameters.epsilon = epsilon_prime;
       gibbs_particle.parameters.epsilon = epsilon_prime;
     }

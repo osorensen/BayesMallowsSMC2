@@ -1,4 +1,5 @@
 test_that("Bernoulli error model works with non-transitive preferences", {
+  set.seed(42)
   # Simulate non-transitive pairwise preferences: A > B, B > C, C > A
   # Items: 1 = A, 2 = B, 3 = C
   preferences <- matrix(c(
@@ -34,6 +35,6 @@ test_that("Bernoulli error model works with non-transitive preferences", {
   
   # Assertions
   expect_true(!is.null(mod$epsilon))
-  expect_true(mean(mod$epsilon) > 0)
-  expect_true(mean(mod$epsilon) < 0.5)
+  expect_true(all(mod$epsilon >= 0))
+  expect_true(all(mod$epsilon < 0.5))
 })

@@ -138,7 +138,12 @@ LatentRankingProposal sample_latent_rankings(
       umat sort_matrix = new_sort_matrices[ndit->first];
       int random_index = Rcpp::sample(sort_matrix.n_cols, 1, false)[0] - 1;
 
-      proposal.proposal.col(proposal_index++) = sort_matrix.col(random_index);
+      uvec ordering = sort_matrix.col(random_index);
+      uvec ranking(prior.n_items);
+      for(size_t i = 0; i < ordering.size(); i++) {
+        ranking(ordering(i) - 1) = i + 1;
+      }
+      proposal.proposal.col(proposal_index++) = ranking;
       proposal.log_probability = join_vert(
         proposal.log_probability, vec{-log(new_sort_counts[ndit->first])}
       );
