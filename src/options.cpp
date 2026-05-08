@@ -13,4 +13,5 @@ Options::Options(const Rcpp::List& input_options) :
   verbose{input_options["verbose"]},
   trace{input_options["trace"]},
   trace_latent{input_options["trace_latent"]},
-  use_backward_simulation{input_options["use_backward_simulation"]}{}
+  use_backward_simulation{input_options["use_backward_simulation"]},
+  error_model ( input_options["error_model"] ){}

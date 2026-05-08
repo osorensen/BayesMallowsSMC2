@@ -9,4 +9,6 @@ struct Prior{
   int cluster_concentration;
   int n_clusters;
   int n_items;
+  double kappa_1;
+  double kappa_2;
 };

@@ -10,11 +10,12 @@
 
 struct StaticParameters{
   StaticParameters() {}
-  StaticParameters(const arma::vec& alpha, const arma::umat& rho, const arma::vec& tau);
-  StaticParameters(const Prior& prior);
+  StaticParameters(const arma::vec& alpha, const arma::umat& rho, const arma::vec& tau, double epsilon);
+  StaticParameters(const Prior& prior, const Options& options);
   arma::vec alpha;
   arma::umat rho;
   arma::vec tau;
+  double epsilon;
 };
 
 struct ParticleFilter{

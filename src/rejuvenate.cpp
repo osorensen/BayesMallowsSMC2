@@ -68,7 +68,7 @@ bool Particle::rejuvenate(
     rho_proposal.col(cluster) = leap_and_shift(parameters.rho.col(cluster), cluster, prior);
   }
 
-  Particle proposal_particle(options, StaticParameters{alpha_proposal, rho_proposal, parameters.tau}, pfun);
+  Particle proposal_particle(options, StaticParameters{alpha_proposal, rho_proposal, parameters.tau, parameters.epsilon}, pfun);
 
   double log_ratio{};
   vec additional_terms = prior.alpha_shape * (log(alpha_proposal) - log(parameters.alpha)) -
@@ -86,7 +86,7 @@ bool Particle::rejuvenate(
 
   bool accepted{};
   if(log_ratio > log(R::runif(0, 1))) {
-    this->parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau};
+    this->parameters = StaticParameters{alpha_proposal, rho_proposal, parameters.tau, parameters.epsilon};
     this->conditioned_particle_filter = proposed_particle_filter;
     this->log_incremental_likelihood = proposal_particle.log_incremental_likelihood;
     this->log_normalized_particle_filter_weights = proposal_particle.log_normalized_particle_filter_weights;
@@ -97,14 +97,17 @@ bool Particle::rejuvenate(
     accepted = false;
   }
 
-  if(prior.n_clusters > 1) {
-    uvec cluster_assignments = particle_filters[conditioned_particle_filter].cluster_assignments;
-    uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
+  if(prior.n_clusters > 1 || options.error_model == "bernoulli") {
+    if(prior.n_clusters > 1) {
+      uvec cluster_assignments = particle_filters[conditioned_particle_filter].cluster_assignments;
+      uvec cluster_frequencies = hist(cluster_assignments, regspace<uvec>(0, prior.n_clusters - 1));
 
-    for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
-      parameters.tau(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
+      for(size_t cluster{}; cluster < prior.n_clusters; cluster++) {
+        parameters.tau(cluster) = R::rgamma(cluster_frequencies(cluster) + prior.cluster_concentration, 1.0);
+      }
+      parameters.tau = normalise(parameters.tau, 1);
     }
-    parameters.tau = normalise(parameters.tau, 1);
+    
     Particle gibbs_particle(options, this->parameters, pfun);
     gibbs_particle.conditioned_particle_filter = 0;
     
@@ -122,15 +125,50 @@ bool Particle::rejuvenate(
         int b_t = Rcpp::sample(probs.size(), 1, false, probs, false)[0];
         
         bsi_latent_rankings.col(t) = this->particle_filters[b_t].latent_rankings.col(t);
-        bsi_cluster_assignments(t) = this->particle_filters[b_t].cluster_assignments(t);
+        if (prior.n_clusters > 1) {
+          bsi_cluster_assignments(t) = this->particle_filters[b_t].cluster_assignments(t);
+        }
       }
       gibbs_particle.reference_latent_rankings = bsi_latent_rankings;
-      gibbs_particle.reference_cluster_assignments = bsi_cluster_assignments;
+      if (prior.n_clusters > 1) {
+        gibbs_particle.reference_cluster_assignments = bsi_cluster_assignments;
+      }
     } else {
       gibbs_particle.reference_latent_rankings = this->particle_filters[this->conditioned_particle_filter].latent_rankings;
-      gibbs_particle.reference_cluster_assignments = this->particle_filters[this->conditioned_particle_filter].cluster_assignments;
+      if (prior.n_clusters > 1) {
+        gibbs_particle.reference_cluster_assignments = this->particle_filters[this->conditioned_particle_filter].cluster_assignments;
+      }
     }
     
+    if (options.error_model == "bernoulli" && dynamic_cast<PairwisePreferences*>(data.get())) {
+      int total_a = 0;
+      int total_p = 0;
+      PairwisePreferences* pp = dynamic_cast<PairwisePreferences*>(data.get());
+      for (size_t t{}; t < T + 1; t++) {
+        pairwise_tp new_data = pp->timeseries[t];
+        for (auto ndit = new_data.begin(); ndit != new_data.end(); ++ndit) {
+          total_p += ndit->second.size();
+          for (auto pair : ndit->second) {
+            unsigned int item_A = pair.first - 1;
+            unsigned int item_B = pair.second - 1;
+            unsigned int rank_A = gibbs_particle.reference_latent_rankings(item_A, t);
+            unsigned int rank_B = gibbs_particle.reference_latent_rankings(item_B, t);
+            if (rank_A > rank_B) {
+              total_a++;
+            }
+          }
+        }
+      }
+      int total_b = total_p - total_a;
+      
+      double epsilon_prime = 1.0;
+      while (epsilon_prime >= 0.5) {
+        epsilon_prime = Rcpp::rbeta(1, prior.kappa_1 + total_a, prior.kappa_2 + total_b)[0];
+      }
+      parameters.epsilon = epsilon_prime;
+      gibbs_particle.parameters.epsilon = epsilon_prime;
+    }
+
     if (options.use_backward_simulation) {
       gibbs_particle.particle_filters[0] = ParticleFilter{};
       gibbs_particle.particle_filters[0].cluster_probabilities = mat{};

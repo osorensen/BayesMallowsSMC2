@@ -13,9 +13,13 @@
 #'   distribution for cluster probabilities. Only used when `n_clusters > 1`.
 #'   Defaults to 10.
 #' @param n_clusters Integer defining the number of clusters. Defaults to 1.
+#' @param kappa_1 First shape parameter of the Beta prior distribution for the
+#'   error probability epsilon. Defaults to 1.
+#' @param kappa_2 Second shape parameter of the Beta prior distribution for the
+#'   error probability epsilon. Defaults to 1.
 #'
 #' @return A list with components `n_items`, `alpha_shape`, `alpha_rate`,
-#'   `cluster_concentration`, and `n_clusters`.
+#'   `cluster_concentration`, `n_clusters`, `kappa_1`, and `kappa_2`.
 #' @export
 #'
 #' @examples
@@ -47,7 +51,7 @@
 #'
 set_hyperparameters <- function(
     n_items, alpha_shape = 1, alpha_rate = .5, cluster_concentration = 10,
-    n_clusters = 1) {
+    n_clusters = 1, kappa_1 = 1, kappa_2 = 1) {
   if(missing(n_items)) stop("n_items must be provided")
   as.list(environment())
 }

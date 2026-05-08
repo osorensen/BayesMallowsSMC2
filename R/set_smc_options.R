@@ -50,6 +50,8 @@
 #' @param use_backward_simulation Logical specifying whether to use
 #'   Particle Gibbs with Backward Simulation (PG-BSi) during the rejuvenation
 #'   step. Defaults to `FALSE`.
+#' @param error_model Character string specifying the error model for pairwise
+#'   preferences. Options are `"none"` (default) or `"bernoulli"`.
 #'
 #' @details
 #' The SMC2 algorithm uses a nested particle filter structure:
@@ -129,6 +131,7 @@ set_smc_options <- function(
     max_rejuvenation_steps = 20,
     metric = "footrule", resampler = "multinomial",
     latent_rank_proposal = "uniform", verbose = FALSE,
-    trace = FALSE, trace_latent = FALSE, use_backward_simulation = FALSE) {
+    trace = FALSE, trace_latent = FALSE, use_backward_simulation = FALSE,
+    error_model = "none") {
   as.list(environment())
 }

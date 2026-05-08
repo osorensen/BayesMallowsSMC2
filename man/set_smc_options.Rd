@@ -17,7 +17,8 @@ set_smc_options(
   verbose = FALSE,
   trace = FALSE,
   trace_latent = FALSE,
-  use_backward_simulation = FALSE
+  use_backward_simulation = FALSE,
+  error_model = "none"
 )
 }
 \arguments{
@@ -78,6 +79,9 @@ substantially increases memory usage. Defaults to \code{FALSE}.}
 \item{use_backward_simulation}{Logical specifying whether to use
 Particle Gibbs with Backward Simulation (PG-BSi) during the rejuvenation
 step. Defaults to \code{FALSE}.}
+
+\item{error_model}{Character string specifying the error model for pairwise
+preferences. Options are \code{"none"} (default) or \code{"bernoulli"}.}
 }
 \value{
 A list containing all the specified options, suitable for passing to
